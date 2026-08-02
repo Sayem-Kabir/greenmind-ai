@@ -1,6 +1,6 @@
 import { Button } from "@mui/material";
 
-import type { SensorRecommendation } from "../../services/recommendationEngine";
+import type { SensorRecommendation } from "../../types/recommendation";
 import { useSimulation } from "../../context/SimulationContext";
 
 interface Props {

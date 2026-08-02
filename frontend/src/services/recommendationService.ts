@@ -1,9 +1,10 @@
 import type { Station } from "../types/station";
-import type { SensorRecommendation } from "./recommendationEngine";
+import type { SensorRecommendation } from "../types/recommendation";
 
 interface RecommendationApiResponse {
   count: number;
   simulatedStationCount: number;
+  source: string;
   recommendations: SensorRecommendation[];
 }
 

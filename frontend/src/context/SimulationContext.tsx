@@ -1,7 +1,7 @@
 import { createContext, useContext, useMemo, useState } from "react";
 
 import type { Station } from "../types/station";
-import type { SensorRecommendation } from "../services/recommendationEngine";
+import type { SensorRecommendation } from "../types/recommendation";
 
 interface SimulationContextType {
   simulatedStations: Station[];

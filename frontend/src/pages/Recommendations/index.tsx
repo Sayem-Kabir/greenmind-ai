@@ -16,7 +16,7 @@ import SimulationImpact from "../../components/recommendations/SimulationImpact"
 import SimulationStatus from "../../components/recommendations/SimulationStatus";
 import { useSimulation } from "../../context/SimulationContext";
 import { getRecommendations } from "../../services/recommendationService";
-import type { SensorRecommendation } from "../../services/recommendationEngine";
+import type { SensorRecommendation } from "../../types/recommendation";
 import { explainRecommendation } from "../../utils/explainRecommendation";
 
 export default function Recommendations() {

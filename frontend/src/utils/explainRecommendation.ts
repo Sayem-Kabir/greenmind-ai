@@ -1,4 +1,4 @@
-import type { SensorRecommendation } from "../services/recommendationEngine";
+import type { SensorRecommendation } from "../types/recommendation";
 
 export interface RecommendationExplanation {
   title: string;

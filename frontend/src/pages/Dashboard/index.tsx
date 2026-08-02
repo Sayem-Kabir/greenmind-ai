@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Alert, Box, Grid, Typography } from "@mui/material";
 
 import KpiCard from "../../components/common/KpiCard";
+import OfficialDatasetSummary from "../../components/common/OfficialDatasetSummary";
 import StationSummary from "../../components/common/StationSummary";
 import { getStations } from "../../services/stationService";
 import type { Station } from "../../types/station";
@@ -122,6 +123,8 @@ export default function Dashboard() {
           />
         </Grid>
       </Grid>
+
+      <OfficialDatasetSummary />
 
       <StationSummary
         totalStations={stations.length}

@@ -12,7 +12,10 @@ export function findNearestAirStation(
   stations: Station[],
 ): NearestStationResult {
   const airStations = stations.filter(
-    (station) => station.station_type === 0,
+    (station) =>
+      station.station_type === 0 &&
+      Number.isFinite(station.lat) &&
+      Number.isFinite(station.lng),
   );
 
   if (airStations.length === 0) {
@@ -22,15 +25,10 @@ export function findNearestAirStation(
     };
   }
 
-  let nearestStation = airStations[0];
-  let shortestDistance = calculateDistanceKm(
-    latitude,
-    longitude,
-    nearestStation.lat,
-    nearestStation.lng,
-  );
+  let nearestStation: Station | null = null;
+  let nearestDistance: number | null = null;
 
-  for (const station of airStations.slice(1)) {
+  for (const station of airStations) {
     const distance = calculateDistanceKm(
       latitude,
       longitude,
@@ -38,14 +36,17 @@ export function findNearestAirStation(
       station.lng,
     );
 
-    if (distance < shortestDistance) {
+    if (
+      nearestDistance === null ||
+      distance < nearestDistance
+    ) {
       nearestStation = station;
-      shortestDistance = distance;
+      nearestDistance = distance;
     }
   }
 
   return {
     station: nearestStation,
-    distanceKm: shortestDistance,
+    distanceKm: nearestDistance,
   };
 }

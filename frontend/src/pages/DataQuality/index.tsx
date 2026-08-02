@@ -4,35 +4,60 @@ import {
   Box,
   Card,
   CardContent,
+  Chip,
   Grid,
+  LinearProgress,
   Typography,
 } from "@mui/material";
 
-import StationTable from "../../components/common/StationTable";
-import type { Station } from "../../types/station";
-
 interface DataQualitySummary {
   totalRecords: number;
-  airStations: number;
-  missingPm25: number;
-  missingWindSpeed: number;
-  missingWindDirection: number;
-  invalidCoordinates: number;
-  negativeValuesRemoved: number;
-  pm25Completeness: number;
+  finalRecords: number;
+  stationCount: number;
+  measurementTypeCount: number;
+  duplicateRowsRemoved: number;
+  missingTimestamps: number;
+  missingValuesBeforeCleaning: number;
+  invalidValuesConvertedToMissing: number;
+  missingValuesAfterCleaning: number;
+}
+
+interface MeasurementQuality {
+  measurementType: string;
+  totalRecords: number;
+  validValues: number;
+  missingValues: number;
+  invalidValues: number;
+  completeness: number;
 }
 
 interface DataQualityResponse {
+  source: string;
   summary: DataQualitySummary;
-  stations: Station[];
+  measurementQuality: MeasurementQuality[];
 }
 
 const API_URL = "http://localhost:8000/api/data-quality/";
 
+function getCompletenessColor(
+  completeness: number,
+): "success" | "warning" | "error" {
+  if (completeness >= 99) {
+    return "success";
+  }
+
+  if (completeness >= 90) {
+    return "warning";
+  }
+
+  return "error";
+}
+
 export default function DataQuality() {
-  const [data, setData] = useState<DataQualityResponse | null>(null);
-  const [error, setError] = useState("");
+  const [data, setData] =
+    useState<DataQualityResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     async function loadDataQuality() {
@@ -41,14 +66,18 @@ export default function DataQuality() {
 
         if (!response.ok) {
           throw new Error(
-            `Request failed: ${response.status} ${response.statusText}`,
+            `Request failed: ${response.status}`,
           );
         }
 
-        const result: DataQualityResponse = await response.json();
+        const result: DataQualityResponse =
+          await response.json();
+
         setData(result);
       } catch {
-        setError("Could not load data-quality information.");
+        setError(
+          "Could not load the official data-quality report.",
+        );
       } finally {
         setLoading(false);
       }
@@ -60,13 +89,21 @@ export default function DataQuality() {
   if (loading) {
     return (
       <Box>
-        <Typography variant="h4" sx={{ fontWeight: 700 }}>
+        <Typography
+          variant="h4"
+          sx={{ fontWeight: 700 }}
+        >
           Data Quality
         </Typography>
 
-        <Typography color="text.secondary" sx={{ mt: 2 }}>
-          Loading data-quality report...
+        <Typography
+          color="text.secondary"
+          sx={{ mt: 2, mb: 2 }}
+        >
+          Processing the official 30-day dataset...
         </Typography>
+
+        <LinearProgress />
       </Box>
     );
   }
@@ -74,7 +111,10 @@ export default function DataQuality() {
   if (error || !data) {
     return (
       <Box>
-        <Typography variant="h4" sx={{ fontWeight: 700, mb: 3 }}>
+        <Typography
+          variant="h4"
+          sx={{ fontWeight: 700, mb: 3 }}
+        >
           Data Quality
         </Typography>
 
@@ -85,69 +125,98 @@ export default function DataQuality() {
     );
   }
 
-  const { summary, stations } = data;
+  const { summary, measurementQuality } = data;
 
-  const cards = [
+  const summaryCards = [
     {
-      title: "Total records",
-      value: summary.totalRecords,
-      description: "Monitoring records processed by the backend",
+      title: "Raw measurements",
+      value: summary.totalRecords.toLocaleString(),
+      subtitle: "Rows loaded from the official Excel files",
     },
     {
-      title: "Missing PM2.5",
-      value: summary.missingPm25,
-      description: "Records without a valid PM2.5 value",
+      title: "Final measurements",
+      value: summary.finalRecords.toLocaleString(),
+      subtitle: "Rows retained after validation",
     },
     {
-      title: "Missing wind speed",
-      value: summary.missingWindSpeed,
-      description: "Records without a valid wind-speed value",
+      title: "Air-quality stations",
+      value: summary.stationCount,
+      subtitle: "Official Green Sentinel stations",
     },
     {
-      title: "Invalid coordinates",
-      value: summary.invalidCoordinates,
-      description: "Records outside valid coordinate ranges",
+      title: "Measurement types",
+      value: summary.measurementTypeCount,
+      subtitle: "Environmental variables detected",
     },
     {
-      title: "Negative values removed",
-      value: summary.negativeValuesRemoved,
-      description: "Invalid negative measurements converted to missing values",
+      title: "Invalid values",
+      value: summary.invalidValuesConvertedToMissing,
+      subtitle: "Out-of-range values converted to missing",
     },
     {
-      title: "Missing wind direction",
-      value: summary.missingWindDirection,
-      description: "Records without a valid wind direction",
+      title: "Missing after cleaning",
+      value: summary.missingValuesAfterCleaning,
+      subtitle: "Values remaining unavailable",
     },
   ];
 
   return (
     <Box>
-      <Typography variant="h4" sx={{ fontWeight: 700 }}>
+      <Typography
+        variant="h4"
+        sx={{ fontWeight: 700 }}
+      >
         Data Quality
       </Typography>
 
-      <Typography color="text.secondary" sx={{ mt: 1, mb: 3 }}>
-        Backend validation and cleaning summary for the Green Sentinel dataset.
+      <Typography
+        color="text.secondary"
+        sx={{ mt: 1 }}
+      >
+        Validation and cleaning results for the official
+        30-day Green Sentinel dataset.
       </Typography>
 
+      <Chip
+        label={data.source}
+        color="primary"
+        variant="outlined"
+        sx={{ mt: 2, mb: 3 }}
+      />
+
       <Grid container spacing={3}>
-        {cards.map((card) => (
+        {summaryCards.map((card) => (
           <Grid
             key={card.title}
             size={{ xs: 12, sm: 6, lg: 4 }}
           >
-            <Card variant="outlined" sx={{ height: "100%" }}>
+            <Card
+              variant="outlined"
+              sx={{ height: "100%" }}
+            >
               <CardContent>
-                <Typography color="text.secondary" variant="body2">
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                >
                   {card.title}
                 </Typography>
 
-                <Typography variant="h4" sx={{ mt: 1, fontWeight: 700 }}>
+                <Typography
+                  variant="h4"
+                  sx={{
+                    mt: 1,
+                    fontWeight: 700,
+                  }}
+                >
                   {card.value}
                 </Typography>
 
-                <Typography color="text.secondary" variant="caption">
-                  {card.description}
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                >
+                  {card.subtitle}
                 </Typography>
               </CardContent>
             </Card>
@@ -157,21 +226,157 @@ export default function DataQuality() {
 
       <Card variant="outlined" sx={{ mt: 3 }}>
         <CardContent>
-          <Typography variant="h6" sx={{ fontWeight: 700 }}>
-            PM2.5 completeness
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 700 }}
+          >
+            Cleaning Summary
           </Typography>
 
-          <Typography variant="h3" sx={{ mt: 1 }}>
-            {summary.pm25Completeness.toFixed(1)}%
-          </Typography>
+          <Grid container spacing={2} sx={{ mt: 1 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <Typography color="text.secondary">
+                Duplicate rows removed
+              </Typography>
 
-          <Typography color="text.secondary" sx={{ mt: 1 }}>
-            Valid PM2.5 data across {summary.airStations} air-quality stations.
-          </Typography>
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: 700 }}
+              >
+                {summary.duplicateRowsRemoved}
+              </Typography>
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <Typography color="text.secondary">
+                Missing timestamps
+              </Typography>
+
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: 700 }}
+              >
+                {summary.missingTimestamps}
+              </Typography>
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <Typography color="text.secondary">
+                Missing before cleaning
+              </Typography>
+
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: 700 }}
+              >
+                {summary.missingValuesBeforeCleaning}
+              </Typography>
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <Typography color="text.secondary">
+                Invalid values detected
+              </Typography>
+
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: 700 }}
+              >
+                {summary.invalidValuesConvertedToMissing}
+              </Typography>
+            </Grid>
+          </Grid>
         </CardContent>
       </Card>
 
-      <StationTable stations={stations} />
+      <Typography
+        variant="h5"
+        sx={{
+          mt: 4,
+          mb: 2,
+          fontWeight: 700,
+        }}
+      >
+        Measurement Completeness
+      </Typography>
+
+      <Grid container spacing={3}>
+        {measurementQuality.map((measurement) => {
+          const color = getCompletenessColor(
+            measurement.completeness,
+          );
+
+          return (
+            <Grid
+              key={measurement.measurementType}
+              size={{ xs: 12, md: 6, lg: 4 }}
+            >
+              <Card
+                variant="outlined"
+                sx={{ height: "100%" }}
+              >
+                <CardContent>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      gap: 2,
+                    }}
+                  >
+                    <Typography
+                      variant="h6"
+                      sx={{ fontWeight: 700 }}
+                    >
+                      {measurement.measurementType}
+                    </Typography>
+
+                    <Chip
+                      size="small"
+                      color={color}
+                      label={`${measurement.completeness.toFixed(
+                        2,
+                      )}%`}
+                    />
+                  </Box>
+
+                  <LinearProgress
+                    variant="determinate"
+                    value={measurement.completeness}
+                    color={color}
+                    sx={{
+                      mt: 2,
+                      mb: 2,
+                      height: 8,
+                      borderRadius: 4,
+                    }}
+                  />
+
+                  <Typography variant="body2">
+                    <strong>Total records:</strong>{" "}
+                    {measurement.totalRecords.toLocaleString()}
+                  </Typography>
+
+                  <Typography variant="body2" sx={{ mt: 0.75 }}>
+                    <strong>Valid values:</strong>{" "}
+                    {measurement.validValues.toLocaleString()}
+                  </Typography>
+
+                  <Typography variant="body2" sx={{ mt: 0.75 }}>
+                    <strong>Missing values:</strong>{" "}
+                    {measurement.missingValues.toLocaleString()}
+                  </Typography>
+
+                  <Typography variant="body2" sx={{ mt: 0.75 }}>
+                    <strong>Invalid values:</strong>{" "}
+                    {measurement.invalidValues.toLocaleString()}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          );
+        })}
+      </Grid>
     </Box>
   );
 }
