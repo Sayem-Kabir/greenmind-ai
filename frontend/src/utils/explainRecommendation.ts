@@ -11,60 +11,91 @@ export function explainRecommendation(
 ): RecommendationExplanation {
   const reasons: string[] = [];
 
-  if (recommendation.coverageScore >= 80) {
+  if (recommendation.coverageScore >= 75) {
     reasons.push(
-      `The location has a major monitoring coverage gap and is ${recommendation.distanceKm.toFixed(
+      `The location is ${recommendation.distanceKm.toFixed(
         2,
-      )} km from the nearest air-quality station.`,
+      )} km from the nearest station, indicating a major monitoring gap.`,
     );
-  } else if (recommendation.coverageScore >= 60) {
+  } else if (recommendation.coverageScore >= 45) {
     reasons.push(
-      "The location has limited coverage from the existing monitoring network.",
+      "The area has a moderate monitoring coverage gap.",
+    );
+  } else {
+    reasons.push(
+      "The area has relatively good existing monitoring coverage.",
     );
   }
 
-  if (recommendation.pm25Risk >= 70) {
+  if (recommendation.pollutionRisk >= 65) {
     reasons.push(
-      `The estimated PM2.5 level is relatively high at ${recommendation.estimatedPm25.toFixed(
-        2,
-      )} µg/m³.`,
+      "Estimated PM2.5, PM10, NO₂ and O₃ levels indicate elevated pollution risk.",
     );
-  } else if (recommendation.pm25Risk >= 40) {
+  } else if (recommendation.pollutionRisk >= 40) {
     reasons.push(
-      "The estimated PM2.5 level indicates moderate environmental risk.",
+      "Estimated pollutant levels indicate moderate environmental risk.",
     );
-  }
-
-  if (recommendation.windRisk >= 70) {
+  } else {
     reasons.push(
-      `The estimated wind speed is low at ${recommendation.estimatedWindSpeed.toFixed(
-        2,
-      )} m/s, which may reduce pollutant dispersion.`,
-    );
-  } else if (recommendation.windRisk >= 40) {
-    reasons.push(
-      "Wind conditions may provide only moderate pollutant dispersion.",
+      "Estimated average pollutant levels are comparatively low.",
     );
   }
 
-  if (reasons.length === 0) {
+  if (recommendation.variabilityRisk >= 60) {
     reasons.push(
-      "The location provides a balanced improvement across monitoring coverage and environmental risk indicators.",
+      "Historical measurements fluctuate strongly, so additional monitoring may capture short-term pollution events.",
+    );
+  } else if (recommendation.variabilityRisk >= 30) {
+    reasons.push(
+      "Historical pollution levels show moderate variability.",
+    );
+  } else {
+    reasons.push(
+      "Historical pollution measurements are relatively stable.",
     );
   }
 
-  let confidence = 70;
+  if (recommendation.windRisk >= 60) {
+    reasons.push(
+      "Low average wind conditions may reduce pollutant dispersion.",
+    );
+  }
 
-  if (recommendation.priorityScore >= 85) {
-    confidence = 92;
-  } else if (recommendation.priorityScore >= 75) {
-    confidence = 85;
-  } else if (recommendation.priorityScore >= 65) {
-    confidence = 78;
+  const scoreSpread = Math.max(
+    recommendation.coverageScore,
+    recommendation.pollutionRisk,
+    recommendation.variabilityRisk,
+    recommendation.windRisk,
+  );
+
+  const confidence = Math.min(
+    95,
+    Math.max(
+      55,
+      Math.round(
+        recommendation.priorityScore * 0.7 +
+          scoreSpread * 0.3,
+      ),
+    ),
+  );
+
+  let title = "Balanced monitoring opportunity";
+
+  if (
+    recommendation.coverageScore >= 75 &&
+    recommendation.pollutionRisk >= 55
+  ) {
+    title = "High-priority monitoring blind spot";
+  } else if (recommendation.coverageScore >= 75) {
+    title = "Major monitoring coverage gap";
+  } else if (recommendation.pollutionRisk >= 65) {
+    title = "Elevated environmental risk area";
+  } else if (recommendation.variabilityRisk >= 60) {
+    title = "Highly variable pollution area";
   }
 
   return {
-    title: "Why this location?",
+    title,
     reasons,
     confidence,
   };

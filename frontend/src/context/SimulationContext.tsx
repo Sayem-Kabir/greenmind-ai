@@ -1,10 +1,19 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 
 import type { Station } from "../types/station";
 import type { SensorRecommendation } from "../types/recommendation";
 
+export interface SimulatedStation extends Station {
+  recommendation: SensorRecommendation;
+}
+
 interface SimulationContextType {
-  simulatedStations: Station[];
+  simulatedStations: SimulatedStation[];
 
   simulateRecommendation: (
     recommendation: SensorRecommendation,
@@ -22,14 +31,13 @@ export function SimulationProvider({
   children: React.ReactNode;
 }) {
   const [simulatedStations, setSimulatedStations] = useState<
-    Station[]
+    SimulatedStation[]
   >([]);
 
   function simulateRecommendation(
     recommendation: SensorRecommendation,
   ) {
-    console.log("Simulation clicked", recommendation);
-    const station: Station = {
+    const station: SimulatedStation = {
       id: Date.now(),
 
       name: "Simulated AI Sensor",
@@ -44,12 +52,23 @@ export function SimulationProvider({
       windSpeed: recommendation.estimatedWindSpeed,
 
       windDirection: 0,
+
+      recommendation,
     };
 
-    setSimulatedStations((previous) => [
-      ...previous,
-      station,
-    ]);
+    setSimulatedStations((previous) => {
+      const alreadySimulated = previous.some(
+        (existing) =>
+          existing.lat === recommendation.lat &&
+          existing.lng === recommendation.lng,
+      );
+
+      if (alreadySimulated) {
+        return previous;
+      }
+
+      return [...previous, station];
+    });
   }
 
   function clearSimulation() {

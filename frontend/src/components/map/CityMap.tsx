@@ -1,7 +1,14 @@
 import "leaflet/dist/leaflet.css";
 
 import { useEffect, useMemo, useState } from "react";
-import { Alert, Box, Card, CircularProgress } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Card,
+  CircularProgress,
+  Divider,
+  Typography,
+} from "@mui/material";
 import {
   Circle,
   CircleMarker,
@@ -17,6 +24,7 @@ import SimulatedSensorLayer from "./SimulatedSensorLayer";
 import { useSimulation } from "../../context/SimulationContext";
 import { getStations } from "../../services/stationService";
 import type { Station } from "../../types/station";
+import MapBoundsController from "./MapBoundsController";
 
 function getPm25Color(pm25?: number): string {
   if (pm25 === undefined || pm25 === null) {
@@ -28,6 +36,21 @@ function getPm25Color(pm25?: number): string {
   if (pm25 <= 35) return "#e67e22";
 
   return "#e74c3c";
+}
+
+function formatMeasurement(
+  value: number | undefined,
+  unit: string,
+): string {
+  if (
+    value === undefined ||
+    value === null ||
+    !Number.isFinite(value)
+  ) {
+    return "No data";
+  }
+
+  return `${value.toFixed(2)} ${unit}`;
 }
 
 export default function CityMap() {
@@ -62,7 +85,7 @@ export default function CityMap() {
       <Card
         sx={{
           mt: 4,
-          height: 500,
+          height: 520,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -91,9 +114,12 @@ export default function CityMap() {
     >
       <MapContainer
         center={[47.5316, 21.6273]}
-        zoom={11}
+        zoom={12}
+        minZoom={11}
+        maxZoom={16}
+        scrollWheelZoom
         style={{
-          height: "500px",
+          height: "520px",
           width: "100%",
         }}
       >
@@ -101,6 +127,8 @@ export default function CityMap() {
           attribution="© OpenStreetMap contributors"
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+
+        <MapBoundsController stations={effectiveStations} />
 
         <CoverageHeatmap stations={effectiveStations} />
 
@@ -118,11 +146,15 @@ export default function CityMap() {
                 radius={2000}
                 pathOptions={{
                   color: isSimulated ? "#8e24aa" : "#2e7d32",
-                  fillColor: isSimulated ? "#ba68c8" : "#66bb6a",
+                  fillColor: isSimulated
+                    ? "#ba68c8"
+                    : "#66bb6a",
                   fillOpacity: isSimulated ? 0.08 : 0.03,
                   opacity: isSimulated ? 0.45 : 0.2,
                   weight: isSimulated ? 2 : 1,
-                  dashArray: isSimulated ? "8 6" : undefined,
+                  dashArray: isSimulated
+                    ? "8 6"
+                    : undefined,
                 }}
               />
             );
@@ -146,34 +178,155 @@ export default function CityMap() {
                 weight: 2,
               }}
             >
-              <Popup>
-                <strong>{station.name}</strong>
+              <Popup minWidth={290}>
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: 700 }}
+                >
+                  {station.name}
+                </Typography>
 
-                <br />
-                <br />
+                {station.stationCode && (
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                  >
+                    {station.stationCode}
+                  </Typography>
+                )}
 
-                <b>PM2.5:</b>{" "}
-                {station.station_type === 1
-                  ? "Not applicable"
-                  : station.pm25 ?? "No data"}{" "}
-                {station.station_type === 0 ? "µg/m³" : ""}
+                <Divider sx={{ my: 1.5 }} />
 
-                <br />
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 700 }}
+                >
+                  Air quality
+                </Typography>
 
-                <b>Wind speed:</b>{" "}
-                {station.windSpeed ?? "No data"} m/s
+                {station.station_type === 1 ? (
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mt: 1 }}
+                  >
+                    Air-quality measurements are not applicable
+                    to this surface-water station.
+                  </Typography>
+                ) : (
+                  <>
+                    <Typography variant="body2" sx={{ mt: 1 }}>
+                      <strong>PM2.5:</strong>{" "}
+                      {formatMeasurement(
+                        station.pm25,
+                        "µg/m³",
+                      )}
+                    </Typography>
 
-                <br />
+                    <Typography variant="body2" sx={{ mt: 0.75 }}>
+                      <strong>PM10:</strong>{" "}
+                      {formatMeasurement(
+                        station.pm10,
+                        "µg/m³",
+                      )}
+                    </Typography>
 
-                <b>Wind direction:</b>{" "}
-                {station.windDirection ?? "No data"}°
+                    <Typography variant="body2" sx={{ mt: 0.75 }}>
+                      <strong>NO₂:</strong>{" "}
+                      {formatMeasurement(
+                        station.no2,
+                        "µg/m³",
+                      )}
+                    </Typography>
 
-                <br />
+                    <Typography variant="body2" sx={{ mt: 0.75 }}>
+                      <strong>O₃:</strong>{" "}
+                      {formatMeasurement(
+                        station.o3,
+                        "µg/m³",
+                      )}
+                    </Typography>
 
-                <b>Station type:</b>{" "}
-                {station.station_type === 1
-                  ? "Surface water"
-                  : "Air quality"}
+                    <Typography variant="body2" sx={{ mt: 0.75 }}>
+                      <strong>CO:</strong>{" "}
+                      {formatMeasurement(
+                        station.co,
+                        "µg/m³",
+                      )}
+                    </Typography>
+
+                    <Typography variant="body2" sx={{ mt: 0.75 }}>
+                      <strong>CO₂:</strong>{" "}
+                      {formatMeasurement(
+                        station.co2,
+                        "µg/m³",
+                      )}
+                    </Typography>
+                  </>
+                )}
+
+                <Divider sx={{ my: 1.5 }} />
+
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 700 }}
+                >
+                  Weather conditions
+                </Typography>
+
+                <Typography variant="body2" sx={{ mt: 1 }}>
+                  <strong>Humidity:</strong>{" "}
+                  {formatMeasurement(
+                    station.humidity,
+                    "%",
+                  )}
+                </Typography>
+
+                <Typography variant="body2" sx={{ mt: 0.75 }}>
+                  <strong>Pressure:</strong>{" "}
+                  {formatMeasurement(
+                    station.pressure,
+                    "mbar",
+                  )}
+                </Typography>
+
+                <Typography variant="body2" sx={{ mt: 0.75 }}>
+                  <strong>Wind speed:</strong>{" "}
+                  {formatMeasurement(
+                    station.windSpeed,
+                    "km/h",
+                  )}
+                </Typography>
+
+                <Typography variant="body2" sx={{ mt: 0.75 }}>
+                  <strong>Wind direction:</strong>{" "}
+                  {formatMeasurement(
+                    station.windDirection,
+                    "°",
+                  )}
+                </Typography>
+
+                <Divider sx={{ my: 1.5 }} />
+
+                <Typography variant="body2">
+                  <strong>Station type:</strong>{" "}
+                  {station.station_type === 1
+                    ? "Surface water"
+                    : "Air quality"}
+                </Typography>
+
+                {station.location && (
+                  <Typography variant="body2" sx={{ mt: 0.75 }}>
+                    <strong>Location:</strong>{" "}
+                    {station.location}
+                  </Typography>
+                )}
+
+                <Typography variant="body2" sx={{ mt: 0.75 }}>
+                  <strong>Coordinates:</strong>{" "}
+                  {station.lat.toFixed(5)},{" "}
+                  {station.lng.toFixed(5)}
+                </Typography>
               </Popup>
             </CircleMarker>
           );

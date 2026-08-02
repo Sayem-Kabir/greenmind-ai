@@ -12,6 +12,10 @@ export interface SensorRecommendation {
   estimatedO3: number;
   estimatedWindSpeed: number;
 
+  estimatedPm25Std: number;
+  estimatedPm10Std: number;
+  estimatedNo2Std: number;
+
   coverageScore: number;
 
   pm25Risk: number;
@@ -19,7 +23,18 @@ export interface SensorRecommendation {
   no2Risk: number;
   o3Risk: number;
 
+  pm25VariabilityRisk: number;
+  pm10VariabilityRisk: number;
+  no2VariabilityRisk: number;
+
   pollutionRisk: number;
+  variabilityRisk: number;
   windRisk: number;
+
   priorityScore: number;
+  coverageConfidence: number;
+pollutionConfidence: number;
+variabilityConfidence: number;
+windConfidence: number;
+overallConfidence: number;
 }
