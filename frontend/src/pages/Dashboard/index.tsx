@@ -4,18 +4,28 @@ import {
   Box,
   Chip,
   Grid,
+  Paper,
   Typography,
 } from "@mui/material";
 
 import KpiCard from "../../components/common/KpiCard";
 import OfficialDatasetSummary from "../../components/common/OfficialDatasetSummary";
-import StationSummary from "../../components/common/StationSummary";
 import { getStations } from "../../services/stationService";
 import {
   getTrafficLocations,
   type TrafficLocation,
 } from "../../services/trafficService";
 import type { Station } from "../../types/station";
+
+const OFFICIAL_NOISE_STATION_COUNT = 5;
+const OFFICIAL_GROUNDWATER_STATION_COUNT = 15;
+
+const OFFICIAL_NOISE_RECORD_COUNT = 300;
+const OFFICIAL_GROUNDWATER_RECORD_COUNT = 31_625;
+
+const AVERAGE_DAYTIME_NOISE_DB = 56.57;
+const AVERAGE_NIGHTTIME_NOISE_DB = 48.92;
+const AVERAGE_WATER_TEMPERATURE_C = 13.54;
 
 export default function Dashboard() {
   const [stations, setStations] = useState<Station[]>([]);
@@ -49,14 +59,6 @@ export default function Dashboard() {
     () =>
       stations.filter(
         (station) => station.station_type === 0,
-      ),
-    [stations],
-  );
-
-  const waterStations = useMemo(
-    () =>
-      stations.filter(
-        (station) => station.station_type === 1,
       ),
     [stations],
   );
@@ -129,10 +131,12 @@ export default function Dashboard() {
             color="text.secondary"
             sx={{
               mt: 0.75,
+              maxWidth: 900,
               lineHeight: 1.6,
             }}
           >
-            Current Green Sentinel measurements and DKV
+            Integrated Green Sentinel air, noise and
+            groundwater measurements combined with DKV
             transport activity across Debrecen.
           </Typography>
         </Box>
@@ -156,6 +160,17 @@ export default function Dashboard() {
           />
 
           <Chip
+            label="Air · Noise · Water"
+            size="small"
+            sx={{
+              color: "#2563eb",
+              backgroundColor: "#eff6ff",
+              border: "1px solid #bfdbfe",
+              fontWeight: 700,
+            }}
+          />
+
+          <Chip
             label="DKV Traffic"
             size="small"
             sx={{
@@ -174,56 +189,353 @@ export default function Dashboard() {
         </Alert>
       )}
 
-      <Grid container spacing={2.5}>
-        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <KpiCard
-            title="Monitoring Stations"
-            value={stations.length || "—"}
-            subtitle="Green Sentinel measuring points"
-          />
-        </Grid>
+      <Paper
+        variant="outlined"
+        sx={{
+          p: {
+            xs: 2,
+            md: 2.75,
+          },
+          borderRadius: 2.5,
+          borderColor:
+            "rgba(15, 118, 110, 0.14)",
+          backgroundColor: "#ffffff",
+        }}
+      >
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: 800,
+            color: "#1f2f2b",
+          }}
+        >
+          Monitoring Network and Environmental Indicators
+        </Typography>
 
-        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <KpiCard
-            title="Air-Quality Stations"
-            value={airStations.length || "—"}
-            subtitle="Stations reporting air measurements"
-          />
-        </Grid>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{
+            mt: 0.5,
+            mb: 2.25,
+          }}
+        >
+          Green Sentinel monitoring availability,
+          environmental measurements and DKV transport
+          activity from the official 30-day dataset.
+        </Typography>
 
-        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <KpiCard
-            title="DKV Transport Stops"
-            value={trafficLocations.length || "—"}
-            subtitle={`${highActivityTrafficStops} high-activity locations`}
-          />
-        </Grid>
+        <Grid container spacing={2}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              lg: 3,
+            }}
+          >
+            <KpiCard
+              title="Monitoring Locations"
+              value={stations.length || "—"}
+              subtitle="Green Sentinel measuring points"
+            />
+          </Grid>
 
-        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <KpiCard
-            title="Average PM2.5"
-            value={
-              averagePm25 === null
-                ? "—"
-                : `${averagePm25.toFixed(2)} µg/m³`
-            }
-            subtitle="Average across valid air stations"
-          />
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              lg: 3,
+            }}
+          >
+            <KpiCard
+              title="Air Stations"
+              value={airStations.length || "—"}
+              subtitle={`${validPm25Stations.length} with valid PM2.5`}
+            />
+          </Grid>
+
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              lg: 3,
+            }}
+          >
+            <KpiCard
+              title="Noise Stations"
+              value={OFFICIAL_NOISE_STATION_COUNT}
+              subtitle={`${OFFICIAL_NOISE_RECORD_COUNT.toLocaleString()} noise records`}
+            />
+          </Grid>
+
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              lg: 3,
+            }}
+          >
+            <KpiCard
+              title="Groundwater Stations"
+              value={
+                OFFICIAL_GROUNDWATER_STATION_COUNT
+              }
+              subtitle={`${OFFICIAL_GROUNDWATER_RECORD_COUNT.toLocaleString()} measurements`}
+            />
+          </Grid>
+
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              lg: 3,
+            }}
+          >
+            <KpiCard
+              title="DKV Transport Stops"
+              value={
+                trafficLocations.length || "—"
+              }
+              subtitle={`${highActivityTrafficStops} high-activity locations`}
+            />
+          </Grid>
+
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              lg: 3,
+            }}
+          >
+            <KpiCard
+              title="Average PM2.5"
+              value={
+                averagePm25 === null
+                  ? "—"
+                  : `${averagePm25.toFixed(
+                      2,
+                    )} µg/m³`
+              }
+              subtitle="Across valid air stations"
+            />
+          </Grid>
+
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              lg: 3,
+            }}
+          >
+            <KpiCard
+              title="Average Daytime Noise"
+              value={`${AVERAGE_DAYTIME_NOISE_DB.toFixed(
+                1,
+              )} dB`}
+              subtitle={`Nighttime average ${AVERAGE_NIGHTTIME_NOISE_DB.toFixed(
+                1,
+              )} dB`}
+            />
+          </Grid>
+
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              lg: 3,
+            }}
+          >
+            <KpiCard
+              title="Average Water Temperature"
+              value={`${AVERAGE_WATER_TEMPERATURE_C.toFixed(
+                1,
+              )}°C`}
+              subtitle="Across groundwater measurements"
+            />
+          </Grid>
         </Grid>
-      </Grid>
+      </Paper>
 
       <Box sx={{ mt: 3 }}>
         <OfficialDatasetSummary />
       </Box>
 
-      <StationSummary
-        totalStations={stations.length}
-        airStations={airStations.length}
-        waterStations={waterStations.length}
-        validPm25Stations={
-          validPm25Stations.length
-        }
-      />
+      <Grid
+        container
+        spacing={2.5}
+        sx={{ mt: 0.25 }}
+      >
+        <Grid
+          size={{
+            xs: 12,
+            md: 4,
+          }}
+        >
+          <Paper
+            variant="outlined"
+            sx={{
+              height: "100%",
+              p: 2.25,
+              borderRadius: 2.5,
+              borderColor: "#a7f3d0",
+              backgroundColor: "#ecfdf5",
+            }}
+          >
+            <Typography
+              variant="caption"
+              sx={{
+                color: "#0f766e",
+                fontWeight: 800,
+                letterSpacing: "0.06em",
+              }}
+            >
+              AIR QUALITY
+            </Typography>
+
+            <Typography
+              variant="h5"
+              sx={{
+                mt: 0.75,
+                fontWeight: 800,
+                color: "#0f766e",
+              }}
+            >
+              {averagePm25 === null
+                ? "—"
+                : `${averagePm25.toFixed(
+                    2,
+                  )} µg/m³`}
+            </Typography>
+
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                mt: 0.5,
+                lineHeight: 1.55,
+              }}
+            >
+              Average PM2.5 across currently valid
+              air-quality monitoring stations.
+            </Typography>
+          </Paper>
+        </Grid>
+
+        <Grid
+          size={{
+            xs: 12,
+            md: 4,
+          }}
+        >
+          <Paper
+            variant="outlined"
+            sx={{
+              height: "100%",
+              p: 2.25,
+              borderRadius: 2.5,
+              borderColor: "#ddd6fe",
+              backgroundColor: "#f5f3ff",
+            }}
+          >
+            <Typography
+              variant="caption"
+              sx={{
+                color: "#7c3aed",
+                fontWeight: 800,
+                letterSpacing: "0.06em",
+              }}
+            >
+              NOISE ENVIRONMENT
+            </Typography>
+
+            <Typography
+              variant="h5"
+              sx={{
+                mt: 0.75,
+                fontWeight: 800,
+                color: "#7c3aed",
+              }}
+            >
+              {AVERAGE_DAYTIME_NOISE_DB.toFixed(
+                1,
+              )}{" "}
+              dB
+            </Typography>
+
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                mt: 0.5,
+                lineHeight: 1.55,
+              }}
+            >
+              Average daytime noise. Nighttime
+              average:{" "}
+              {AVERAGE_NIGHTTIME_NOISE_DB.toFixed(
+                1,
+              )}{" "}
+              dB.
+            </Typography>
+          </Paper>
+        </Grid>
+
+        <Grid
+          size={{
+            xs: 12,
+            md: 4,
+          }}
+        >
+          <Paper
+            variant="outlined"
+            sx={{
+              height: "100%",
+              p: 2.25,
+              borderRadius: 2.5,
+              borderColor: "#bfdbfe",
+              backgroundColor: "#eff6ff",
+            }}
+          >
+            <Typography
+              variant="caption"
+              sx={{
+                color: "#2563eb",
+                fontWeight: 800,
+                letterSpacing: "0.06em",
+              }}
+            >
+              GROUNDWATER
+            </Typography>
+
+            <Typography
+              variant="h5"
+              sx={{
+                mt: 0.75,
+                fontWeight: 800,
+                color: "#2563eb",
+              }}
+            >
+              {AVERAGE_WATER_TEMPERATURE_C.toFixed(
+                1,
+              )}
+              °C
+            </Typography>
+
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                mt: 0.5,
+                lineHeight: 1.55,
+              }}
+            >
+              Average groundwater temperature
+              across the processed official
+              measurements.
+            </Typography>
+          </Paper>
+        </Grid>
+      </Grid>
     </Box>
   );
 }

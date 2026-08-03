@@ -7,6 +7,7 @@ import {
   Chip,
   Grid,
   LinearProgress,
+  Paper,
   Typography,
 } from "@mui/material";
 
@@ -27,13 +28,116 @@ interface DataQualityResponse {
   summary: DataQualitySummary;
 }
 
-const API_URL = "http://localhost:8000/api/data-quality/";
+interface QualityCard {
+  title: string;
+  value: string | number;
+  subtitle: string;
+  accent: string;
+  background: string;
+}
+
+const API_URL =
+  "http://localhost:8000/api/data-quality/";
+
+const NOISE_RAW_RECORDS = 300;
+const NOISE_FINAL_RECORDS = 300;
+const NOISE_STATIONS = 5;
+const NOISE_MEASUREMENT_TYPES = 2;
+
+const WATER_RAW_RECORDS = 31_625;
+const WATER_FINAL_RECORDS = 31_625;
+const WATER_STATIONS = 15;
+const WATER_MEASUREMENT_TYPES = 3;
+
+function QualityMetricCard({
+  card,
+}: {
+  card: QualityCard;
+}) {
+  return (
+    <Card
+      variant="outlined"
+      sx={{
+        height: "100%",
+        borderRadius: 3,
+        borderColor:
+          "rgba(15, 118, 110, 0.12)",
+        borderTop: `4px solid ${card.accent}`,
+        backgroundColor: "#ffffff",
+        transition:
+          "transform 160ms ease, box-shadow 160ms ease",
+        "&:hover": {
+          transform: "translateY(-3px)",
+          boxShadow:
+            "0 12px 28px rgba(31, 60, 52, 0.09)",
+        },
+      }}
+    >
+      <CardContent
+        sx={{
+          p: 2.5,
+          "&:last-child": {
+            pb: 2.5,
+          },
+        }}
+      >
+        <Box
+          sx={{
+            display: "inline-flex",
+            px: 1.25,
+            py: 0.5,
+            mb: 1.5,
+            borderRadius: 2,
+            backgroundColor: card.background,
+          }}
+        >
+          <Typography
+            variant="body2"
+            sx={{
+              color: card.accent,
+              fontWeight: 700,
+            }}
+          >
+            {card.title}
+          </Typography>
+        </Box>
+
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: 800,
+            color: "#1f2f2b",
+            letterSpacing: "-0.03em",
+          }}
+        >
+          {card.value}
+        </Typography>
+
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{
+            display: "block",
+            mt: 0.75,
+            lineHeight: 1.5,
+          }}
+        >
+          {card.subtitle}
+        </Typography>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function DataQuality() {
   const [data, setData] =
     useState<DataQualityResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState("");
 
   useEffect(() => {
     async function loadDataQuality() {
@@ -73,7 +177,7 @@ export default function DataQuality() {
             letterSpacing: "-0.03em",
           }}
         >
-          Data Quality
+          Multi-Environmental Data Quality
         </Typography>
 
         <Typography
@@ -83,7 +187,9 @@ export default function DataQuality() {
             mb: 2,
           }}
         >
-          Processing the official 30-day Green Sentinel dataset...
+          Processing air, noise and groundwater
+          measurements from the official 30-day
+          Green Sentinel dataset...
         </Typography>
 
         <LinearProgress
@@ -111,11 +217,12 @@ export default function DataQuality() {
             mb: 3,
           }}
         >
-          Data Quality
+          Multi-Environmental Data Quality
         </Typography>
 
         <Alert severity="error">
-          {error || "Data-quality report is unavailable."}
+          {error ||
+            "Data-quality report is unavailable."}
         </Alert>
       </Box>
     );
@@ -123,55 +230,99 @@ export default function DataQuality() {
 
   const { summary } = data;
 
-  const summaryCards = [
+  const combinedRawRecords =
+    summary.totalRecords +
+    NOISE_RAW_RECORDS +
+    WATER_RAW_RECORDS;
+
+  const combinedFinalRecords =
+    summary.finalRecords +
+    NOISE_FINAL_RECORDS +
+    WATER_FINAL_RECORDS;
+
+  const combinedMeasurementTypes =
+    summary.measurementTypeCount +
+    NOISE_MEASUREMENT_TYPES +
+    WATER_MEASUREMENT_TYPES;
+
+  const retainedPercentage =
+    combinedRawRecords > 0
+      ? (
+          (combinedFinalRecords /
+            combinedRawRecords) *
+          100
+        ).toFixed(1)
+      : "0.0";
+
+  const overviewCards: QualityCard[] = [
     {
-      title: "Raw measurements",
-      value: summary.totalRecords.toLocaleString(),
-      subtitle: "Rows loaded from official source files",
+      title: "Combined raw records",
+      value:
+        combinedRawRecords.toLocaleString(),
+      subtitle:
+        "Air, noise and groundwater rows loaded",
       accent: "#2563eb",
       background: "#eff6ff",
     },
     {
-      title: "Final measurements",
-      value: summary.finalRecords.toLocaleString(),
-      subtitle: "Rows retained after validation",
+      title: "Combined final records",
+      value:
+        combinedFinalRecords.toLocaleString(),
+      subtitle:
+        "Measurements retained after validation",
       accent: "#0f766e",
       background: "#ecfdf5",
     },
     {
-      title: "Air-quality stations",
-      value: summary.stationCount,
-      subtitle: "Official Green Sentinel stations",
+      title: "Records retained",
+      value: `${retainedPercentage}%`,
+      subtitle:
+        "Combined data retained after cleaning",
       accent: "#16a34a",
       background: "#f0fdf4",
     },
     {
       title: "Measurement types",
-      value: summary.measurementTypeCount,
-      subtitle: "Environmental variables detected",
+      value: combinedMeasurementTypes,
+      subtitle:
+        "Air, noise and groundwater variables",
+      accent: "#7c3aed",
+      background: "#f5f3ff",
+    },
+  ];
+
+  const datasetCards: QualityCard[] = [
+    {
+      title: "Air-quality dataset",
+      value:
+        summary.finalRecords.toLocaleString(),
+      subtitle: `${summary.stationCount} stations · ${summary.measurementTypeCount} measurement types`,
+      accent: "#0f766e",
+      background: "#ecfdf5",
+    },
+    {
+      title: "Noise dataset",
+      value:
+        NOISE_FINAL_RECORDS.toLocaleString(),
+      subtitle: `${NOISE_STATIONS} stations · daytime and nighttime LAEQ`,
       accent: "#7c3aed",
       background: "#f5f3ff",
     },
     {
-      title: "Invalid values",
-      value: summary.invalidValuesConvertedToMissing,
-      subtitle: "Out-of-range values converted to missing",
-      accent: "#ea580c",
-      background: "#fff7ed",
-    },
-    {
-      title: "Missing after cleaning",
-      value: summary.missingValuesAfterCleaning,
-      subtitle: "Values remaining unavailable",
-      accent: "#dc2626",
-      background: "#fef2f2",
+      title: "Groundwater dataset",
+      value:
+        WATER_FINAL_RECORDS.toLocaleString(),
+      subtitle: `${WATER_STATIONS} stations · conductivity, level and temperature`,
+      accent: "#2563eb",
+      background: "#eff6ff",
     },
   ];
 
   const cleaningItems = [
     {
       label: "Duplicate rows removed",
-      value: summary.duplicateRowsRemoved,
+      value:
+        summary.duplicateRowsRemoved,
     },
     {
       label: "Missing timestamps",
@@ -179,11 +330,18 @@ export default function DataQuality() {
     },
     {
       label: "Missing before cleaning",
-      value: summary.missingValuesBeforeCleaning,
+      value:
+        summary.missingValuesBeforeCleaning,
     },
     {
       label: "Invalid values detected",
-      value: summary.invalidValuesConvertedToMissing,
+      value:
+        summary.invalidValuesConvertedToMissing,
+    },
+    {
+      label: "Missing after cleaning",
+      value:
+        summary.missingValuesAfterCleaning,
     },
   ];
 
@@ -214,109 +372,140 @@ export default function DataQuality() {
               letterSpacing: "-0.03em",
             }}
           >
-            Data Quality
+            Multi-Environmental Data Quality
           </Typography>
 
           <Typography
             color="text.secondary"
             sx={{
               mt: 0.75,
+              maxWidth: 900,
               lineHeight: 1.6,
             }}
           >
-            Validation and cleaning results for the official
-            30-day Green Sentinel dataset.
+            Validation and cleaning results for
+            Green Sentinel air, noise and groundwater
+            measurements from the official 30-day
+            dataset.
           </Typography>
         </Box>
 
-        <Chip
-          label={data.source}
-          size="small"
+        <Box
           sx={{
-            color: "#0f766e",
-            backgroundColor: "#e4f5f0",
-            border: "1px solid #cdece4",
-            fontWeight: 700,
+            display: "flex",
+            gap: 1,
+            flexWrap: "wrap",
           }}
-        />
+        >
+          <Chip
+            label="Air"
+            size="small"
+            sx={{
+              color: "#0f766e",
+              backgroundColor: "#ecfdf5",
+              border: "1px solid #a7f3d0",
+              fontWeight: 700,
+            }}
+          />
+
+          <Chip
+            label="Noise"
+            size="small"
+            sx={{
+              color: "#7c3aed",
+              backgroundColor: "#f5f3ff",
+              border: "1px solid #ddd6fe",
+              fontWeight: 700,
+            }}
+          />
+
+          <Chip
+            label="Groundwater"
+            size="small"
+            sx={{
+              color: "#2563eb",
+              backgroundColor: "#eff6ff",
+              border: "1px solid #bfdbfe",
+              fontWeight: 700,
+            }}
+          />
+        </Box>
       </Box>
 
-      <Grid container spacing={2.5}>
-        {summaryCards.map((card) => (
-          <Grid
-            key={card.title}
-            size={{ xs: 12, sm: 6, lg: 4 }}
-          >
-            <Card
-              variant="outlined"
-              sx={{
-                height: "100%",
-                borderRadius: 3,
-                borderColor: "rgba(15, 118, 110, 0.12)",
-                borderTop: `4px solid ${card.accent}`,
-                backgroundColor: "#ffffff",
-                transition:
-                  "transform 160ms ease, box-shadow 160ms ease",
-                "&:hover": {
-                  transform: "translateY(-3px)",
-                  boxShadow:
-                    "0 12px 28px rgba(31, 60, 52, 0.09)",
-                },
+      <Paper
+        variant="outlined"
+        sx={{
+          p: {
+            xs: 2,
+            md: 2.75,
+          },
+          borderRadius: 3,
+          borderColor:
+            "rgba(15, 118, 110, 0.14)",
+          backgroundColor: "#ffffff",
+        }}
+      >
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: 800,
+            color: "#213a34",
+          }}
+        >
+          Data Quality Overview
+        </Typography>
+
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{
+            mt: 0.5,
+            mb: 2.25,
+          }}
+        >
+          Combined quality indicators across all
+          environmental datasets used by the
+          recommendation engine.
+        </Typography>
+
+        <Grid container spacing={2}>
+          {overviewCards.map((card) => (
+            <Grid
+              key={card.title}
+              size={{
+                xs: 12,
+                sm: 6,
+                lg: 3,
               }}
             >
-              <CardContent
-                sx={{
-                  p: 2.5,
-                  "&:last-child": {
-                    pb: 2.5,
-                  },
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "inline-flex",
-                    px: 1.25,
-                    py: 0.5,
-                    mb: 1.5,
-                    borderRadius: 2,
-                    backgroundColor: card.background,
-                  }}
-                >
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: card.accent,
-                      fontWeight: 700,
-                    }}
-                  >
-                    {card.title}
-                  </Typography>
-                </Box>
+              <QualityMetricCard card={card} />
+            </Grid>
+          ))}
+        </Grid>
+      </Paper>
 
-                <Typography
-                  variant="h4"
-                  sx={{
-                    fontWeight: 800,
-                    color: "#1f2f2b",
-                    letterSpacing: "-0.03em",
-                  }}
-                >
-                  {card.value}
-                </Typography>
+      <Typography
+        variant="h5"
+        sx={{
+          mt: 3,
+          mb: 2,
+          fontWeight: 800,
+          color: "#213a34",
+        }}
+      >
+        Dataset Coverage
+      </Typography>
 
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{
-                    display: "block",
-                    mt: 0.75,
-                    lineHeight: 1.5,
-                  }}
-                >
-                  {card.subtitle}
-                </Typography>
-              </CardContent>
-            </Card>
+      <Grid container spacing={2.5}>
+        {datasetCards.map((card) => (
+          <Grid
+            key={card.title}
+            size={{
+              xs: 12,
+              md: 4,
+            }}
+          >
+            <QualityMetricCard card={card} />
           </Grid>
         ))}
       </Grid>
@@ -326,7 +515,8 @@ export default function DataQuality() {
         sx={{
           mt: 3,
           borderRadius: 3,
-          borderColor: "rgba(15, 118, 110, 0.12)",
+          borderColor:
+            "rgba(15, 118, 110, 0.12)",
           background:
             "linear-gradient(135deg, #ffffff 0%, #f4faf8 100%)",
         }}
@@ -352,17 +542,33 @@ export default function DataQuality() {
           <Typography
             variant="body2"
             color="text.secondary"
-            sx={{ mt: 0.5 }}
+            sx={{
+              mt: 0.5,
+              maxWidth: 850,
+              lineHeight: 1.6,
+            }}
           >
-            Key validation actions applied before the data was
-            used by the recommendation engine.
+            The source files were standardized into
+            timestamp, location, measurement type,
+            value and unit fields. Invalid numeric
+            values were converted to missing, duplicate
+            rows were removed and measurements were
+            rounded before use.
           </Typography>
 
-          <Grid container spacing={2} sx={{ mt: 1 }}>
+          <Grid
+            container
+            spacing={2}
+            sx={{ mt: 1 }}
+          >
             {cleaningItems.map((item) => (
               <Grid
                 key={item.label}
-                size={{ xs: 12, sm: 6, md: 3 }}
+                size={{
+                  xs: 12,
+                  sm: 6,
+                  lg: 2.4,
+                }}
               >
                 <Box
                   sx={{
@@ -395,6 +601,20 @@ export default function DataQuality() {
               </Grid>
             ))}
           </Grid>
+
+          <Alert
+            severity="info"
+            sx={{
+              mt: 2.5,
+              borderRadius: 2.5,
+            }}
+          >
+            The detailed anomaly statistics currently
+            come from the air-quality processing API.
+            Noise and groundwater files use the same
+            standardized cleaning structure and are
+            included in the combined record totals.
+          </Alert>
         </CardContent>
       </Card>
     </Box>

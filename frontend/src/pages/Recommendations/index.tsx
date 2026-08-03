@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import AirOutlinedIcon from "@mui/icons-material/AirOutlined";
 import DirectionsBusOutlinedIcon from "@mui/icons-material/DirectionsBusOutlined";
-import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
+import SensorsOutlinedIcon from "@mui/icons-material/SensorsOutlined";
+import VolumeUpOutlinedIcon from "@mui/icons-material/VolumeUpOutlined";
+import WaterDropOutlinedIcon from "@mui/icons-material/WaterDropOutlined";
 import {
   Alert,
   Box,
@@ -20,7 +23,11 @@ import SimulationImpact from "../../components/recommendations/SimulationImpact"
 import SimulationStatus from "../../components/recommendations/SimulationStatus";
 import { useSimulation } from "../../context/SimulationContext";
 import { getRecommendations } from "../../services/recommendationService";
-import type { SensorRecommendation } from "../../types/recommendation";
+import type {
+  MonitoringNeed,
+  RecommendationType,
+  SensorRecommendation,
+} from "../../types/recommendation";
 
 const MAX_VISIBLE_RECOMMENDATIONS = 3;
 
@@ -75,6 +82,74 @@ function getConfidenceStyle(confidence: number) {
   };
 }
 
+function getRecommendationLabel(
+  type: RecommendationType,
+  fallback: string,
+): string {
+  switch (type) {
+    case "air_sensor":
+      return "Install air-quality sensor";
+    case "noise_sensor":
+      return "Install noise sensor";
+    case "water_sensor":
+      return "Install groundwater sensor";
+    case "full_station":
+      return "Install full Green Sentinel station";
+    default:
+      return fallback;
+  }
+}
+
+function getMonitoringNeedLabel(
+  need: MonitoringNeed,
+): string {
+  switch (need) {
+    case "air":
+      return "Air quality";
+    case "noise":
+      return "Noise";
+    case "water":
+      return "Groundwater";
+    default:
+      return "Environmental monitoring";
+  }
+}
+
+function getMonitoringNeedColor(
+  need: MonitoringNeed,
+): {
+  color: string;
+  background: string;
+  border: string;
+} {
+  switch (need) {
+    case "air":
+      return {
+        color: "#0f766e",
+        background: "#ecfdf5",
+        border: "#a7f3d0",
+      };
+    case "noise":
+      return {
+        color: "#7c3aed",
+        background: "#f5f3ff",
+        border: "#ddd6fe",
+      };
+    case "water":
+      return {
+        color: "#2563eb",
+        background: "#eff6ff",
+        border: "#bfdbfe",
+      };
+    default:
+      return {
+        color: "#475467",
+        background: "#f2f4f7",
+        border: "#d0d5dd",
+      };
+  }
+}
+
 function formatScore(value: number | undefined): string {
   return `${Math.round(value ?? 0)}/100`;
 }
@@ -123,6 +198,68 @@ function MetricBox({
       >
         {value}
       </Typography>
+    </Box>
+  );
+}
+
+interface DetailRowProps {
+  icon: React.ReactNode;
+  iconColor: string;
+  iconBackground: string;
+  title: string;
+  children: React.ReactNode;
+}
+
+function DetailRow({
+  icon,
+  iconColor,
+  iconBackground,
+  title,
+  children,
+}: DetailRowProps) {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        gap: 1.25,
+        alignItems: "flex-start",
+      }}
+    >
+      <Box
+        sx={{
+          width: 34,
+          height: 34,
+          borderRadius: 2,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: iconColor,
+          backgroundColor: iconBackground,
+          flexShrink: 0,
+        }}
+      >
+        {icon}
+      </Box>
+
+      <Box>
+        <Typography
+          variant="body2"
+          sx={{
+            fontWeight: 700,
+            color: "#344054",
+          }}
+        >
+          {title}
+        </Typography>
+
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ mt: 0.25, lineHeight: 1.55 }}
+        >
+          {children}
+        </Typography>
+      </Box>
     </Box>
   );
 }
@@ -201,34 +338,35 @@ export default function Recommendations() {
               letterSpacing: "-0.03em",
             }}
           >
-            AI Sensor Recommendations
+            AI Monitoring Recommendations
           </Typography>
 
           <Typography
             color="text.secondary"
             sx={{
               mt: 0.75,
-              maxWidth: 880,
+              maxWidth: 920,
               lineHeight: 1.6,
             }}
           >
-            The top three locations are ranked using monitoring
-            coverage, environmental risk, historical variability,
-            low-wind conditions and DKV public-transport activity.
+            GreenMind AI ranks locations for new Green Sentinel
+            infrastructure using air, noise and groundwater suitability,
+            monitoring coverage, environmental conditions and DKV
+            public-transport activity.
           </Typography>
         </Box>
 
         <Chip
-          icon={<DirectionsBusOutlinedIcon />}
-          label="Traffic-aware ranking"
+          icon={<SensorsOutlinedIcon />}
+          label="Multi-environmental ranking"
           size="small"
           sx={{
-            color: "#5b21b6",
-            backgroundColor: "#f3e8ff",
-            border: "1px solid #e9d5ff",
+            color: "#0f766e",
+            backgroundColor: "#ecfdf5",
+            border: "1px solid #a7f3d0",
             fontWeight: 700,
             "& .MuiChip-icon": {
-              color: "#7c3aed",
+              color: "#0f766e",
             },
           }}
         />
@@ -272,7 +410,7 @@ export default function Recommendations() {
           variant="body2"
           color="text.secondary"
         >
-          Ranked by combined environmental and coverage priority
+          Ranked for the next Green Sentinel monitoring investment
         </Typography>
       </Box>
 
@@ -343,6 +481,17 @@ export default function Recommendations() {
                 overallConfidence,
               );
 
+            const monitoringNeedStyle =
+              getMonitoringNeedColor(
+                candidate.primaryMonitoringNeed,
+              );
+
+            const recommendationLabel =
+              getRecommendationLabel(
+                candidate.recommendationType,
+                candidate.recommendedSensor,
+              );
+
             return (
               <Grid
                 key={candidate.id}
@@ -394,7 +543,7 @@ export default function Recommendations() {
                         alignItems:
                           "flex-start",
                         gap: 1.5,
-                        mb: 2,
+                        mb: 1.5,
                       }}
                     >
                       <Box>
@@ -415,9 +564,10 @@ export default function Recommendations() {
                             mt: 0.2,
                             fontWeight: 800,
                             color: "#1f2f2b",
+                            lineHeight: 1.3,
                           }}
                         >
-                          Recommended Location
+                          {recommendationLabel}
                         </Typography>
                       </Box>
 
@@ -456,19 +606,98 @@ export default function Recommendations() {
                       </Box>
                     </Box>
 
-                    <Chip
-                      size="small"
-                      label={priorityStyle.label}
+                    <Box
                       sx={{
-                        alignSelf: "flex-start",
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: 1,
                         mb: 2,
-                        color: priorityStyle.color,
-                        backgroundColor:
-                          priorityStyle.background,
-                        border: `1px solid ${priorityStyle.border}`,
-                        fontWeight: 700,
                       }}
-                    />
+                    >
+                      <Chip
+                        size="small"
+                        label={priorityStyle.label}
+                        sx={{
+                          color: priorityStyle.color,
+                          backgroundColor:
+                            priorityStyle.background,
+                          border: `1px solid ${priorityStyle.border}`,
+                          fontWeight: 700,
+                        }}
+                      />
+
+                      <Chip
+                        size="small"
+                        label={`Primary need: ${getMonitoringNeedLabel(
+                          candidate.primaryMonitoringNeed,
+                        )}`}
+                        sx={{
+                          color: monitoringNeedStyle.color,
+                          backgroundColor:
+                            monitoringNeedStyle.background,
+                          border: `1px solid ${monitoringNeedStyle.border}`,
+                          fontWeight: 700,
+                        }}
+                      />
+                    </Box>
+
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        mb: 1,
+                        color: "#344054",
+                        fontWeight: 800,
+                      }}
+                    >
+                      Environmental suitability
+                    </Typography>
+
+                    <Grid container spacing={1.25}>
+                      <Grid size={{ xs: 4 }}>
+                        <MetricBox
+                          label="Air"
+                          value={formatScore(
+                            candidate.airSuitability,
+                          )}
+                          accent="#0f766e"
+                          background="#ecfdf5"
+                        />
+                      </Grid>
+
+                      <Grid size={{ xs: 4 }}>
+                        <MetricBox
+                          label="Noise"
+                          value={formatScore(
+                            candidate.noiseSuitability,
+                          )}
+                          accent="#7c3aed"
+                          background="#f5f3ff"
+                        />
+                      </Grid>
+
+                      <Grid size={{ xs: 4 }}>
+                        <MetricBox
+                          label="Water"
+                          value={formatScore(
+                            candidate.waterSuitability,
+                          )}
+                          accent="#2563eb"
+                          background="#eff6ff"
+                        />
+                      </Grid>
+                    </Grid>
+
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        mt: 2,
+                        mb: 1,
+                        color: "#344054",
+                        fontWeight: 800,
+                      }}
+                    >
+                      Decision factors
+                    </Typography>
 
                     <Grid container spacing={1.25}>
                       <Grid size={{ xs: 6 }}>
@@ -484,23 +713,23 @@ export default function Recommendations() {
 
                       <Grid size={{ xs: 6 }}>
                         <MetricBox
-                          label="Pollution risk"
-                          value={formatScore(
-                            candidate.pollutionRisk,
-                          )}
-                          accent="#c2410c"
-                          background="#fff7ed"
-                        />
-                      </Grid>
-
-                      <Grid size={{ xs: 6 }}>
-                        <MetricBox
                           label="DKV activity"
                           value={formatScore(
                             trafficActivityScore,
                           )}
                           accent="#6d28d9"
                           background="#f5f3ff"
+                        />
+                      </Grid>
+
+                      <Grid size={{ xs: 6 }}>
+                        <MetricBox
+                          label="Pollution risk"
+                          value={formatScore(
+                            candidate.pollutionRisk,
+                          )}
+                          accent="#c2410c"
+                          background="#fff7ed"
                         />
                       </Grid>
 
@@ -523,167 +752,82 @@ export default function Recommendations() {
                         gap: 1.75,
                       }}
                     >
-                      <Box
-                        sx={{
-                          display: "flex",
-                          gap: 1.25,
-                          alignItems: "flex-start",
-                        }}
+                      <DetailRow
+                        icon={
+                          <LocationOnOutlinedIcon fontSize="small" />
+                        }
+                        iconColor="#0f766e"
+                        iconBackground="#e4f5f0"
+                        title="Monitoring gap"
                       >
-                        <Box
-                          sx={{
-                            width: 34,
-                            height: 34,
-                            borderRadius: 2,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: "#0f766e",
-                            backgroundColor: "#e4f5f0",
-                            flexShrink: 0,
-                          }}
-                        >
-                          <LocationOnOutlinedIcon
-                            fontSize="small"
-                          />
-                        </Box>
+                        {candidate.distanceKm.toFixed(2)} km from{" "}
+                        {candidate.nearestStation}. Air, noise and water
+                        coverage scores are{" "}
+                        {candidate.airCoverageScore},{" "}
+                        {candidate.noiseCoverageScore} and{" "}
+                        {candidate.waterCoverageScore}.
+                      </DetailRow>
 
-                        <Box>
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              fontWeight: 700,
-                              color: "#344054",
-                            }}
-                          >
-                            Monitoring gap
-                          </Typography>
+                      <DetailRow
+                        icon={
+                          <AirOutlinedIcon fontSize="small" />
+                        }
+                        iconColor="#0f766e"
+                        iconBackground="#ecfdf5"
+                        title="Air-quality estimate"
+                      >
+                        PM2.5: {candidate.estimatedPm25.toFixed(2)} µg/m³ ·
+                        PM10: {candidate.estimatedPm10.toFixed(2)} µg/m³ ·
+                        Wind risk: {candidate.windRisk}/100
+                      </DetailRow>
 
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{ mt: 0.25 }}
-                          >
-                            {candidate.distanceKm.toFixed(
+                      <DetailRow
+                        icon={
+                          <VolumeUpOutlinedIcon fontSize="small" />
+                        }
+                        iconColor="#7c3aed"
+                        iconBackground="#f5f3ff"
+                        title="Noise estimate"
+                      >
+                        Daytime:{" "}
+                        {candidate.estimatedDaytimeNoise.toFixed(1)} dB ·
+                        Nighttime:{" "}
+                        {candidate.estimatedNighttimeNoise.toFixed(1)} dB ·
+                        Noise risk: {candidate.noiseRisk}/100
+                      </DetailRow>
+
+                      <DetailRow
+                        icon={
+                          <WaterDropOutlinedIcon fontSize="small" />
+                        }
+                        iconColor="#2563eb"
+                        iconBackground="#eff6ff"
+                        title="Groundwater estimate"
+                      >
+                        Conductivity:{" "}
+                        {candidate.estimatedConductivity.toFixed(2)} mS/cm ·
+                        Level: {candidate.estimatedWaterLevel.toFixed(2)} m ·
+                        Monitoring priority:{" "}
+                        {candidate.waterMonitoringPriority}/100
+                      </DetailRow>
+
+                      <DetailRow
+                        icon={
+                          <DirectionsBusOutlinedIcon fontSize="small" />
+                        }
+                        iconColor="#6d28d9"
+                        iconBackground="#f3e8ff"
+                        title="DKV transport context"
+                      >
+                        {nearestTrafficStop}
+                        {trafficDistanceKm !== undefined &&
+                        trafficDistanceKm !== null
+                          ? ` · ${trafficDistanceKm.toFixed(
                               2,
-                            )}{" "}
-                            km from{" "}
-                            {candidate.nearestStation}
-                          </Typography>
-                        </Box>
-                      </Box>
-
-                      <Box
-                        sx={{
-                          display: "flex",
-                          gap: 1.25,
-                          alignItems: "flex-start",
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            width: 34,
-                            height: 34,
-                            borderRadius: 2,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: "#6d28d9",
-                            backgroundColor: "#f3e8ff",
-                            flexShrink: 0,
-                          }}
-                        >
-                          <DirectionsBusOutlinedIcon
-                            fontSize="small"
-                          />
-                        </Box>
-
-                        <Box>
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              fontWeight: 700,
-                              color: "#344054",
-                            }}
-                          >
-                            DKV transport context
-                          </Typography>
-
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{ mt: 0.25 }}
-                          >
-                            {nearestTrafficStop}
-                            {trafficDistanceKm !==
-                              undefined &&
-                            trafficDistanceKm !== null
-                              ? ` · ${trafficDistanceKm.toFixed(
-                                  2,
-                                )} km away`
-                              : ""}
-                          </Typography>
-
-                          <Typography
-                            variant="caption"
-                            color="text.secondary"
-                          >
-                            Traffic data confidence:{" "}
-                            {trafficConfidence}%
-                          </Typography>
-                        </Box>
-                      </Box>
-
-                      <Box
-                        sx={{
-                          display: "flex",
-                          gap: 1.25,
-                          alignItems: "flex-start",
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            width: 34,
-                            height: 34,
-                            borderRadius: 2,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: "#c2410c",
-                            backgroundColor: "#fff7ed",
-                            flexShrink: 0,
-                          }}
-                        >
-                          <InsightsOutlinedIcon
-                            fontSize="small"
-                          />
-                        </Box>
-
-                        <Box>
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              fontWeight: 700,
-                              color: "#344054",
-                            }}
-                          >
-                            Environmental estimate
-                          </Typography>
-
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{ mt: 0.25 }}
-                          >
-                            PM2.5:{" "}
-                            {candidate.estimatedPm25.toFixed(
-                              2,
-                            )}{" "}
-                            µg/m³ · Wind risk:{" "}
-                            {candidate.windRisk}/100
-                          </Typography>
-                        </Box>
-                      </Box>
+                            )} km away`
+                          : ""}
+                        . Traffic data confidence: {trafficConfidence}%.
+                      </DetailRow>
                     </Box>
 
                     <Box
@@ -696,7 +840,7 @@ export default function Recommendations() {
 
                       <Chip
                         size="small"
-                        label={`${overallConfidence}% confidence`}
+                        label={`${overallConfidence}% overall confidence`}
                         sx={{
                           mb: 2,
                           color:

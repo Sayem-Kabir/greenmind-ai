@@ -28,17 +28,17 @@ interface FormulaItem {
 const methodologySteps: MethodStep[] = [
   {
     number: "01",
-    title: "Green Sentinel data preparation",
+    title: "Multi-environmental data preparation",
     description:
-      "The official 30-day environmental dataset is validated and transformed before it is used by the recommendation engine.",
+      "The official 30-day Green Sentinel air, noise and groundwater files are standardized before analysis.",
     details: [
-      "Loads the official Green Sentinel air-quality station files.",
-      "Parses timestamps and standardizes station and measurement names.",
-      "Converts invalid negative measurements to missing values.",
-      "Preserves missing values rather than inventing environmental readings.",
+      "Loads all available air, noise and subsurface-water source files.",
+      "Standardizes every dataset to timestamp, location, measurement type, value and unit.",
+      "Parses timestamps and converts measurement values to numeric form.",
+      "Converts invalid values to missing instead of inventing measurements.",
       "Removes duplicate rows and invalid timestamps.",
       "Rounds processed measurements for consistent API output.",
-      "Transforms the source records into station-level environmental summaries.",
+      "Creates station-level summaries for air, noise and groundwater.",
     ],
     accent: "#0f766e",
     background: "#ecfdf5",
@@ -47,30 +47,29 @@ const methodologySteps: MethodStep[] = [
     number: "02",
     title: "DKV transport data preparation",
     description:
-      "Monthly DKV stop statistics are transformed into a geographic public-transport activity layer.",
+      "Monthly DKV stop statistics are transformed into a geographic transport-activity layer.",
     details: [
-      "Loads the official list of DKV stops and monthly stop statistics.",
-      "Uses passenger frequency, passengers entering, passengers leaving and vehicle occupancy.",
-      "Converts invalid passenger values into valid missing or zero values.",
-      "Normalizes each transport indicator to a comparable scale.",
-      "Calculates one Traffic Activity Score from 0 to 100.",
+      "Loads the official DKV stop list and monthly service statistics.",
+      "Uses passenger frequency, passengers entering and passengers leaving.",
+      "Normalizes transport indicators to a comparable 0–100 scale.",
+      "Calculates one Traffic Activity Score for every stop.",
       "Combines duplicate platforms into one representative stop location.",
-      "Links the activity score with the stop latitude and longitude.",
+      "Links each score to the corresponding latitude and longitude.",
     ],
     accent: "#6d28d9",
     background: "#f5f3ff",
   },
   {
     number: "03",
-    title: "Debrecen candidate grid",
+    title: "Candidate location grid",
     description:
-      "The city boundary is used to create valid candidate locations for future environmental sensors.",
+      "A geographic grid is generated across Debrecen and each point is evaluated as a possible monitoring location.",
     details: [
-      "Generates a geographic grid covering the Debrecen administrative area.",
-      "Uses the Debrecen GeoJSON boundary to identify valid city locations.",
-      "Excludes points outside the defined city boundary.",
-      "Evaluates each remaining point as a possible sensor location.",
-      "Keeps recommended locations separated to avoid clustering.",
+      "Generates candidate coordinates across the configured Debrecen area.",
+      "Calculates distance from existing air, noise and groundwater monitoring locations.",
+      "Measures a separate coverage gap for every environmental domain.",
+      "Keeps final recommendations at least two kilometres apart.",
+      "Prevents the Top 5 from clustering in one part of the city.",
     ],
     accent: "#2563eb",
     background: "#eff6ff",
@@ -79,62 +78,61 @@ const methodologySteps: MethodStep[] = [
     number: "04",
     title: "Spatial estimation with IDW",
     description:
-      "Environmental conditions at candidate locations are estimated from nearby stations through inverse-distance weighting.",
+      "Conditions at candidate locations are estimated from nearby measurements through inverse-distance weighting.",
     details: [
-      "Selects up to five nearby valid air-quality stations.",
-      "Gives closer stations more influence than distant stations.",
+      "Selects nearby valid monitoring stations for each environmental domain.",
+      "Gives closer stations greater influence than distant stations.",
       "Uses the inverse-distance weighting rule 1 / distance².",
-      "Ignores measurements beyond the configured interpolation distance.",
-      "Estimates PM2.5, PM10, NO₂, O₃ and wind speed separately.",
-      "Estimates historical pollutant variability from 30-day standard deviations.",
+      "Ignores observations beyond the configured interpolation distance.",
+      "Estimates PM2.5, PM10, NO₂, O₃, wind speed and pollutant variability.",
+      "Estimates daytime noise, nighttime noise, conductivity, water level and water temperature.",
     ],
     accent: "#0284c7",
     background: "#f0f9ff",
   },
   {
     number: "05",
-    title: "Traffic influence estimation",
+    title: "Domain suitability calculation",
     description:
-      "Nearby DKV stops influence each candidate according to their activity and distance from the proposed sensor location.",
+      "Air, noise and groundwater are scored independently so different environmental needs remain visible.",
     details: [
-      "Finds DKV stops within the configured transport search radius.",
-      "Weights nearby stops using inverse-distance weighting.",
-      "Gives greater influence to busy stops located close to the candidate.",
-      "Calculates a local Traffic Activity Score from 0 to 100.",
-      "Records the nearest DKV stop and its distance.",
-      "Calculates transport-data confidence using stop count, effective contributors and distance.",
-    ],
-    accent: "#7c3aed",
-    background: "#faf5ff",
-  },
-  {
-    number: "06",
-    title: "Risk and confidence calculation",
-    description:
-      "Each candidate receives interpretable environmental, coverage and transport indicators before final ranking.",
-    details: [
-      "Coverage gap reflects distance from the nearest existing air-quality sensor.",
-      "Pollution risk combines PM2.5, PM10, NO₂ and O₃.",
-      "Variability risk represents historical pollutant fluctuation.",
-      "Low-wind risk highlights weaker pollutant dispersion.",
-      "Traffic risk represents nearby DKV public-transport activity.",
-      "Overall confidence combines Green Sentinel and DKV data support.",
+      "Air suitability combines air coverage, pollution, historical variability and low-wind risk.",
+      "Noise suitability combines noise coverage, measured noise risk and nearby DKV activity.",
+      "Groundwater suitability combines groundwater coverage and monitoring priority.",
+      "Noise receives direct transport influence because public transport is closely related to urban noise exposure.",
+      "The highest domain score becomes the primary monitoring need.",
     ],
     accent: "#c2410c",
     background: "#fff7ed",
   },
   {
-    number: "07",
-    title: "Dynamic simulation",
+    number: "06",
+    title: "Full-station priority and confidence",
     description:
-      "A selected recommendation can be added as a virtual sensor and the network is recalculated.",
+      "The three suitability scores are combined into one explainable priority for a complete Green Sentinel station.",
     details: [
-      "The selected recommendation becomes a simulated air-quality station.",
-      "The frontend sends simulated sensor locations to the FastAPI backend.",
-      "Official and simulated stations are combined into one effective network.",
-      "Coverage, interpolation, risk and confidence values are recalculated.",
-      "The remaining recommendations are ranked again.",
-      "The interface displays the updated Top 3 recommendation locations.",
+      "Overall priority combines air suitability, noise suitability and groundwater suitability.",
+      "Noise receives substantial weight because only five locations contain noise measurements.",
+      "Air confidence reflects pollution, variability and wind-data support.",
+      "Noise and groundwater confidence reflect nearby station count, effective contributors and distance.",
+      "DKV confidence reflects nearby stop availability and proximity.",
+      "Priority and confidence remain separate so a high-value location can still show limited data support.",
+    ],
+    accent: "#ea580c",
+    background: "#fff7ed",
+  },
+  {
+    number: "07",
+    title: "Dynamic network simulation",
+    description:
+      "A recommendation can be added as a virtual full Green Sentinel station and the network is recalculated.",
+    details: [
+      "The selected recommendation becomes a simulated multi-environmental station.",
+      "The frontend sends simulated station coordinates to the FastAPI backend.",
+      "Official and simulated stations form one effective monitoring network.",
+      "Coverage, suitability, priority and confidence are recalculated.",
+      "Remaining locations are ranked again.",
+      "The interface displays the updated Top 3 recommendations and network impact.",
     ],
     accent: "#16a34a",
     background: "#f0fdf4",
@@ -143,67 +141,49 @@ const methodologySteps: MethodStep[] = [
 
 const priorityFormula: FormulaItem[] = [
   {
-    label: "Coverage gap",
-    weight: "35%",
+    label: "Air suitability",
+    weight: "40%",
     color: "#0f766e",
     background: "#ecfdf5",
   },
   {
-    label: "Pollution risk",
-    weight: "25%",
-    color: "#c2410c",
-    background: "#fff7ed",
-  },
-  {
-    label: "DKV transport activity",
-    weight: "15%",
-    color: "#6d28d9",
+    label: "Noise suitability",
+    weight: "40%",
+    color: "#7c3aed",
     background: "#f5f3ff",
   },
   {
-    label: "Historical variability",
-    weight: "15%",
+    label: "Groundwater suitability",
+    weight: "20%",
     color: "#2563eb",
     background: "#eff6ff",
-  },
-  {
-    label: "Low-wind risk",
-    weight: "10%",
-    color: "#15803d",
-    background: "#f0fdf4",
   },
 ];
 
 const confidenceFormula: FormulaItem[] = [
   {
-    label: "Coverage certainty",
-    weight: "30%",
+    label: "Air-data confidence",
+    weight: "40%",
     color: "#0f766e",
     background: "#ecfdf5",
   },
   {
-    label: "Pollution certainty",
+    label: "Noise-data confidence",
     weight: "25%",
-    color: "#c2410c",
-    background: "#fff7ed",
-  },
-  {
-    label: "DKV traffic certainty",
-    weight: "20%",
-    color: "#6d28d9",
+    color: "#7c3aed",
     background: "#f5f3ff",
   },
   {
-    label: "Variability certainty",
-    weight: "15%",
+    label: "Groundwater-data confidence",
+    weight: "20%",
     color: "#2563eb",
     background: "#eff6ff",
   },
   {
-    label: "Wind certainty",
-    weight: "10%",
-    color: "#15803d",
-    background: "#f0fdf4",
+    label: "DKV traffic confidence",
+    weight: "15%",
+    color: "#6d28d9",
+    background: "#faf5ff",
   },
 ];
 
@@ -356,9 +336,7 @@ export default function Methodology() {
               lineHeight: 1.6,
             }}
           >
-            GreenMind AI combines official Green Sentinel measurements,
-            DKV public-transport activity and spatial coverage analysis to
-            rank possible environmental sensor locations in Debrecen.
+            GreenMind AI combines official Green Sentinel air, noise and groundwater measurements with DKV public-transport activity and spatial coverage analysis to rank locations for complete environmental monitoring stations in Debrecen.
           </Typography>
         </Box>
 
@@ -381,7 +359,7 @@ export default function Methodology() {
           />
 
           <Chip
-            label="Traffic-aware"
+            label="Air · Noise · Water"
             size="small"
             sx={{
               color: "#6d28d9",
@@ -402,9 +380,7 @@ export default function Methodology() {
           backgroundColor: "#f0f9ff",
         }}
       >
-        Recommendation coordinates are not hardcoded. Every result is
-        calculated from the current monitoring network, environmental
-        measurements, DKV activity and simulated sensors.
+        Recommendation coordinates are not hardcoded. Every result is calculated from air, noise and groundwater coverage, interpolated measurements, DKV activity and simulated stations.
       </Alert>
 
       <Grid container spacing={2.5}>
@@ -533,8 +509,8 @@ export default function Methodology() {
       <Grid container spacing={2.5} sx={{ mt: 0 }}>
         <Grid size={{ xs: 12, lg: 6 }}>
           <FormulaCard
-            title="Traffic-Aware Priority Score"
-            subtitle="The final score measures how valuable a new monitoring sensor could be at each candidate location."
+            title="Full-Station Priority Score"
+            subtitle="The final priority combines separate air, noise and groundwater suitability scores for a complete Green Sentinel station."
             items={priorityFormula}
           />
         </Grid>
@@ -542,14 +518,14 @@ export default function Methodology() {
         <Grid size={{ xs: 12, lg: 6 }}>
           <FormulaCard
             title="Overall Confidence"
-            subtitle="Confidence is separate from priority and measures how strongly the available data supports the recommendation."
+            subtitle="Confidence is separate from priority and measures how strongly air, noise, groundwater and DKV data support the recommendation."
             items={confidenceFormula}
           />
         </Grid>
       </Grid>
 
       <Grid container spacing={2.5} sx={{ mt: 0 }}>
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12, lg: 4 }}>
           <Card
             variant="outlined"
             sx={{
@@ -566,15 +542,15 @@ export default function Methodology() {
                   color: "#213a34",
                 }}
               >
-                Pollution Risk
+                Air Suitability
               </Typography>
 
               <Typography
                 color="text.secondary"
                 sx={{ mt: 0.75 }}
               >
-                Multiple pollutants are combined so the model does not
-                depend on PM2.5 alone.
+                Air monitoring priority combines the spatial gap with
+                estimated pollution, variability and low-wind accumulation.
               </Typography>
 
               <Box
@@ -582,8 +558,8 @@ export default function Methodology() {
                   mt: 2.5,
                   p: 2.25,
                   borderRadius: 2.5,
-                  backgroundColor: "#fff7ed",
-                  border: "1px solid #fed7aa",
+                  backgroundColor: "#ecfdf5",
+                  border: "1px solid #a7f3d0",
                 }}
               >
                 <Typography
@@ -591,26 +567,26 @@ export default function Methodology() {
                   sx={{
                     fontFamily: "monospace",
                     fontWeight: 700,
-                    color: "#9a3412",
+                    color: "#0f766e",
                     lineHeight: 1.8,
                   }}
                 >
-                  Pollution Risk =
+                  Air Suitability =
                   <br />
-                  35% × PM2.5 Risk
+                  45% × Air Coverage Gap
                   <br />
-                  + 25% × PM10 Risk
+                  + 30% × Pollution Risk
                   <br />
-                  + 25% × NO₂ Risk
+                  + 15% × Variability Risk
                   <br />
-                  + 15% × O₃ Risk
+                  + 10% × Low-Wind Risk
                 </Typography>
               </Box>
             </CardContent>
           </Card>
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12, lg: 4 }}>
           <Card
             variant="outlined"
             sx={{
@@ -627,15 +603,74 @@ export default function Methodology() {
                   color: "#213a34",
                 }}
               >
-                Historical Variability
+                Noise Suitability
               </Typography>
 
               <Typography
                 color="text.secondary"
                 sx={{ mt: 0.75 }}
               >
-                Higher variability indicates locations where pollutant
-                levels may fluctuate and require additional observation.
+                Noise monitoring priority emphasizes uncovered areas and
+                incorporates measured noise and nearby DKV activity.
+              </Typography>
+
+              <Box
+                sx={{
+                  mt: 2.5,
+                  p: 2.25,
+                  borderRadius: 2.5,
+                  backgroundColor: "#f5f3ff",
+                  border: "1px solid #ddd6fe",
+                }}
+              >
+                <Typography
+                  component="div"
+                  sx={{
+                    fontFamily: "monospace",
+                    fontWeight: 700,
+                    color: "#7c3aed",
+                    lineHeight: 1.8,
+                  }}
+                >
+                  Noise Suitability =
+                  <br />
+                  50% × Noise Coverage Gap
+                  <br />
+                  + 30% × Noise Risk
+                  <br />
+                  + 20% × DKV Activity
+                </Typography>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid size={{ xs: 12, lg: 4 }}>
+          <Card
+            variant="outlined"
+            sx={{
+              height: "100%",
+              borderRadius: 3,
+              borderColor: "rgba(15, 118, 110, 0.12)",
+            }}
+          >
+            <CardContent sx={{ p: 3 }}>
+              <Typography
+                variant="h5"
+                sx={{
+                  fontWeight: 800,
+                  color: "#213a34",
+                }}
+              >
+                Groundwater Suitability
+              </Typography>
+
+              <Typography
+                color="text.secondary"
+                sx={{ mt: 0.75 }}
+              >
+                Groundwater monitoring priority combines network coverage
+                with conductivity, level and temperature-based monitoring need.
               </Typography>
 
               <Box
@@ -652,17 +687,15 @@ export default function Methodology() {
                   sx={{
                     fontFamily: "monospace",
                     fontWeight: 700,
-                    color: "#1d4ed8",
+                    color: "#2563eb",
                     lineHeight: 1.8,
                   }}
                 >
-                  Variability Risk =
+                  Water Suitability =
                   <br />
-                  50% × PM2.5 Standard Deviation
+                  65% × Water Coverage Gap
                   <br />
-                  + 30% × PM10 Standard Deviation
-                  <br />
-                  + 20% × NO₂ Standard Deviation
+                  + 35% × Monitoring Priority
                 </Typography>
               </Box>
             </CardContent>
@@ -698,8 +731,7 @@ export default function Methodology() {
               lineHeight: 1.6,
             }}
           >
-            Every virtual sensor modifies the effective monitoring
-            network and triggers a complete backend recalculation.
+            Every virtual full station modifies the effective air, noise and groundwater monitoring network and triggers a complete backend recalculation.
           </Typography>
 
           <Box
@@ -800,9 +832,10 @@ export default function Methodology() {
             }}
           >
             {[
-              "The current environmental model uses the official Green Sentinel competition dataset.",
+              "The model uses the official Green Sentinel competition dataset and processed DKV transport data.",
               "DKV statistics represent public-transport activity, not total road traffic volume.",
-              "IDW estimates spatial conditions but does not replace direct physical measurement.",
+              "IDW estimates spatial conditions between monitoring locations but does not replace direct physical measurement.",
+              "Noise and groundwater suitability indicate monitoring need, not confirmed pollution or regulatory exceedance.",
               "The system provides decision support and does not make automatic infrastructure decisions.",
               "Final installation should also consider land ownership, electricity, connectivity, accessibility and regulatory restrictions.",
             ].map((limitation) => (

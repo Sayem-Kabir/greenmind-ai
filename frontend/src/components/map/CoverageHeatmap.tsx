@@ -3,7 +3,6 @@ import { CircleMarker } from "react-leaflet";
 
 import { cityGrid } from "../../services/gridService";
 import type { Station } from "../../types/station";
-import { isInsideUrbanArea } from "../../utils/isInsideUrbanArea";
 import { findNearestAirStation } from "../../utils/nearestStation";
 import { isInsideDebrecenBoundary } from "../../utils/isInsideDebrecenBoundary";
 
