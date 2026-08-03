@@ -37,4 +37,13 @@ pollutionConfidence: number;
 variabilityConfidence: number;
 windConfidence: number;
 overallConfidence: number;
+trafficActivityScore?: number;
+trafficRisk?: number;
+trafficConfidence?: number;
+nearestTrafficStop?: string | null;
+trafficDistanceKm?: number | null;
+nearbyTrafficStopCount?: number;
+nearbyPassengerFrequency?: number;
+nearbyPassengersIn?: number;
+nearbyPassengersOut?: number;
 }
