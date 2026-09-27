@@ -26,12 +26,12 @@ export default function BrandLogo({
         <Typography
           component="span"
           sx={{
-            fontWeight: 900,
+            fontWeight: 700,
             fontSize: compact ? "1.25rem" : "1.45rem",
             letterSpacing: "-0.03em",
             lineHeight: 1.1,
             color: word1Color,
-            fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
+            fontFamily: "inherit",
           }}
         >
           GreenMind
@@ -40,13 +40,13 @@ export default function BrandLogo({
         <Typography
           component="span"
           sx={{
-            fontWeight: 900,
+            fontWeight: 700,
             fontSize: compact ? "1.25rem" : "1.45rem",
             letterSpacing: "-0.02em",
             lineHeight: 1.1,
             color: word2Color,
-            fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
-            textShadow: isMidnight ? "0 0 16px rgba(0, 220, 130, 0.4)" : "none",
+            fontFamily: "inherit",
+            textShadow: "none",
           }}
         >
           AI

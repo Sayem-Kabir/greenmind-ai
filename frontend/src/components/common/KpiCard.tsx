@@ -18,7 +18,7 @@ export default function KpiCard({
           {title}
         </Typography>
 
-        <Typography variant="h4" sx={{ mt: 1, fontWeight: 700 }}>
+        <Typography variant="h4" sx={{ mt: 1, fontWeight: 600 }}>
           {value}
         </Typography>
 

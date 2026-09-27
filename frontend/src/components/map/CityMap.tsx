@@ -254,7 +254,7 @@ const TrafficMarkersLayer = React.memo(function TrafficMarkersLayer({
                   <Box sx={{ flex: 1 }}>
                     <Typography
                       variant="subtitle2"
-                      sx={{ fontWeight: 800, color: "#0f172a", lineHeight: 1.2 }}
+                      sx={{ fontWeight: 600, color: "#0f172a", lineHeight: 1.2 }}
                     >
                       {location.stopName}
                     </Typography>
@@ -269,7 +269,7 @@ const TrafficMarkersLayer = React.memo(function TrafficMarkersLayer({
                     size="small"
                     label={getTrafficLevel(location.trafficActivityScore)}
                     sx={{
-                      fontWeight: 800,
+                      fontWeight: 600,
                       fontSize: "0.68rem",
                       backgroundColor: `${getTrafficColor(location.trafficActivityScore)}15`,
                       color: getTrafficColor(location.trafficActivityScore),
@@ -304,7 +304,7 @@ const TrafficMarkersLayer = React.memo(function TrafficMarkersLayer({
                     <Typography
                       variant="body2"
                       sx={{
-                        fontWeight: 800,
+                        fontWeight: 600,
                         color: getTrafficColor(location.trafficActivityScore),
                       }}
                     >
@@ -328,7 +328,7 @@ const TrafficMarkersLayer = React.memo(function TrafficMarkersLayer({
                     </Typography>
                     <Typography
                       variant="body2"
-                      sx={{ fontWeight: 800, color: "#1e293b" }}
+                      sx={{ fontWeight: 600, color: "#1e293b" }}
                     >
                       {formatNumber(location.passengerFrequencyTotal)}
                     </Typography>
@@ -350,7 +350,7 @@ const TrafficMarkersLayer = React.memo(function TrafficMarkersLayer({
                     </Typography>
                     <Typography
                       variant="body2"
-                      sx={{ fontWeight: 800, color: "#166534" }}
+                      sx={{ fontWeight: 600, color: "#166534" }}
                     >
                       {formatNumber(location.passengersInTotal)}
                     </Typography>
@@ -372,7 +372,7 @@ const TrafficMarkersLayer = React.memo(function TrafficMarkersLayer({
                     </Typography>
                     <Typography
                       variant="body2"
-                      sx={{ fontWeight: 800, color: "#991b1b" }}
+                      sx={{ fontWeight: 600, color: "#991b1b" }}
                     >
                       {formatNumber(location.passengersOutTotal)}
                     </Typography>
@@ -398,7 +398,7 @@ const TrafficMarkersLayer = React.memo(function TrafficMarkersLayer({
                     sx={{
                       height: 18,
                       fontSize: "0.65rem",
-                      fontFamily: "monospace",
+                      fontFamily: "inherit",
                       backgroundColor: "#f8fafc",
                       color: "#64748b",
                       border: "1px solid #e2e8f0",
@@ -487,7 +487,7 @@ const ImplementedStationsLayer = React.memo(function ImplementedStationsLayer({
                     <Typography
                       variant="subtitle2"
                       sx={{
-                        fontWeight: 800,
+                        fontWeight: 600,
                         lineHeight: 1.25,
                         color: "#0f172a",
                         fontSize: "0.88rem",
@@ -513,7 +513,7 @@ const ImplementedStationsLayer = React.memo(function ImplementedStationsLayer({
                     label={station.station_type === 1 ? "💧 Water" : "🍃 Air"}
                     sx={{
                       height: 20,
-                      fontWeight: 800,
+                      fontWeight: 600,
                       fontSize: "0.68rem",
                       backgroundColor:
                         station.station_type === 1 ? "#eff6ff" : "#ecfdf5",
@@ -540,7 +540,7 @@ const ImplementedStationsLayer = React.memo(function ImplementedStationsLayer({
                   >
                     <Typography
                       variant="caption"
-                      sx={{ fontWeight: 800, color: "#1e40af", display: "block" }}
+                      sx={{ fontWeight: 600, color: "#1e40af", display: "block" }}
                     >
                       💧 Surface Water Telemetry
                     </Typography>
@@ -582,7 +582,7 @@ const ImplementedStationsLayer = React.memo(function ImplementedStationsLayer({
                             <Typography
                               variant="caption"
                               sx={{
-                                fontWeight: 800,
+                                fontWeight: 600,
                                 color: aq.badgeColor,
                                 textTransform: "uppercase",
                                 letterSpacing: 0.5,
@@ -597,7 +597,7 @@ const ImplementedStationsLayer = React.memo(function ImplementedStationsLayer({
                               sx={{
                                 height: 18,
                                 fontSize: "0.62rem",
-                                fontWeight: 800,
+                                fontWeight: 600,
                                 backgroundColor: "#ffffff",
                                 color: aq.badgeColor,
                                 border: `1px solid ${aq.borderColor}`,
@@ -614,7 +614,7 @@ const ImplementedStationsLayer = React.memo(function ImplementedStationsLayer({
                             <Typography
                               variant="h6"
                               sx={{
-                                fontWeight: 900,
+                                fontWeight: 700,
                                 color: aq.badgeColor,
                                 lineHeight: 1,
                                 fontSize: "1.15rem",
@@ -626,7 +626,7 @@ const ImplementedStationsLayer = React.memo(function ImplementedStationsLayer({
                             </Typography>
                             <Typography
                               variant="caption"
-                              sx={{ fontWeight: 700, color: "#64748b", fontSize: "0.7rem" }}
+                              sx={{ fontWeight: 600, color: "#64748b", fontSize: "0.7rem" }}
                             >
                               µg/m³
                             </Typography>
@@ -662,7 +662,7 @@ const ImplementedStationsLayer = React.memo(function ImplementedStationsLayer({
                           variant="caption"
                           sx={{
                             color: "#64748b",
-                            fontWeight: 700,
+                            fontWeight: 600,
                             display: "block",
                             fontSize: "0.64rem",
                           }}
@@ -671,7 +671,7 @@ const ImplementedStationsLayer = React.memo(function ImplementedStationsLayer({
                         </Typography>
                         <Typography
                           variant="caption"
-                          sx={{ fontWeight: 800, color: "#1e293b", fontSize: "0.78rem" }}
+                          sx={{ fontWeight: 600, color: "#1e293b", fontSize: "0.78rem" }}
                         >
                           {station.pm10 != null
                             ? `${Number(station.pm10).toFixed(1)} µg/m³`
@@ -691,7 +691,7 @@ const ImplementedStationsLayer = React.memo(function ImplementedStationsLayer({
                           variant="caption"
                           sx={{
                             color: "#64748b",
-                            fontWeight: 700,
+                            fontWeight: 600,
                             display: "block",
                             fontSize: "0.64rem",
                           }}
@@ -700,7 +700,7 @@ const ImplementedStationsLayer = React.memo(function ImplementedStationsLayer({
                         </Typography>
                         <Typography
                           variant="caption"
-                          sx={{ fontWeight: 800, color: "#1e293b", fontSize: "0.78rem" }}
+                          sx={{ fontWeight: 600, color: "#1e293b", fontSize: "0.78rem" }}
                         >
                           {station.no2 != null
                             ? `${Number(station.no2).toFixed(1)} µg/m³`
@@ -720,7 +720,7 @@ const ImplementedStationsLayer = React.memo(function ImplementedStationsLayer({
                           variant="caption"
                           sx={{
                             color: "#64748b",
-                            fontWeight: 700,
+                            fontWeight: 600,
                             display: "block",
                             fontSize: "0.64rem",
                           }}
@@ -729,7 +729,7 @@ const ImplementedStationsLayer = React.memo(function ImplementedStationsLayer({
                         </Typography>
                         <Typography
                           variant="caption"
-                          sx={{ fontWeight: 800, color: "#1e293b", fontSize: "0.78rem" }}
+                          sx={{ fontWeight: 600, color: "#1e293b", fontSize: "0.78rem" }}
                         >
                           {station.o3 != null
                             ? `${Number(station.o3).toFixed(1)} µg/m³`
@@ -749,7 +749,7 @@ const ImplementedStationsLayer = React.memo(function ImplementedStationsLayer({
                           variant="caption"
                           sx={{
                             color: "#64748b",
-                            fontWeight: 700,
+                            fontWeight: 600,
                             display: "block",
                             fontSize: "0.64rem",
                           }}
@@ -758,7 +758,7 @@ const ImplementedStationsLayer = React.memo(function ImplementedStationsLayer({
                         </Typography>
                         <Typography
                           variant="caption"
-                          sx={{ fontWeight: 800, color: "#1e293b", fontSize: "0.78rem" }}
+                          sx={{ fontWeight: 600, color: "#1e293b", fontSize: "0.78rem" }}
                         >
                           {formatCoValue(station.co)}
                         </Typography>
@@ -798,7 +798,7 @@ const ImplementedStationsLayer = React.memo(function ImplementedStationsLayer({
                     <Typography
                       variant="caption"
                       sx={{
-                        fontWeight: 800,
+                        fontWeight: 600,
                         color: "#0f172a",
                         fontSize: "0.72rem",
                         display: "block",
@@ -840,7 +840,7 @@ const ImplementedStationsLayer = React.memo(function ImplementedStationsLayer({
                     <Typography
                       variant="caption"
                       sx={{
-                        fontWeight: 800,
+                        fontWeight: 600,
                         color: "#0f172a",
                         fontSize: "0.72rem",
                         display: "block",
@@ -880,7 +880,7 @@ const ImplementedStationsLayer = React.memo(function ImplementedStationsLayer({
                     <Typography
                       variant="caption"
                       sx={{
-                        fontWeight: 800,
+                        fontWeight: 600,
                         color: "#0f172a",
                         fontSize: "0.72rem",
                         display: "block",
@@ -929,7 +929,7 @@ const ImplementedStationsLayer = React.memo(function ImplementedStationsLayer({
                     sx={{
                       height: 18,
                       fontSize: "0.62rem",
-                      fontFamily: "monospace",
+                      fontFamily: "inherit",
                       backgroundColor: "#f8fafc",
                       color: "#64748b",
                       border: "1px solid #e2e8f0",
@@ -1037,7 +1037,7 @@ export default function CityMap() {
     [trafficLocations],
   );
 
-  const activeTierConfig = TIER_CONFIGS[customPinTier] || TIER_CONFIGS.iot;
+  const activeTierConfig = TIER_CONFIGS[customPinTier] || TIER_CONFIGS.air;
 
   if (loading) {
     return (
@@ -1091,7 +1091,7 @@ export default function CityMap() {
           <Box>
             <Typography
               variant="subtitle1"
-              sx={{ fontWeight: 800, color: "#0f172a", lineHeight: 1.2, fontSize: "1rem" }}
+              sx={{ fontWeight: 600, color: "#0f172a", lineHeight: 1.2, fontSize: "1rem" }}
             >
               🌿 Debrecen Spatial Digital Twin
             </Typography>
@@ -1113,7 +1113,7 @@ export default function CityMap() {
             onClick={() => setIsPlacingCustomPin((prev) => !prev)}
             sx={{
               textTransform: "none",
-              fontWeight: 700,
+              fontWeight: 600,
               fontSize: "0.78rem",
               backgroundColor: isPlacingCustomPin ? activeTierConfig.color : undefined,
               borderColor: activeTierConfig.color,
@@ -1129,7 +1129,7 @@ export default function CityMap() {
 
           {/* Tier Selector Chips */}
           <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
-            {(["reference", "micro", "iot"] as SensorTier[]).map((tierKey) => {
+            {(["air", "water", "noise"] as SensorTier[]).map((tierKey) => {
               const conf = TIER_CONFIGS[tierKey];
               const isSelected = customPinTier === tierKey;
               return (
@@ -1138,11 +1138,11 @@ export default function CityMap() {
                   size="small"
                   clickable
                   label={
-                    tierKey === "reference"
-                      ? "🏛️ Ref (€28k)"
-                      : tierKey === "micro"
-                        ? "📡 Micro (€6.5k)"
-                        : "📶 IoT (€1.2k)"
+                    tierKey === "air"
+                      ? `🌬️ Air (€${(conf.unitCost / 1000).toFixed(1)}k)`
+                      : tierKey === "water"
+                        ? `💧 Water (€${(conf.unitCost / 1000).toFixed(1)}k)`
+                        : `🔊 Noise (€${(conf.unitCost / 1000).toFixed(1)}k)`
                   }
                   onClick={() => {
                     setCustomPinTier(tierKey);
@@ -1151,7 +1151,7 @@ export default function CityMap() {
                     }
                   }}
                   sx={{
-                    fontWeight: isSelected ? 800 : 600,
+                    fontWeight: 600,
                     fontSize: "0.72rem",
                     backgroundColor: isSelected ? conf.bgColor : "#f8fafc",
                     color: isSelected ? conf.color : "#475569",
@@ -1185,7 +1185,7 @@ export default function CityMap() {
         >
           <Typography
             variant="caption"
-            sx={{ fontWeight: 800, color: "#64748b", textTransform: "uppercase", fontSize: "0.68rem" }}
+            sx={{ fontWeight: 600, color: "#64748b", textTransform: "uppercase", fontSize: "0.68rem" }}
           >
             Layers:
           </Typography>
@@ -1277,7 +1277,7 @@ export default function CityMap() {
               sx={{
                 backgroundColor: activeTierConfig.color,
                 color: "#ffffff",
-                fontWeight: 800,
+                fontWeight: 600,
                 fontSize: "0.7rem",
                 height: 20,
               }}
@@ -1289,7 +1289,7 @@ export default function CityMap() {
           <Button
             size="small"
             onClick={() => setIsPlacingCustomPin(false)}
-            sx={{ fontSize: "0.72rem", textTransform: "none", fontWeight: 700, color: activeTierConfig.color }}
+            sx={{ fontSize: "0.72rem", textTransform: "none", fontWeight: 600, color: activeTierConfig.color }}
           >
             Cancel
           </Button>
@@ -1307,7 +1307,7 @@ export default function CityMap() {
           "& .leaflet-popup-content-wrapper": {
             borderRadius: "14px !important",
             boxShadow:
-              "0 12px 28px -4px rgba(15, 23, 42, 0.18), 0 4px 12px -2px rgba(15, 23, 42, 0.08) !important",
+              "none",
             padding: "2px !important",
           },
           "& .leaflet-container a.leaflet-popup-close-button": {
@@ -1383,7 +1383,7 @@ export default function CityMap() {
               })
             }
             onPinAdded={(_lat, _lng, placedTier) => {
-              const conf = TIER_CONFIGS[placedTier] || TIER_CONFIGS.iot;
+              const conf = TIER_CONFIGS[placedTier] || TIER_CONFIGS.air;
               setNotification({
                 message: `Virtual ${conf.name} (${conf.badge}) placed! Drag marker anywhere to test coverage.`,
                 severity: "success",
@@ -1416,7 +1416,7 @@ export default function CityMap() {
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.25, flexWrap: "wrap" }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 800, color: "#0f172a" }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#0f172a" }}>
                 Active Station Telemetry: {cleanLocationName(selectedStation.name)}
               </Typography>
               <Chip
@@ -1427,7 +1427,7 @@ export default function CityMap() {
                     : "🍃 Air Quality Station"
                 }
                 sx={{
-                  fontWeight: 700,
+                  fontWeight: 600,
                   fontSize: "0.72rem",
                   backgroundColor:
                     selectedStation.station_type === 1 ? "#eff6ff" : "#ecfdf5",
@@ -1444,7 +1444,7 @@ export default function CityMap() {
                   size="small"
                   variant="outlined"
                   label={`#${selectedStation.stationCode}`}
-                  sx={{ fontSize: "0.72rem", fontWeight: 700 }}
+                  sx={{ fontSize: "0.72rem", fontWeight: 600 }}
                 />
               )}
             </Box>
@@ -1456,7 +1456,7 @@ export default function CityMap() {
               sx={{
                 textTransform: "none",
                 color: "#64748b",
-                fontWeight: 700,
+                fontWeight: 600,
                 fontSize: "0.75rem",
               }}
             >
@@ -1486,14 +1486,14 @@ export default function CityMap() {
             >
               <Typography
                 variant="caption"
-                sx={{ color: "#64748b", fontWeight: 700, display: "block" }}
+                sx={{ color: "#64748b", fontWeight: 600, display: "block" }}
               >
                 PM2.5 (Fine Particles)
               </Typography>
               <Typography
                 variant="h6"
                 sx={{
-                  fontWeight: 800,
+                  fontWeight: 600,
                   color: getAirQualityMeta(selectedStation.pm25).badgeColor,
                 }}
               >
@@ -1516,13 +1516,13 @@ export default function CityMap() {
             >
               <Typography
                 variant="caption"
-                sx={{ color: "#64748b", fontWeight: 700, display: "block" }}
+                sx={{ color: "#64748b", fontWeight: 600, display: "block" }}
               >
                 PM10 (Coarse Particles)
               </Typography>
               <Typography
                 variant="h6"
-                sx={{ fontWeight: 800, color: "#1e293b" }}
+                sx={{ fontWeight: 600, color: "#1e293b" }}
               >
                 {selectedStation.pm10 != null
                   ? `${Number(selectedStation.pm10).toFixed(1)} µg/m³`
@@ -1543,13 +1543,13 @@ export default function CityMap() {
             >
               <Typography
                 variant="caption"
-                sx={{ color: "#64748b", fontWeight: 700, display: "block" }}
+                sx={{ color: "#64748b", fontWeight: 600, display: "block" }}
               >
                 NO₂ (Nitrogen Dioxide)
               </Typography>
               <Typography
                 variant="h6"
-                sx={{ fontWeight: 800, color: "#1e293b" }}
+                sx={{ fontWeight: 600, color: "#1e293b" }}
               >
                 {selectedStation.no2 != null
                   ? `${Number(selectedStation.no2).toFixed(1)} µg/m³`
@@ -1570,13 +1570,13 @@ export default function CityMap() {
             >
               <Typography
                 variant="caption"
-                sx={{ color: "#64748b", fontWeight: 700, display: "block" }}
+                sx={{ color: "#64748b", fontWeight: 600, display: "block" }}
               >
                 O₃ (Ground Ozone)
               </Typography>
               <Typography
                 variant="h6"
-                sx={{ fontWeight: 800, color: "#1e293b" }}
+                sx={{ fontWeight: 600, color: "#1e293b" }}
               >
                 {selectedStation.o3 != null
                   ? `${Number(selectedStation.o3).toFixed(1)} µg/m³`
@@ -1597,13 +1597,13 @@ export default function CityMap() {
             >
               <Typography
                 variant="caption"
-                sx={{ color: "#64748b", fontWeight: 700, display: "block" }}
+                sx={{ color: "#64748b", fontWeight: 600, display: "block" }}
               >
                 CO (Carbon Monoxide)
               </Typography>
               <Typography
                 variant="h6"
-                sx={{ fontWeight: 800, color: "#1e293b" }}
+                sx={{ fontWeight: 600, color: "#1e293b" }}
               >
                 {formatCoValue(selectedStation.co)}
               </Typography>
@@ -1622,13 +1622,13 @@ export default function CityMap() {
             >
               <Typography
                 variant="caption"
-                sx={{ color: "#64748b", fontWeight: 700, display: "block" }}
+                sx={{ color: "#64748b", fontWeight: 600, display: "block" }}
               >
                 Microclimate & Wind
               </Typography>
               <Typography
                 variant="body2"
-                sx={{ fontWeight: 800, color: "#0f172a", mt: 0.5 }}
+                sx={{ fontWeight: 600, color: "#0f172a", mt: 0.5 }}
               >
                 💨 {selectedStation.windSpeed != null ? `${Number(selectedStation.windSpeed).toFixed(1)} km/h` : "—"}{" "}
                 {degreesToCompass(selectedStation.windDirection)}
@@ -1654,7 +1654,7 @@ export default function CityMap() {
           <Alert
             onClose={() => setNotification(null)}
             severity={notification.severity}
-            sx={{ width: "100%", fontWeight: 600, boxShadow: 4 }}
+            sx={{ width: "100%", fontWeight: 600, boxShadow: "none" }}
           >
             {notification.message}
           </Alert>

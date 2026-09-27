@@ -47,7 +47,7 @@ export default function BudgetPlanning() {
             <Typography
               variant="h4"
               sx={{
-                fontWeight: 800,
+                fontWeight: 600,
                 color: "#173c35",
                 letterSpacing: "-0.03em",
               }}
@@ -58,15 +58,13 @@ export default function BudgetPlanning() {
 
           <Typography
             color="text.secondary"
+            variant="body2"
             sx={{
-              mt: 1,
-              maxWidth: 960,
-              lineHeight: 1.6,
+              mt: 0.5,
+              fontSize: "0.85rem",
             }}
           >
-            GreenMind AI’s multi-tier allocation engine optimizes municipal capital expenditure (CapEx)
-            and 5-year operating lifecycle costs (TCO) across certified EN Reference Stations (€28k),
-            Mid-Tier Micro-Stations (€6.5k), and Low-Cost IoT Mesh Nodes (€1.2k) for the city of Debrecen.
+            Plan and simulate multi-tier sensor deployment across Debrecen.
           </Typography>
         </Box>
 
@@ -78,7 +76,7 @@ export default function BudgetPlanning() {
             color: "#0f766e",
             backgroundColor: "#ecfdf5",
             border: "1px solid #a7f3d0",
-            fontWeight: 700,
+            fontWeight: 600,
             py: 2,
             px: 0.5,
           }}
@@ -98,7 +96,7 @@ export default function BudgetPlanning() {
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 1 }}>
             <Typography
               variant="h5"
-              sx={{ fontWeight: 800, color: "#1e293b" }}
+              sx={{ fontWeight: 600, color: "#1e293b" }}
             >
               Live Municipal Deployment Simulation Map
             </Typography>
@@ -107,7 +105,7 @@ export default function BudgetPlanning() {
               size="small"
               label="Interactive: Drag Any Marker to Reposition"
               sx={{
-                fontWeight: 700,
+                fontWeight: 600,
                 fontSize: "0.75rem",
                 backgroundColor: "#ecfdf5",
                 color: "#0f766e",

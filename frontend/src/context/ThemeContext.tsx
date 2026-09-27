@@ -71,13 +71,13 @@ export function ThemeCustomProvider({ children }: { children: ReactNode }) {
           contrastText: "#ffffff",
         },
         secondary: {
-          main: isMid ? "#00dc82" : "#16a34a",
-          dark: isMid ? "#00c571" : "#15803d",
-          light: isMid ? "#5ef2b4" : "#4ade80",
+          main: isMid ? "#82b99b" : "#38785b",
+          dark: isMid ? "#6ca788" : "#2d634b",
+          light: isMid ? "#b6d8c5" : "#8ebba4",
           contrastText: isMid ? "#0b1329" : "#ffffff",
         },
         background: {
-          default: isMid ? "#f8fafc" : "#f4f8f6",
+          default: isMid ? "#f6f7f9" : "#f5f7f5",
           paper: "#ffffff",
         },
         text: {
@@ -88,12 +88,30 @@ export function ThemeCustomProvider({ children }: { children: ReactNode }) {
       },
       typography: {
         fontFamily:
-          '"Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          '"Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif',
+        h4: {
+          fontSize: "1.8rem",
+          fontWeight: 600,
+          letterSpacing: "-0.035em",
+          lineHeight: 1.3,
+        },
+        h5: {
+          fontSize: "1.25rem",
+          fontWeight: 600,
+          letterSpacing: "-0.02em",
+        },
         h6: {
-          fontWeight: 800,
+          fontWeight: 600,
+          fontSize: "1.05rem",
         },
         subtitle1: {
-          fontWeight: 700,
+          fontWeight: 600,
+        },
+        body1: {
+          lineHeight: 1.6,
+        },
+        body2: {
+          lineHeight: 1.6,
         },
         button: {
           textTransform: "none",
@@ -101,13 +119,27 @@ export function ThemeCustomProvider({ children }: { children: ReactNode }) {
         },
       },
       shape: {
-        borderRadius: 12,
+        borderRadius: 4,
       },
       components: {
+        MuiCssBaseline: {
+          styleOverrides: {
+            body: { WebkitFontSmoothing: "antialiased" },
+            "button, a, input, select, textarea": {
+              "&:focus-visible": { outline: "2px solid #568c72", outlineOffset: 3 },
+            },
+            "@media (prefers-reduced-motion: reduce)": {
+              "*, *::before, *::after": {
+                animationDuration: "0.01ms !important",
+                transitionDuration: "0.01ms !important",
+              },
+            },
+          },
+        },
         MuiPaper: {
           styleOverrides: {
             root: {
-              borderRadius: 16,
+              borderRadius: 12,
               backgroundImage: "none",
             },
           },
@@ -115,10 +147,12 @@ export function ThemeCustomProvider({ children }: { children: ReactNode }) {
         MuiButton: {
           styleOverrides: {
             root: {
-              borderRadius: 10,
+              borderRadius: 6,
+              minHeight: 36,
+              transition: "background-color 160ms ease, border-color 160ms ease",
               boxShadow: "none",
               "&:hover": {
-                boxShadow: "0 4px 12px rgba(11, 19, 41, 0.08)",
+                boxShadow: "none",
               },
             },
           },
@@ -126,9 +160,20 @@ export function ThemeCustomProvider({ children }: { children: ReactNode }) {
         MuiChip: {
           styleOverrides: {
             root: {
-              borderRadius: 8,
-              fontWeight: 600,
+              borderRadius: 5,
+              fontWeight: 500,
             },
+          },
+        },
+        MuiTableCell: {
+          styleOverrides: {
+            root: { borderColor: "#e5e9e7" },
+            head: { backgroundColor: "#f7f9f8", color: "#526059", fontWeight: 600 },
+          },
+        },
+        MuiDialog: {
+          styleOverrides: {
+            paper: { boxShadow: "0 16px 48px rgba(15, 23, 42, 0.16)" },
           },
         },
       },

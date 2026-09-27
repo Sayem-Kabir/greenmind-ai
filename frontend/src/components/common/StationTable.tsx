@@ -31,7 +31,7 @@ function getPm25Chip(pm25?: number | null) {
         size="small"
         label={`${val} µg/m³ · Good`}
         sx={{
-          fontWeight: 700,
+          fontWeight: 600,
           fontSize: "0.72rem",
           backgroundColor: "#f0fdf4",
           color: "#15803d",
@@ -46,7 +46,7 @@ function getPm25Chip(pm25?: number | null) {
         size="small"
         label={`${val} µg/m³ · Mod`}
         sx={{
-          fontWeight: 700,
+          fontWeight: 600,
           fontSize: "0.72rem",
           backgroundColor: "#fffbeb",
           color: "#b45309",
@@ -60,7 +60,7 @@ function getPm25Chip(pm25?: number | null) {
       size="small"
       label={`${val} µg/m³ · Alert`}
       sx={{
-        fontWeight: 700,
+        fontWeight: 600,
         fontSize: "0.72rem",
         backgroundColor: "#fef2f2",
         color: "#b91c1c",
@@ -73,18 +73,18 @@ function getPm25Chip(pm25?: number | null) {
 export default function StationTable({ stations }: StationTableProps) {
   return (
     <TableContainer component={Paper} elevation={1} sx={{ mt: 3, borderRadius: 2 }}>
-      <Typography variant="h6" sx={{ p: 2, fontWeight: 800, color: "#0f172a" }}>
+      <Typography variant="h6" sx={{ p: 2, fontWeight: 600, color: "#0f172a" }}>
         Official Debrecen Monitoring Stations
       </Typography>
 
       <Table size="small">
         <TableHead sx={{ backgroundColor: "#f8fafc" }}>
           <TableRow>
-            <TableCell sx={{ fontWeight: 700 }}>Station</TableCell>
-            <TableCell sx={{ fontWeight: 700 }}>Type</TableCell>
-            <TableCell align="right" sx={{ fontWeight: 700 }}>PM2.5</TableCell>
-            <TableCell align="right" sx={{ fontWeight: 700 }}>Wind Speed</TableCell>
-            <TableCell align="right" sx={{ fontWeight: 700 }}>Coordinates</TableCell>
+            <TableCell sx={{ fontWeight: 600 }}>Station</TableCell>
+            <TableCell sx={{ fontWeight: 600 }}>Type</TableCell>
+            <TableCell align="right" sx={{ fontWeight: 600 }}>PM2.5</TableCell>
+            <TableCell align="right" sx={{ fontWeight: 600 }}>Wind Speed</TableCell>
+            <TableCell align="right" sx={{ fontWeight: 600 }}>Coordinates</TableCell>
           </TableRow>
         </TableHead>
 
@@ -109,7 +109,7 @@ export default function StationTable({ stations }: StationTableProps) {
                       : "🍃 Air quality"
                   }
                   sx={{
-                    fontWeight: 700,
+                    fontWeight: 600,
                     fontSize: "0.72rem",
                     backgroundColor: station.station_type === 1 ? "#eff6ff" : "#ecfdf5",
                     color: station.station_type === 1 ? "#1d4ed8" : "#047857",
@@ -130,7 +130,7 @@ export default function StationTable({ stations }: StationTableProps) {
                   : "—"}
               </TableCell>
 
-              <TableCell align="right" sx={{ fontFamily: "monospace", fontSize: "0.75rem", color: "#64748b" }}>
+              <TableCell align="right" sx={{ fontFamily: "inherit", fontSize: "0.75rem", color: "#64748b" }}>
                 {Number(station.lat || 0).toFixed(4)}, {Number(station.lng || 0).toFixed(4)}
               </TableCell>
             </TableRow>

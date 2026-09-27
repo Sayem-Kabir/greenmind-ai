@@ -67,23 +67,23 @@ function getAirQualityMeta(pm25?: number | null) {
 }
 
 const createTierPinIcon = (tier?: SensorTier) => {
-  let bgGradient = "linear-gradient(135deg, #0f766e 0%, #047857 100%)";
-  let borderColor = "#14b8a6";
-  let glowColor = "rgba(20, 184, 166, 0.4)";
-  let symbol = "📶";
-  let size = 26;
+  let bgGradient = "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)";
+  let borderColor = "#38bdf8";
+  let glowColor = "rgba(56, 189, 248, 0.4)";
+  let symbol = "🌬️";
+  let size = 28;
 
-  if (tier === "reference") {
-    bgGradient = "linear-gradient(135deg, #b45309 0%, #d97706 100%)";
-    borderColor = "#f59e0b";
-    glowColor = "rgba(245, 158, 11, 0.5)";
-    symbol = "🏛️";
-    size = 32;
-  } else if (tier === "micro") {
-    bgGradient = "linear-gradient(135deg, #6b21a8 0%, #9333ea 100%)";
+  if (tier === "water") {
+    bgGradient = "linear-gradient(135deg, #0d9488 0%, #0f766e 100%)";
+    borderColor = "#14b8a6";
+    glowColor = "rgba(20, 184, 166, 0.45)";
+    symbol = "💧";
+    size = 28;
+  } else if (tier === "noise") {
+    bgGradient = "linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)";
     borderColor = "#a855f7";
     glowColor = "rgba(168, 85, 247, 0.45)";
-    symbol = "📡";
+    symbol = "🔊";
     size = 28;
   }
 
@@ -122,7 +122,7 @@ const createTierPinIcon = (tier?: SensorTier) => {
           align-items: center;
           justify-content: center;
           color: #ffffff;
-          font-size: ${tier === "reference" ? 14 : 12}px;
+          font-size: 13px;
         ">
           ${symbol}
         </div>
@@ -146,10 +146,10 @@ const SimulatedSensorLayer = React.memo(function SimulatedSensorLayer({ stations
 
   const icons = useMemo(
     () => ({
-      reference: createTierPinIcon("reference"),
-      micro: createTierPinIcon("micro"),
-      iot: createTierPinIcon("iot"),
-      default: createTierPinIcon(),
+      air: createTierPinIcon("air"),
+      water: createTierPinIcon("water"),
+      noise: createTierPinIcon("noise"),
+      default: createTierPinIcon("air"),
     }),
     [],
   );
@@ -158,14 +158,14 @@ const SimulatedSensorLayer = React.memo(function SimulatedSensorLayer({ stations
     <>
       {aiStations.map((station) => {
         const recommendation = station.recommendation;
-        const tier = (station.sensorTier as SensorTier) || "iot";
+        const tier = (station.sensorTier as SensorTier) || "air";
         const tierConfig = TIER_CONFIGS[tier];
 
-        const markerColor = tierConfig ? tierConfig.color : "#0f766e";
-        const fillColor = tierConfig ? tierConfig.borderColor : "#14b8a6";
+        const markerColor = tierConfig ? tierConfig.color : "#0284c7";
+        const fillColor = tierConfig ? tierConfig.borderColor : "#38bdf8";
         const coverageRadiusMeters = tierConfig
           ? tierConfig.radiusKm * 1000
-          : 1500;
+          : 2000;
 
         const icon = icons[tier] || icons.default;
 
@@ -178,10 +178,10 @@ const SimulatedSensorLayer = React.memo(function SimulatedSensorLayer({ stations
               pathOptions={{
                 color: markerColor,
                 fillColor: fillColor,
-                fillOpacity: tier === "reference" ? 0.08 : 0.04,
+                fillOpacity: 0.08,
                 opacity: 0.5,
-                weight: tier === "reference" ? 2.5 : 1.5,
-                dashArray: tier === "reference" ? "6 6" : "8 8",
+                weight: 2,
+                dashArray: "6 6",
               }}
             />
 
@@ -237,7 +237,7 @@ const SimulatedSensorLayer = React.memo(function SimulatedSensorLayer({ stations
                       <Typography
                         variant="subtitle2"
                         sx={{
-                          fontWeight: 800,
+                          fontWeight: 600,
                           lineHeight: 1.25,
                           color: "#0f172a",
                           fontSize: "0.88rem",
@@ -271,7 +271,7 @@ const SimulatedSensorLayer = React.memo(function SimulatedSensorLayer({ stations
                         sx={{
                           height: 22,
                           fontSize: "0.68rem",
-                          fontWeight: 800,
+                          fontWeight: 600,
                           backgroundColor: tierConfig?.bgColor || "#ecfdf5",
                           color: markerColor,
                           border: `1px solid ${tierConfig?.borderColor || "#a7f3d0"}`,
@@ -288,14 +288,14 @@ const SimulatedSensorLayer = React.memo(function SimulatedSensorLayer({ stations
                           },
                         }}
                       >
-                        <MenuItem value="reference" sx={{ fontSize: "0.75rem", fontWeight: 700 }}>
-                          🏛️ Tier 1: Reference
+                        <MenuItem value="air" sx={{ fontSize: "0.75rem", fontWeight: 600 }}>
+                          🌬️ Air Quality
                         </MenuItem>
-                        <MenuItem value="micro" sx={{ fontSize: "0.75rem", fontWeight: 700 }}>
-                          📡 Tier 2: Micro
+                        <MenuItem value="water" sx={{ fontSize: "0.75rem", fontWeight: 600 }}>
+                          💧 Water Quality
                         </MenuItem>
-                        <MenuItem value="iot" sx={{ fontSize: "0.75rem", fontWeight: 700 }}>
-                          📶 Tier 3: IoT Mesh
+                        <MenuItem value="noise" sx={{ fontSize: "0.75rem", fontWeight: 600 }}>
+                          🔊 Noise Sensor
                         </MenuItem>
                       </Select>
                     </FormControl>
@@ -326,7 +326,7 @@ const SimulatedSensorLayer = React.memo(function SimulatedSensorLayer({ stations
                           <Typography
                             variant="caption"
                             sx={{
-                              fontWeight: 800,
+                              fontWeight: 600,
                               color: aq.badgeColor,
                               textTransform: "uppercase",
                               letterSpacing: 0.5,
@@ -341,7 +341,7 @@ const SimulatedSensorLayer = React.memo(function SimulatedSensorLayer({ stations
                             sx={{
                               height: 18,
                               fontSize: "0.62rem",
-                              fontWeight: 800,
+                              fontWeight: 600,
                               backgroundColor: "#ffffff",
                               color: aq.badgeColor,
                               border: `1px solid ${aq.borderColor}`,
@@ -358,7 +358,7 @@ const SimulatedSensorLayer = React.memo(function SimulatedSensorLayer({ stations
                           <Typography
                             variant="h6"
                             sx={{
-                              fontWeight: 900,
+                              fontWeight: 700,
                               color: aq.badgeColor,
                               lineHeight: 1,
                               fontSize: "1.15rem",
@@ -368,7 +368,7 @@ const SimulatedSensorLayer = React.memo(function SimulatedSensorLayer({ stations
                           </Typography>
                           <Typography
                             variant="caption"
-                            sx={{ fontWeight: 700, color: "#64748b", fontSize: "0.7rem" }}
+                            sx={{ fontWeight: 600, color: "#64748b", fontSize: "0.7rem" }}
                           >
                             µg/m³
                           </Typography>
@@ -404,7 +404,7 @@ const SimulatedSensorLayer = React.memo(function SimulatedSensorLayer({ stations
                         variant="caption"
                         sx={{
                           color: "#64748b",
-                          fontWeight: 700,
+                          fontWeight: 600,
                           display: "block",
                           fontSize: "0.64rem",
                         }}
@@ -413,7 +413,7 @@ const SimulatedSensorLayer = React.memo(function SimulatedSensorLayer({ stations
                       </Typography>
                       <Typography
                         variant="caption"
-                        sx={{ fontWeight: 800, color: "#1e293b", fontSize: "0.78rem" }}
+                        sx={{ fontWeight: 600, color: "#1e293b", fontSize: "0.78rem" }}
                       >
                         {recommendation?.estimatedPm10 != null
                           ? `${Number(recommendation.estimatedPm10).toFixed(1)} µg/m³`
@@ -433,7 +433,7 @@ const SimulatedSensorLayer = React.memo(function SimulatedSensorLayer({ stations
                         variant="caption"
                         sx={{
                           color: "#64748b",
-                          fontWeight: 700,
+                          fontWeight: 600,
                           display: "block",
                           fontSize: "0.64rem",
                         }}
@@ -442,7 +442,7 @@ const SimulatedSensorLayer = React.memo(function SimulatedSensorLayer({ stations
                       </Typography>
                       <Typography
                         variant="caption"
-                        sx={{ fontWeight: 800, color: "#1e293b", fontSize: "0.78rem" }}
+                        sx={{ fontWeight: 600, color: "#1e293b", fontSize: "0.78rem" }}
                       >
                         {recommendation?.estimatedNo2 != null
                           ? `${Number(recommendation.estimatedNo2).toFixed(1)} µg/m³`
@@ -462,7 +462,7 @@ const SimulatedSensorLayer = React.memo(function SimulatedSensorLayer({ stations
                         variant="caption"
                         sx={{
                           color: "#64748b",
-                          fontWeight: 700,
+                          fontWeight: 600,
                           display: "block",
                           fontSize: "0.64rem",
                         }}
@@ -471,7 +471,7 @@ const SimulatedSensorLayer = React.memo(function SimulatedSensorLayer({ stations
                       </Typography>
                       <Typography
                         variant="caption"
-                        sx={{ fontWeight: 800, color: "#1e293b", fontSize: "0.78rem" }}
+                        sx={{ fontWeight: 600, color: "#1e293b", fontSize: "0.78rem" }}
                       >
                         {recommendation?.estimatedDaytimeNoise != null
                           ? `${Number(recommendation.estimatedDaytimeNoise).toFixed(1)} dB`
@@ -491,7 +491,7 @@ const SimulatedSensorLayer = React.memo(function SimulatedSensorLayer({ stations
                         variant="caption"
                         sx={{
                           color: "#64748b",
-                          fontWeight: 700,
+                          fontWeight: 600,
                           display: "block",
                           fontSize: "0.64rem",
                         }}
@@ -500,7 +500,7 @@ const SimulatedSensorLayer = React.memo(function SimulatedSensorLayer({ stations
                       </Typography>
                       <Typography
                         variant="caption"
-                        sx={{ fontWeight: 800, color: "#1e293b", fontSize: "0.78rem" }}
+                        sx={{ fontWeight: 600, color: "#1e293b", fontSize: "0.78rem" }}
                       >
                         {recommendation?.estimatedConductivity != null
                           ? `${Number(recommendation.estimatedConductivity).toFixed(2)} mS/cm`
@@ -540,7 +540,7 @@ const SimulatedSensorLayer = React.memo(function SimulatedSensorLayer({ stations
                       <Typography
                         variant="caption"
                         sx={{
-                          fontWeight: 800,
+                          fontWeight: 600,
                           color: "#0f172a",
                           fontSize: "0.72rem",
                           display: "block",
@@ -572,7 +572,7 @@ const SimulatedSensorLayer = React.memo(function SimulatedSensorLayer({ stations
                       <Typography
                         variant="caption"
                         sx={{
-                          fontWeight: 800,
+                          fontWeight: 600,
                           color: "#0f172a",
                           fontSize: "0.72rem",
                           display: "block",
@@ -604,7 +604,7 @@ const SimulatedSensorLayer = React.memo(function SimulatedSensorLayer({ stations
                       <Typography
                         variant="caption"
                         sx={{
-                          fontWeight: 800,
+                          fontWeight: 600,
                           color: "#0f172a",
                           fontSize: "0.72rem",
                           display: "block",
@@ -649,14 +649,14 @@ const SimulatedSensorLayer = React.memo(function SimulatedSensorLayer({ stations
                     <Typography
                       variant="caption"
                       sx={{
-                        fontFamily: "monospace",
+                        fontFamily: "inherit",
                         fontSize: "0.65rem",
                         color: "#475569",
                         backgroundColor: "#f1f5f9",
                         px: 0.6,
                         py: 0.2,
                         borderRadius: 1,
-                        fontWeight: 700,
+                        fontWeight: 600,
                         whiteSpace: "nowrap",
                       }}
                     >
@@ -674,7 +674,7 @@ const SimulatedSensorLayer = React.memo(function SimulatedSensorLayer({ stations
                     onClick={() => removeSimulatedStation(station.id)}
                     sx={{
                       textTransform: "none",
-                      fontWeight: 700,
+                      fontWeight: 600,
                       fontSize: "0.72rem",
                       py: 0.35,
                       borderRadius: 1.5,

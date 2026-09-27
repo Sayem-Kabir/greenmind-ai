@@ -213,7 +213,7 @@ function FormulaCard({
         borderRadius: 3,
         borderColor: "rgba(15, 118, 110, 0.12)",
         background:
-          "linear-gradient(135deg, #ffffff 0%, #f8fbfa 100%)",
+          "#ffffff",
       }}
     >
       <CardContent
@@ -227,7 +227,7 @@ function FormulaCard({
         <Typography
           variant="h5"
           sx={{
-            fontWeight: 800,
+            fontWeight: 600,
             color: "#213a34",
             letterSpacing: "-0.02em",
           }}
@@ -271,7 +271,7 @@ function FormulaCard({
               <Typography
                 variant="body2"
                 sx={{
-                  fontWeight: 700,
+                  fontWeight: 600,
                   color: "#344054",
                 }}
               >
@@ -286,7 +286,7 @@ function FormulaCard({
                   color: item.color,
                   backgroundColor: "#ffffff",
                   border: `1px solid ${item.color}44`,
-                  fontWeight: 800,
+                  fontWeight: 600,
                 }}
               />
             </Box>
@@ -320,7 +320,7 @@ export default function Methodology() {
           <Typography
             variant="h4"
             sx={{
-              fontWeight: 800,
+              fontWeight: 600,
               color: "#173c35",
               letterSpacing: "-0.03em",
             }}
@@ -354,7 +354,7 @@ export default function Methodology() {
               color: "#0f766e",
               backgroundColor: "#e4f5f0",
               border: "1px solid #cdece4",
-              fontWeight: 700,
+              fontWeight: 600,
             }}
           />
 
@@ -365,7 +365,7 @@ export default function Methodology() {
               color: "#6d28d9",
               backgroundColor: "#f3e8ff",
               border: "1px solid #e9d5ff",
-              fontWeight: 700,
+              fontWeight: 600,
             }}
           />
         </Box>
@@ -399,9 +399,9 @@ export default function Methodology() {
                 transition:
                   "transform 160ms ease, box-shadow 160ms ease",
                 "&:hover": {
-                  transform: "translateY(-3px)",
+                  transform: "none",
                   boxShadow:
-                    "0 12px 28px rgba(31, 60, 52, 0.09)",
+                    "none",
                 },
               }}
             >
@@ -432,7 +432,7 @@ export default function Methodology() {
                       color: step.accent,
                       backgroundColor: step.background,
                       border: `1px solid ${step.accent}33`,
-                      fontWeight: 800,
+                      fontWeight: 600,
                     }}
                   >
                     {step.number}
@@ -442,7 +442,7 @@ export default function Methodology() {
                     <Typography
                       variant="h6"
                       sx={{
-                        fontWeight: 800,
+                        fontWeight: 600,
                         color: "#1f2f2b",
                       }}
                     >
@@ -538,7 +538,7 @@ export default function Methodology() {
               <Typography
                 variant="h5"
                 sx={{
-                  fontWeight: 800,
+                  fontWeight: 600,
                   color: "#213a34",
                 }}
               >
@@ -565,8 +565,8 @@ export default function Methodology() {
                 <Typography
                   component="div"
                   sx={{
-                    fontFamily: "monospace",
-                    fontWeight: 700,
+                    fontFamily: "inherit",
+                    fontWeight: 600,
                     color: "#0f766e",
                     lineHeight: 1.8,
                   }}
@@ -599,7 +599,7 @@ export default function Methodology() {
               <Typography
                 variant="h5"
                 sx={{
-                  fontWeight: 800,
+                  fontWeight: 600,
                   color: "#213a34",
                 }}
               >
@@ -626,8 +626,8 @@ export default function Methodology() {
                 <Typography
                   component="div"
                   sx={{
-                    fontFamily: "monospace",
-                    fontWeight: 700,
+                    fontFamily: "inherit",
+                    fontWeight: 600,
                     color: "#7c3aed",
                     lineHeight: 1.8,
                   }}
@@ -658,7 +658,7 @@ export default function Methodology() {
               <Typography
                 variant="h5"
                 sx={{
-                  fontWeight: 800,
+                  fontWeight: 600,
                   color: "#213a34",
                 }}
               >
@@ -685,8 +685,8 @@ export default function Methodology() {
                 <Typography
                   component="div"
                   sx={{
-                    fontFamily: "monospace",
-                    fontWeight: 700,
+                    fontFamily: "inherit",
+                    fontWeight: 600,
                     color: "#2563eb",
                     lineHeight: 1.8,
                   }}
@@ -710,14 +710,14 @@ export default function Methodology() {
           borderRadius: 3,
           borderColor: "rgba(15, 118, 110, 0.12)",
           background:
-            "linear-gradient(135deg, #ffffff 0%, #f4faf8 100%)",
+            "#ffffff",
         }}
       >
         <CardContent sx={{ p: 3 }}>
           <Typography
             variant="h5"
             sx={{
-              fontWeight: 800,
+              fontWeight: 600,
               color: "#213a34",
             }}
           >
@@ -778,7 +778,7 @@ export default function Methodology() {
                       index === 0
                         ? "1px solid #a7f3d0"
                         : "1px solid rgba(15, 118, 110, 0.14)",
-                    fontWeight: 700,
+                    fontWeight: 600,
                   }}
                 >
                   {label}
@@ -792,7 +792,7 @@ export default function Methodology() {
                         lg: "block",
                       },
                       color: "#98a2b3",
-                      fontWeight: 800,
+                      fontWeight: 600,
                     }}
                   >
                     →
@@ -816,7 +816,7 @@ export default function Methodology() {
           <Typography
             variant="h5"
             sx={{
-              fontWeight: 800,
+              fontWeight: 600,
               color: "#213a34",
             }}
           >

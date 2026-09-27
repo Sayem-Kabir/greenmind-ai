@@ -11,7 +11,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Divider,
   Grid,
   IconButton,
   InputAdornment,
@@ -34,6 +33,7 @@ import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlin
 import AssignmentTurnedInRoundedIcon from "@mui/icons-material/AssignmentTurnedInRounded";
 import FilterListRoundedIcon from "@mui/icons-material/FilterListRounded";
 import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 import { useAppTheme } from "../../context/ThemeContext";
 import { useMaintenance } from "../../context/MaintenanceContext";
@@ -68,6 +68,9 @@ export default function MaintenanceSchedule() {
 
   // Cancel dialog state
   const [cancellingOrder, setCancellingOrder] = useState<WorkOrder | null>(null);
+
+  // Details dialog state
+  const [viewingOrder, setViewingOrder] = useState<WorkOrder | null>(null);
 
   // New order dialog state
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
@@ -125,16 +128,16 @@ export default function MaintenanceSchedule() {
           main: "#dc2626",
           bg: "#fef2f2",
           border: "#fecaca",
-          label: "P1 · Critical (Immediate)",
-          icon: <ErrorOutlineRoundedIcon sx={{ fontSize: 16 }} />,
+          label: "Critical",
+          icon: <ErrorOutlineRoundedIcon sx={{ fontSize: 15 }} />,
         };
       case "HIGH":
         return {
           main: "#d97706",
           bg: "#fffbeb",
           border: "#fde68a",
-          label: "P2 · High Priority (Advisory)",
-          icon: <WarningAmberRoundedIcon sx={{ fontSize: 16 }} />,
+          label: "High",
+          icon: <WarningAmberRoundedIcon sx={{ fontSize: 15 }} />,
         };
       case "ROUTINE":
       default:
@@ -142,8 +145,8 @@ export default function MaintenanceSchedule() {
           main: "#2563eb",
           bg: "#eff6ff",
           border: "#bfdbfe",
-          label: "P3 · Routine Maintenance",
-          icon: <CheckCircleOutlineRoundedIcon sx={{ fontSize: 16 }} />,
+          label: "Routine",
+          icon: <CheckCircleOutlineRoundedIcon sx={{ fontSize: 15 }} />,
         };
     }
   };
@@ -196,16 +199,16 @@ export default function MaintenanceSchedule() {
   const nextOrder = orders.length > 0 ? orders[0] : null;
 
   return (
-    <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: 1440, mx: "auto" }}>
+    <Box sx={{ p: 0, maxWidth: 1440, mx: "auto" }}>
       {/* Top Banner Header */}
       <Box
         sx={{
           mb: 3.5,
           p: { xs: 2.5, md: 3.5 },
           borderRadius: 4,
-          background: `linear-gradient(135deg, ${tokens.cardBg} 0%, rgba(0, 220, 130, 0.05) 100%)`,
+          background: tokens.cardBg,
           border: `1px solid ${isMidnight ? "rgba(0, 220, 130, 0.2)" : "#bbf7d0"}`,
-          boxShadow: tokens.cardShadow,
+          boxShadow: "none",
           position: "relative",
           overflow: "hidden",
           display: "flex",
@@ -226,7 +229,7 @@ export default function MaintenanceSchedule() {
                 alignItems: "center",
                 justifyContent: "center",
                 backgroundColor: "rgba(0, 220, 130, 0.12)",
-                color: isMidnight ? "#00dc82" : "#059669",
+                color: isMidnight ? "#79b998" : "#059669",
                 border: "1px solid rgba(0, 220, 130, 0.25)",
               }}
             >
@@ -236,7 +239,7 @@ export default function MaintenanceSchedule() {
               <Typography
                 variant="h4"
                 sx={{
-                  fontWeight: 900,
+                  fontWeight: 700,
                   fontSize: { xs: "1.45rem", md: "1.85rem" },
                   color: tokens.textPrimary,
                   letterSpacing: "-0.02em",
@@ -244,38 +247,18 @@ export default function MaintenanceSchedule() {
               >
                 Sensor Maintenance Schedule
               </Typography>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.25 }}>
-                <Chip
-                  size="small"
-                  label="Field Dispatch Queue"
-                  sx={{
-                    height: 22,
-                    fontSize: "0.72rem",
-                    fontWeight: 700,
-                    backgroundColor: "rgba(0, 220, 130, 0.15)",
-                    color: isMidnight ? "#00dc82" : "#065f46",
-                    border: "1px solid rgba(0, 220, 130, 0.3)",
-                  }}
-                />
-                <Typography variant="caption" sx={{ color: tokens.textSecondary, fontWeight: 600 }}>
-                  Debrecen Smart Monitoring Infrastructure
-                </Typography>
-              </Box>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: tokens.textSecondary,
+                  mt: 0.5,
+                  fontSize: "0.85rem",
+                }}
+              >
+                Manage active work orders, technician dispatch, and field service schedules.
+              </Typography>
             </Box>
           </Box>
-          <Typography
-            variant="body2"
-            sx={{
-              color: tokens.textSecondary,
-              maxWidth: 780,
-              lineHeight: 1.6,
-              mt: 1,
-              fontSize: "0.92rem",
-            }}
-          >
-            Manage active municipal work orders. Modify scheduled appointment times, adjust
-            technician priorities, or cancel orders directly with automatic fleet status synchronization.
-          </Typography>
         </Box>
 
         <Box sx={{ display: "flex", gap: 1.5, position: "relative", zIndex: 1 }}>
@@ -288,7 +271,7 @@ export default function MaintenanceSchedule() {
               borderRadius: 2.5,
               px: 2.2,
               py: 1,
-              fontWeight: 700,
+              fontWeight: 600,
               fontSize: "0.85rem",
               textTransform: "none",
               borderColor: isMidnight ? "rgba(0, 220, 130, 0.3)" : "#cbd5e1",
@@ -311,12 +294,12 @@ export default function MaintenanceSchedule() {
               borderRadius: 2.5,
               px: 2.5,
               py: 1,
-              fontWeight: 800,
+              fontWeight: 600,
               fontSize: "0.85rem",
               textTransform: "none",
               backgroundColor: "#00dc82",
               color: "#0b1329",
-              boxShadow: "0 4px 12px rgba(0, 220, 130, 0.25)",
+              boxShadow: "none",
               "&:hover": {
                 backgroundColor: "#00c474",
               },
@@ -338,7 +321,7 @@ export default function MaintenanceSchedule() {
               borderRadius: 3.5,
               backgroundColor: tokens.cardBg,
               border: `1px solid ${tokens.cardBorder}`,
-              boxShadow: tokens.cardShadow,
+              boxShadow: "none",
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
@@ -346,24 +329,24 @@ export default function MaintenanceSchedule() {
           >
             <Box>
               <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1.5 }}>
-                <Typography variant="overline" sx={{ color: tokens.textMuted, fontWeight: 800 }}>
+                <Typography variant="overline" sx={{ color: tokens.textMuted, fontWeight: 600 }}>
                   Active Work Orders
                 </Typography>
-                <CalendarMonthRoundedIcon sx={{ color: isMidnight ? "#00dc82" : tokens.primary, fontSize: 22 }} />
+                <CalendarMonthRoundedIcon sx={{ color: isMidnight ? "#79b998" : tokens.primary, fontSize: 22 }} />
               </Box>
               <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
-                <Typography variant="h3" sx={{ fontWeight: 900, color: tokens.textPrimary }}>
+                <Typography variant="h3" sx={{ fontWeight: 700, color: tokens.textPrimary }}>
                   {totalOrders}
                 </Typography>
                 <Chip
                   size="small"
                   label="In Dispatch Queue"
                   sx={{
-                    fontWeight: 700,
+                    fontWeight: 600,
                     height: 22,
                     fontSize: "0.72rem",
                     backgroundColor: isMidnight ? "rgba(0,220,130,0.18)" : "#d1fae5",
-                    color: isMidnight ? "#00dc82" : "#047857",
+                    color: isMidnight ? "#79b998" : "#047857",
                   }}
                 />
               </Box>
@@ -385,7 +368,7 @@ export default function MaintenanceSchedule() {
               borderRadius: 3.5,
               backgroundColor: tokens.cardBg,
               border: `1px solid ${tokens.cardBorder}`,
-              boxShadow: tokens.cardShadow,
+              boxShadow: "none",
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
@@ -393,7 +376,7 @@ export default function MaintenanceSchedule() {
           >
             <Box>
               <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1.5 }}>
-                <Typography variant="overline" sx={{ color: tokens.textMuted, fontWeight: 800 }}>
+                <Typography variant="overline" sx={{ color: tokens.textMuted, fontWeight: 600 }}>
                   Critical (P1) Priority
                 </Typography>
                 <ErrorOutlineRoundedIcon sx={{ color: "#dc2626", fontSize: 22 }} />
@@ -402,7 +385,7 @@ export default function MaintenanceSchedule() {
                 <Typography
                   variant="h3"
                   sx={{
-                    fontWeight: 900,
+                    fontWeight: 700,
                     color: criticalCount > 0 ? "#dc2626" : tokens.textPrimary,
                   }}
                 >
@@ -412,7 +395,7 @@ export default function MaintenanceSchedule() {
                   size="small"
                   label={criticalCount > 0 ? "Immediate Dispatch" : "Queue Nominal"}
                   sx={{
-                    fontWeight: 700,
+                    fontWeight: 600,
                     height: 22,
                     fontSize: "0.72rem",
                     backgroundColor: criticalCount > 0 ? "#fee2e2" : "#d1fae5",
@@ -438,7 +421,7 @@ export default function MaintenanceSchedule() {
               borderRadius: 3.5,
               backgroundColor: tokens.cardBg,
               border: `1px solid ${tokens.cardBorder}`,
-              boxShadow: tokens.cardShadow,
+              boxShadow: "none",
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
@@ -446,13 +429,13 @@ export default function MaintenanceSchedule() {
           >
             <Box>
               <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1.5 }}>
-                <Typography variant="overline" sx={{ color: tokens.textMuted, fontWeight: 800 }}>
+                <Typography variant="overline" sx={{ color: tokens.textMuted, fontWeight: 600 }}>
                   Estimated Field Time
                 </Typography>
                 <AccessTimeRoundedIcon sx={{ color: "#38bdf8", fontSize: 22 }} />
               </Box>
               <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
-                <Typography variant="h3" sx={{ fontWeight: 900, color: tokens.textPrimary }}>
+                <Typography variant="h3" sx={{ fontWeight: 700, color: tokens.textPrimary }}>
                   {totalHours.toFixed(1)}
                 </Typography>
                 <Typography variant="body2" sx={{ color: tokens.textSecondary, fontWeight: 600 }}>
@@ -477,7 +460,7 @@ export default function MaintenanceSchedule() {
               borderRadius: 3.5,
               backgroundColor: tokens.cardBg,
               border: `1px solid ${tokens.cardBorder}`,
-              boxShadow: tokens.cardShadow,
+              boxShadow: "none",
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
@@ -485,13 +468,13 @@ export default function MaintenanceSchedule() {
           >
             <Box>
               <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1.5 }}>
-                <Typography variant="overline" sx={{ color: tokens.textMuted, fontWeight: 800 }}>
+                <Typography variant="overline" sx={{ color: tokens.textMuted, fontWeight: 600 }}>
                   Next Scheduled Visit
                 </Typography>
                 <AssignmentTurnedInRoundedIcon sx={{ color: "#a855f7", fontSize: 22 }} />
               </Box>
               <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
-                <Typography variant="h5" sx={{ fontWeight: 900, color: tokens.textPrimary }}>
+                <Typography variant="h5" sx={{ fontWeight: 700, color: tokens.textPrimary }}>
                   {nextOrder ? nextOrder.scheduledDate : "None"}
                 </Typography>
                 {nextOrder && (
@@ -499,7 +482,7 @@ export default function MaintenanceSchedule() {
                     size="small"
                     label={nextOrder.scheduledTime}
                     sx={{
-                      fontWeight: 700,
+                      fontWeight: 600,
                       height: 22,
                       fontSize: "0.72rem",
                       backgroundColor: "#f1f5f9",
@@ -526,7 +509,7 @@ export default function MaintenanceSchedule() {
           borderRadius: 3.5,
           backgroundColor: tokens.cardBg,
           border: `1px solid ${tokens.cardBorder}`,
-          boxShadow: tokens.cardShadow,
+          boxShadow: "none",
         }}
       >
         <Box
@@ -583,7 +566,7 @@ export default function MaintenanceSchedule() {
                   clickable
                   onClick={() => setPriorityFilter(p)}
                   sx={{
-                    fontWeight: 700,
+                    fontWeight: 600,
                     borderRadius: 2,
                     border: isSelected ? `1.5px solid ${tokens.primary}` : "1px solid #e2e8f0",
                     backgroundColor: isSelected ? "#dcfce7" : "transparent",
@@ -641,7 +624,7 @@ export default function MaintenanceSchedule() {
           }}
         >
           <AssignmentTurnedInRoundedIcon sx={{ fontSize: 48, color: "#10b981", mb: 1.5 }} />
-          <Typography variant="h6" sx={{ fontWeight: 800, color: tokens.textPrimary }}>
+          <Typography variant="h6" sx={{ fontWeight: 600, color: tokens.textPrimary }}>
             No Scheduled Work Orders in Queue
           </Typography>
           <Typography variant="body2" sx={{ color: tokens.textSecondary, maxWidth: 440, mx: "auto", mt: 0.5 }}>
@@ -655,7 +638,7 @@ export default function MaintenanceSchedule() {
             sx={{
               mt: 2.5,
               borderRadius: 2.5,
-              fontWeight: 800,
+              fontWeight: 600,
               backgroundColor: "#00dc82",
               color: "#0b1329",
               textTransform: "none",
@@ -676,187 +659,139 @@ export default function MaintenanceSchedule() {
               <Card
                 key={order.id}
                 sx={{
-                  borderRadius: 3.5,
+                  borderRadius: 3,
                   backgroundColor: tokens.cardBg,
                   border: `1px solid ${tokens.cardBorder}`,
-                  boxShadow: tokens.cardShadow,
-                  transition: "transform 140ms ease, box-shadow 140ms ease",
+                  boxShadow: "none",
+                  transition: "border-color 0.15s ease",
                   "&:hover": {
-                    transform: "translateY(-2px)",
-                    boxShadow: "0 10px 24px rgba(0,0,0,0.06)",
+                    borderColor: tokens.primary,
                   },
                 }}
               >
-                <CardContent sx={{ p: 3 }}>
+                <CardContent sx={{ p: 2.5, "&:last-child": { pb: 2.5 } }}>
+                  {/* Top: Place, Priority Badge, and Scheduled Time */}
                   <Box
                     sx={{
                       display: "flex",
-                      flexDirection: { xs: "column", md: "row" },
-                      alignItems: { xs: "flex-start", md: "center" },
+                      alignItems: { xs: "flex-start", sm: "center" },
                       justifyContent: "space-between",
-                      gap: 2,
-                      mb: 2,
+                      flexWrap: "wrap",
+                      gap: 1.5,
+                      mb: 1.5,
                     }}
                   >
-                    {/* Top Left: Station & Priority Chips */}
-                    <Box>
-                      <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 1, mb: 0.75 }}>
-                        <Chip
-                          label={order.id}
-                          size="small"
-                          sx={{
-                            fontWeight: 800,
-                            fontFamily: "monospace",
-                            fontSize: "0.75rem",
-                            backgroundColor: "#f1f5f9",
-                            color: "#334155",
-                          }}
-                        />
-                        <Chip
-                          label={order.stationCode}
-                          size="small"
-                          sx={{
-                            fontWeight: 800,
-                            fontFamily: "monospace",
-                            fontSize: "0.75rem",
-                            backgroundColor: "#d1fae5",
-                            color: "#065f46",
-                          }}
-                        />
-                        <Chip
-                          icon={pStyle.icon}
-                          label={pStyle.label}
-                          size="small"
-                          sx={{
-                            fontWeight: 800,
-                            fontSize: "0.72rem",
-                            backgroundColor: pStyle.bg,
-                            color: pStyle.main,
-                            border: `1px solid ${pStyle.border}`,
-                          }}
-                        />
-                        <Chip
-                          label={order.status}
-                          size="small"
-                          sx={{
-                            fontWeight: 700,
-                            fontSize: "0.72rem",
-                            backgroundColor: "#f8fafc",
-                            color: "#64748b",
-                            border: "1px solid #e2e8f0",
-                          }}
-                        />
-                      </Box>
-
-                      <Typography variant="h6" sx={{ fontWeight: 800, color: tokens.textPrimary, lineHeight: 1.3 }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 700, color: tokens.textPrimary }}>
                         {order.stationName}
                       </Typography>
-                      <Typography variant="caption" sx={{ color: tokens.textMuted }}>
-                        {order.sensorType}
-                      </Typography>
+                      <Chip
+                        icon={pStyle.icon}
+                        label={pStyle.label}
+                        size="small"
+                        sx={{
+                          fontWeight: 600,
+                          fontSize: "0.72rem",
+                          height: 22,
+                          backgroundColor: pStyle.bg,
+                          color: pStyle.main,
+                          border: `1px solid ${pStyle.border}`,
+                        }}
+                      />
                     </Box>
 
-                    {/* Top Right: Scheduled Appointment Pill */}
+                    {/* Time */}
                     <Box
                       sx={{
-                        p: 1.5,
-                        px: 2,
-                        borderRadius: 3,
-                        backgroundColor: "#f8fafc",
-                        border: "1px solid #e2e8f0",
                         display: "flex",
                         alignItems: "center",
-                        gap: 1.5,
+                        gap: 0.75,
+                        py: 0.5,
+                        px: 1.25,
+                        borderRadius: 2,
+                        backgroundColor: "#f8fafc",
+                        border: "1px solid #e2e8f0",
+                        fontSize: "0.82rem",
+                        fontWeight: 700,
+                        color: tokens.textPrimary,
                       }}
                     >
-                      <Box
-                        sx={{
-                          width: 38,
-                          height: 38,
-                          borderRadius: 2,
-                          backgroundColor: "#d1fae5",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: "#059669",
-                        }}
-                      >
-                        <CalendarMonthRoundedIcon sx={{ fontSize: 22 }} />
-                      </Box>
-                      <Box>
-                        <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 700, display: "block" }}>
-                          Scheduled Appointment
-                        </Typography>
-                        <Typography variant="body1" sx={{ fontWeight: 900, color: tokens.textPrimary }}>
-                          {order.scheduledDate} · {order.scheduledTime}
-                        </Typography>
-                      </Box>
+                      <CalendarMonthRoundedIcon sx={{ fontSize: 17, color: "#059669" }} />
+                      <span>{order.scheduledDate} · {order.scheduledTime}</span>
                     </Box>
                   </Box>
 
-                  {/* Body Details: Diagnosis & Actions */}
-                  <Grid container spacing={2.5} sx={{ mb: 2 }}>
-                    <Grid size={{ xs: 12, md: 7 }}>
-                      <Box sx={{ p: 2, borderRadius: 2.5, backgroundColor: "#f8fafc", border: "1px solid #e2e8f0" }}>
-                        <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 800, display: "block", mb: 0.5 }}>
-                          Diagnosis & Failure Mode
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: tokens.textPrimary, fontWeight: 600, mb: 1 }}>
-                          {order.issueDescription}
-                        </Typography>
-                        <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 800, display: "block", mb: 0.25 }}>
-                          Action Required
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: tokens.textSecondary, fontSize: "0.85rem" }}>
-                          {order.actionRequired}
-                        </Typography>
-                      </Box>
-                    </Grid>
+                  {/* Middle: Short Issue & Assigned Person Name */}
+                  <Box
+                    sx={{
+                      p: 1.5,
+                      borderRadius: 2,
+                      backgroundColor: "#f8fafc",
+                      border: "1px solid #e2e8f0",
+                      display: "flex",
+                      flexDirection: { xs: "column", sm: "row" },
+                      alignItems: { xs: "flex-start", sm: "center" },
+                      justifyContent: "space-between",
+                      gap: 1.5,
+                      mb: 2,
+                    }}
+                  >
+                    {/* Short Issue */}
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
+                      <Typography variant="caption" sx={{ fontWeight: 700, color: tokens.textMuted, textTransform: "uppercase" }}>
+                        Issue:
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: tokens.textPrimary }}>
+                        {order.issueDescription}
+                      </Typography>
+                    </Box>
 
-                    <Grid size={{ xs: 12, md: 5 }}>
-                      <Box sx={{ p: 2, borderRadius: 2.5, backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", height: "100%" }}>
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-                          <EngineeringRoundedIcon sx={{ color: "#64748b", fontSize: 20 }} />
-                          <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 800 }}>
-                            Assigned Field Tech
-                          </Typography>
-                        </Box>
-                        <Typography variant="body2" sx={{ fontWeight: 800, color: tokens.textPrimary, mb: 1 }}>
-                          {order.assignedTechnician}
-                        </Typography>
+                    {/* Assigned Person Name */}
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, flexShrink: 0 }}>
+                      <EngineeringRoundedIcon sx={{ color: "#64748b", fontSize: 18 }} />
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: tokens.textPrimary }}>
+                        {order.assignedTechnician}
+                      </Typography>
+                    </Box>
+                  </Box>
 
-                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                          <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 700 }}>
-                            Est. Service Duration:
-                          </Typography>
-                          <Typography variant="caption" sx={{ fontWeight: 800, color: tokens.textPrimary }}>
-                            {order.estimatedHours} Hours
-                          </Typography>
-                        </Box>
-                        {order.notes && (
-                          <Typography variant="caption" sx={{ display: "block", mt: 0.5, color: tokens.textSecondary, fontStyle: "italic" }}>
-                            "{order.notes}"
-                          </Typography>
-                        )}
-                      </Box>
-                    </Grid>
-                  </Grid>
+                  {/* Bottom: Action buttons */}
+                  <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 1.25 }}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<VisibilityOutlinedIcon />}
+                      onClick={() => setViewingOrder(order)}
+                      sx={{
+                        borderRadius: 2,
+                        px: 2,
+                        py: 0.5,
+                        fontSize: "0.8rem",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        borderColor: "#cbd5e1",
+                        color: tokens.textPrimary,
+                        "&:hover": {
+                          borderColor: tokens.primary,
+                          backgroundColor: "#f8fafc",
+                        },
+                      }}
+                    >
+                      Details
+                    </Button>
 
-                  {/* Actions Bar */}
-                  <Divider sx={{ my: 1.5, borderColor: tokens.cardBorder }} />
-
-                  <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 1.5 }}>
                     <Button
                       variant="outlined"
                       color="error"
+                      size="small"
                       startIcon={<CancelOutlinedIcon />}
                       onClick={() => setCancellingOrder(order)}
                       sx={{
-                        borderRadius: 2.5,
-                        px: 2.2,
-                        py: 0.8,
-                        fontSize: "0.82rem",
-                        fontWeight: 700,
+                        borderRadius: 2,
+                        px: 2,
+                        py: 0.5,
+                        fontSize: "0.8rem",
+                        fontWeight: 600,
                         textTransform: "none",
                         borderColor: "#fecaca",
                         color: "#dc2626",
@@ -871,14 +806,15 @@ export default function MaintenanceSchedule() {
 
                     <Button
                       variant="outlined"
+                      size="small"
                       startIcon={<EditCalendarRoundedIcon />}
                       onClick={() => handleOpenEdit(order)}
                       sx={{
-                        borderRadius: 2.5,
-                        px: 2.5,
-                        py: 0.8,
-                        fontSize: "0.82rem",
-                        fontWeight: 700,
+                        borderRadius: 2,
+                        px: 2,
+                        py: 0.5,
+                        fontSize: "0.8rem",
+                        fontWeight: 600,
                         textTransform: "none",
                         borderColor: "#cbd5e1",
                         color: tokens.textPrimary,
@@ -889,7 +825,7 @@ export default function MaintenanceSchedule() {
                         },
                       }}
                     >
-                      Modify Time / Reschedule
+                      Reschedule
                     </Button>
                   </Box>
                 </CardContent>
@@ -898,6 +834,266 @@ export default function MaintenanceSchedule() {
           })}
         </Box>
       )}
+
+      {/* Modal 0: Work Order Comprehensive Details Dialog */}
+      <Dialog
+        open={Boolean(viewingOrder)}
+        onClose={() => setViewingOrder(null)}
+        maxWidth="sm"
+        fullWidth
+        slotProps={{
+          paper: {
+            sx: {
+              borderRadius: 4,
+              backgroundColor: "#ffffff",
+              border: "1px solid #e2e8f0",
+              boxShadow: "0 24px 60px rgba(15, 23, 42, 0.18)",
+            },
+          },
+        }}
+      >
+        {viewingOrder && (
+          <>
+            <DialogTitle sx={{ p: 3, pb: 1.5, display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+              <Box>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1, flexWrap: "wrap" }}>
+                  <Chip
+                    label={viewingOrder.id}
+                    size="small"
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: "0.75rem",
+                      backgroundColor: "#f1f5f9",
+                      color: "#475569",
+                      borderRadius: 1.5,
+                    }}
+                  />
+                  <Chip
+                    label={viewingOrder.stationCode}
+                    size="small"
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: "0.75rem",
+                      backgroundColor: "#ecfdf5",
+                      color: "#059669",
+                      border: "1px solid #a7f3d0",
+                      borderRadius: 1.5,
+                    }}
+                  />
+                  {(() => {
+                    const p = getPriorityStyle(viewingOrder.priority);
+                    return (
+                      <Chip
+                        icon={p.icon}
+                        label={p.label}
+                        size="small"
+                        sx={{
+                          fontWeight: 600,
+                          fontSize: "0.72rem",
+                          height: 24,
+                          backgroundColor: p.bg,
+                          color: p.main,
+                          border: `1px solid ${p.border}`,
+                        }}
+                      />
+                    );
+                  })()}
+                  <Chip
+                    label={viewingOrder.status}
+                    size="small"
+                    sx={{
+                      fontWeight: 600,
+                      fontSize: "0.72rem",
+                      height: 24,
+                      backgroundColor: "#f8fafc",
+                      color: "#64748b",
+                      border: "1px solid #e2e8f0",
+                    }}
+                  />
+                </Box>
+                <Typography variant="h6" sx={{ fontWeight: 800, color: tokens.textPrimary, lineHeight: 1.25 }}>
+                  {viewingOrder.stationName}
+                </Typography>
+              </Box>
+              <IconButton onClick={() => setViewingOrder(null)} sx={{ color: "#64748b" }}>
+                <CloseRoundedIcon />
+              </IconButton>
+            </DialogTitle>
+
+            <DialogContent sx={{ p: 3, pt: 1 }}>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
+                {/* Meta Summary Cards */}
+                <Grid container spacing={1.5}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <Box
+                      sx={{
+                        p: 1.75,
+                        borderRadius: 2.5,
+                        backgroundColor: "#f8fafc",
+                        border: "1px solid #e2e8f0",
+                      }}
+                    >
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
+                        <CalendarMonthRoundedIcon sx={{ fontSize: 18, color: "#059669" }} />
+                        <Typography variant="caption" sx={{ fontWeight: 700, color: tokens.textMuted, textTransform: "uppercase" }}>
+                          Scheduled Slot
+                        </Typography>
+                      </Box>
+                      <Typography variant="body2" sx={{ fontWeight: 700, color: tokens.textPrimary }}>
+                        {viewingOrder.scheduledDate} · {viewingOrder.scheduledTime}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: tokens.textMuted }}>
+                        Estimated Duration: {viewingOrder.estimatedHours} hrs
+                      </Typography>
+                    </Box>
+                  </Grid>
+
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <Box
+                      sx={{
+                        p: 1.75,
+                        borderRadius: 2.5,
+                        backgroundColor: "#f8fafc",
+                        border: "1px solid #e2e8f0",
+                      }}
+                    >
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
+                        <EngineeringRoundedIcon sx={{ fontSize: 18, color: "#2563eb" }} />
+                        <Typography variant="caption" sx={{ fontWeight: 700, color: tokens.textMuted, textTransform: "uppercase" }}>
+                          Assigned Technician
+                        </Typography>
+                      </Box>
+                      <Typography variant="body2" sx={{ fontWeight: 700, color: tokens.textPrimary }}>
+                        {viewingOrder.assignedTechnician}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: tokens.textMuted }}>
+                        Sensor: {viewingOrder.sensorType}
+                      </Typography>
+                    </Box>
+                  </Grid>
+                </Grid>
+
+                {/* Issue Diagnosis */}
+                <Box
+                  sx={{
+                    p: 2,
+                    borderRadius: 2.5,
+                    backgroundColor: "#fef2f2",
+                    border: "1px solid #fecaca",
+                  }}
+                >
+                  <Typography variant="caption" sx={{ fontWeight: 700, color: "#b91c1c", textTransform: "uppercase", display: "block", mb: 0.5 }}>
+                    Sensor Issue & Failure Diagnosis
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600, color: "#7f1d1d", lineHeight: 1.5 }}>
+                    {viewingOrder.issueDescription}
+                  </Typography>
+                </Box>
+
+                {/* Action Required */}
+                <Box
+                  sx={{
+                    p: 2,
+                    borderRadius: 2.5,
+                    backgroundColor: "#f0fdf4",
+                    border: "1px solid #bbf7d0",
+                  }}
+                >
+                  <Typography variant="caption" sx={{ fontWeight: 700, color: "#15803d", textTransform: "uppercase", display: "block", mb: 0.5 }}>
+                    Recommended Action Required
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600, color: "#14532d", lineHeight: 1.5 }}>
+                    {viewingOrder.actionRequired}
+                  </Typography>
+                </Box>
+
+                {/* Work Notes */}
+                {viewingOrder.notes && (
+                  <Box
+                    sx={{
+                      p: 2,
+                      borderRadius: 2.5,
+                      backgroundColor: "#f8fafc",
+                      border: "1px solid #e2e8f0",
+                    }}
+                  >
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: tokens.textMuted, textTransform: "uppercase", display: "block", mb: 0.5 }}>
+                      Technician & Site Dispatch Notes
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: tokens.textSecondary, fontStyle: "italic", lineHeight: 1.5 }}>
+                      "{viewingOrder.notes}"
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+            </DialogContent>
+
+            <DialogActions sx={{ p: 3, pt: 1, gap: 1.5, justifyContent: "space-between" }}>
+              <Button
+                variant="outlined"
+                color="error"
+                startIcon={<CancelOutlinedIcon />}
+                onClick={() => {
+                  const target = viewingOrder;
+                  setViewingOrder(null);
+                  setCancellingOrder(target);
+                }}
+                sx={{
+                  borderRadius: 2,
+                  px: 2,
+                  textTransform: "none",
+                  fontWeight: 600,
+                  borderColor: "#fecaca",
+                  color: "#dc2626",
+                  "&:hover": {
+                    backgroundColor: "#fef2f2",
+                    borderColor: "#dc2626",
+                  },
+                }}
+              >
+                Cancel Order
+              </Button>
+
+              <Box sx={{ display: "flex", gap: 1.5 }}>
+                <Button
+                  variant="outlined"
+                  onClick={() => setViewingOrder(null)}
+                  sx={{
+                    borderRadius: 2,
+                    px: 2.5,
+                    textTransform: "none",
+                    fontWeight: 600,
+                    borderColor: "#cbd5e1",
+                    color: tokens.textPrimary,
+                  }}
+                >
+                  Close
+                </Button>
+                <Button
+                  variant="contained"
+                  startIcon={<EditCalendarRoundedIcon />}
+                  onClick={() => {
+                    const target = viewingOrder;
+                    setViewingOrder(null);
+                    handleOpenEdit(target);
+                  }}
+                  sx={{
+                    borderRadius: 2,
+                    px: 2.5,
+                    textTransform: "none",
+                    fontWeight: 600,
+                    backgroundColor: tokens.primary,
+                    color: "#0b1329",
+                    "&:hover": { backgroundColor: tokens.primaryDark },
+                  }}
+                >
+                  Reschedule
+                </Button>
+              </Box>
+            </DialogActions>
+          </>
+        )}
+      </Dialog>
 
       {/* Modal 1: Modify Time / Reschedule Dialog */}
       <Dialog
@@ -920,10 +1116,10 @@ export default function MaintenanceSchedule() {
           <>
             <DialogTitle sx={{ p: 3, pb: 1, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <Box>
-                <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 700 }}>
+                <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 600 }}>
                   Reschedule Work Order #{editingOrder.id}
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 900, color: tokens.textPrimary }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: tokens.textPrimary }}>
                   {editingOrder.stationName}
                 </Typography>
               </Box>
@@ -937,7 +1133,7 @@ export default function MaintenanceSchedule() {
                 {/* Date & Time Pickers */}
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 800, display: "block", mb: 0.75 }}>
+                    <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 600, display: "block", mb: 0.75 }}>
                       Scheduled Date
                     </Typography>
                     <TextField
@@ -951,7 +1147,7 @@ export default function MaintenanceSchedule() {
                   </Grid>
 
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 800, display: "block", mb: 0.75 }}>
+                    <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 600, display: "block", mb: 0.75 }}>
                       Scheduled Time
                     </Typography>
                     <TextField
@@ -967,7 +1163,7 @@ export default function MaintenanceSchedule() {
 
                 {/* Priority Selector */}
                 <Box>
-                  <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 800, display: "block", mb: 0.75 }}>
+                  <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 600, display: "block", mb: 0.75 }}>
                     Dispatch Priority Level
                   </Typography>
                   <Select
@@ -985,7 +1181,7 @@ export default function MaintenanceSchedule() {
 
                 {/* Assigned Technician */}
                 <Box>
-                  <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 800, display: "block", mb: 0.75 }}>
+                  <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 600, display: "block", mb: 0.75 }}>
                     Assigned Field Technician
                   </Typography>
                   <TextField
@@ -999,7 +1195,7 @@ export default function MaintenanceSchedule() {
 
                 {/* Notes */}
                 <Box>
-                  <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 800, display: "block", mb: 0.75 }}>
+                  <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 600, display: "block", mb: 0.75 }}>
                     Technician Work Notes
                   </Typography>
                   <TextField
@@ -1023,7 +1219,7 @@ export default function MaintenanceSchedule() {
                   borderRadius: 2.5,
                   px: 2.5,
                   textTransform: "none",
-                  fontWeight: 700,
+                  fontWeight: 600,
                   borderColor: "#cbd5e1",
                   color: "#334155",
                 }}
@@ -1037,7 +1233,7 @@ export default function MaintenanceSchedule() {
                   borderRadius: 2.5,
                   px: 3,
                   textTransform: "none",
-                  fontWeight: 800,
+                  fontWeight: 600,
                   backgroundColor: "#00dc82",
                   color: "#0b1329",
                   "&:hover": { backgroundColor: "#00c474" },
@@ -1084,7 +1280,7 @@ export default function MaintenanceSchedule() {
               >
                 <CancelOutlinedIcon />
               </Box>
-              <Typography variant="h6" sx={{ fontWeight: 900, color: tokens.textPrimary }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: tokens.textPrimary }}>
                 Cancel Work Order?
               </Typography>
             </DialogTitle>
@@ -1107,7 +1303,7 @@ export default function MaintenanceSchedule() {
                   borderRadius: 2.5,
                   px: 2.5,
                   textTransform: "none",
-                  fontWeight: 700,
+                  fontWeight: 600,
                   borderColor: "#cbd5e1",
                   color: "#334155",
                 }}
@@ -1122,7 +1318,7 @@ export default function MaintenanceSchedule() {
                   borderRadius: 2.5,
                   px: 3,
                   textTransform: "none",
-                  fontWeight: 800,
+                  fontWeight: 600,
                   backgroundColor: "#dc2626",
                   color: "#ffffff",
                   "&:hover": { backgroundColor: "#b91c1c" },
@@ -1154,10 +1350,10 @@ export default function MaintenanceSchedule() {
       >
         <DialogTitle sx={{ p: 3, pb: 1, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <Box>
-            <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 700 }}>
+            <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 600 }}>
               Debrecen Municipal Network
             </Typography>
-            <Typography variant="h6" sx={{ fontWeight: 900, color: tokens.textPrimary }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: tokens.textPrimary }}>
               Schedule New Work Order
             </Typography>
           </Box>
@@ -1169,7 +1365,7 @@ export default function MaintenanceSchedule() {
         <DialogContent sx={{ p: 3, pt: 1.5 }}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
             <Box>
-              <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 800, display: "block", mb: 0.75 }}>
+              <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 600, display: "block", mb: 0.75 }}>
                 Station Code
               </Typography>
               <TextField
@@ -1182,7 +1378,7 @@ export default function MaintenanceSchedule() {
             </Box>
 
             <Box>
-              <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 800, display: "block", mb: 0.75 }}>
+              <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 600, display: "block", mb: 0.75 }}>
                 Station / Location Name
               </Typography>
               <TextField
@@ -1196,7 +1392,7 @@ export default function MaintenanceSchedule() {
 
             <Grid container spacing={2}>
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 800, display: "block", mb: 0.75 }}>
+                <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 600, display: "block", mb: 0.75 }}>
                   Scheduled Date
                 </Typography>
                 <TextField
@@ -1210,7 +1406,7 @@ export default function MaintenanceSchedule() {
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 800, display: "block", mb: 0.75 }}>
+                <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 600, display: "block", mb: 0.75 }}>
                   Scheduled Time
                 </Typography>
                 <TextField
@@ -1225,7 +1421,7 @@ export default function MaintenanceSchedule() {
             </Grid>
 
             <Box>
-              <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 800, display: "block", mb: 0.75 }}>
+              <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 600, display: "block", mb: 0.75 }}>
                 Dispatch Priority Level
               </Typography>
               <Select
@@ -1242,7 +1438,7 @@ export default function MaintenanceSchedule() {
             </Box>
 
             <Box>
-              <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 800, display: "block", mb: 0.75 }}>
+              <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 600, display: "block", mb: 0.75 }}>
                 Assigned Technician
               </Typography>
               <TextField
@@ -1255,7 +1451,7 @@ export default function MaintenanceSchedule() {
             </Box>
 
             <Box>
-              <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 800, display: "block", mb: 0.75 }}>
+              <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 600, display: "block", mb: 0.75 }}>
                 Reason & Description
               </Typography>
               <TextField
@@ -1278,7 +1474,7 @@ export default function MaintenanceSchedule() {
               borderRadius: 2.5,
               px: 2.5,
               textTransform: "none",
-              fontWeight: 700,
+              fontWeight: 600,
               borderColor: "#cbd5e1",
               color: "#334155",
             }}
@@ -1292,7 +1488,7 @@ export default function MaintenanceSchedule() {
               borderRadius: 2.5,
               px: 3,
               textTransform: "none",
-              fontWeight: 800,
+              fontWeight: 600,
               backgroundColor: "#00dc82",
               color: "#0b1329",
               "&:hover": { backgroundColor: "#00c474" },

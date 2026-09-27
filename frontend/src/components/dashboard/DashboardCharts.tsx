@@ -43,7 +43,6 @@ export default function DashboardCharts({
   averagePm25 = 7.9,
   daytimeNoise = 56.6,
   nighttimeNoise = 48.9,
-  stationCount = 16,
   districtProfiles,
   coveragePercentage = 68,
 }: DashboardChartsProps) {
@@ -97,13 +96,17 @@ export default function DashboardCharts({
   }, [districtProfiles, daytimeNoise, nighttimeNoise]);
 
   // 3. City Coverage Donut Data dynamically calculated from station mesh
-  const coverageData = useMemo(() => {
-    const monitored = Math.min(100, Math.max(10, Math.round(coveragePercentage)));
-    const blindSpots = Math.max(0, 100 - monitored);
-    return [
-      { name: "Monitored Urban Area", value: monitored, color: "#00dc82" },
-      { name: "AI Priority Blind Spots", value: blindSpots, color: "#f59e0b" },
-    ];
+  const { monitored, blindSpots, coverageData } = useMemo(() => {
+    const m = Math.min(100, Math.max(10, Math.round(coveragePercentage)));
+    const b = Math.max(0, 100 - m);
+    return {
+      monitored: m,
+      blindSpots: b,
+      coverageData: [
+        { name: "Monitored Urban Area", value: m, color: "#00dc82" },
+        { name: "AI Priority Blind Spots", value: b, color: "#f59e0b" },
+      ],
+    };
   }, [coveragePercentage]);
 
   return (
@@ -115,7 +118,7 @@ export default function DashboardCharts({
         borderRadius: 3.5,
         backgroundColor: tokens.cardBg,
         border: `1px solid ${tokens.cardBorder}`,
-        boxShadow: tokens.cardShadow,
+        boxShadow: "none",
       }}
     >
       {/* Header & Tabs */}
@@ -132,22 +135,19 @@ export default function DashboardCharts({
         }}
       >
         <Box>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <BarChartIcon sx={{ color: "#00dc82" }} />
-            <Typography variant="h5" sx={{ fontWeight: 800, color: tokens.textPrimary }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: tokens.textPrimary }}>
               Debrecen Visual Storyboard
             </Typography>
           </Box>
-          <Typography variant="body2" color="text.secondary">
-            Intuitive graphs designed to make environmental trends easy to grasp for everyone.
-          </Typography>
         </Box>
 
         <Tabs
           value={activeTab}
           onChange={(_, val) => setActiveTab(val)}
           sx={{
-            minHeight: 40,
+            minHeight: 38,
             backgroundColor: tokens.sidebarHoverBg,
             borderRadius: 2.5,
             p: 0.5,
@@ -155,25 +155,25 @@ export default function DashboardCharts({
               display: "none",
             },
             "& .MuiTab-root": {
-              minHeight: 32,
+              minHeight: 30,
               py: 0.5,
-              px: 2,
+              px: 1.75,
               borderRadius: 2,
-              fontWeight: 700,
-              fontSize: "0.85rem",
+              fontWeight: 600,
+              fontSize: "0.82rem",
               textTransform: "none",
               color: tokens.textSecondary,
               "&.Mui-selected": {
                 backgroundColor: tokens.cardBg,
                 color: tokens.textPrimary,
-                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                boxShadow: "none",
               },
             },
           }}
         >
-          <Tab icon={<AirIcon sx={{ fontSize: 18 }} />} iconPosition="start" label="Air by District" />
-          <Tab icon={<NoiseIcon sx={{ fontSize: 18 }} />} iconPosition="start" label="Day vs Night Noise" />
-          <Tab icon={<PieChartIcon sx={{ fontSize: 18 }} />} iconPosition="start" label="Network Coverage" />
+          <Tab icon={<AirIcon sx={{ fontSize: 17 }} />} iconPosition="start" label="Air Quality" />
+          <Tab icon={<NoiseIcon sx={{ fontSize: 17 }} />} iconPosition="start" label="Noise Levels" />
+          <Tab icon={<PieChartIcon sx={{ fontSize: 17 }} />} iconPosition="start" label="Coverage" />
         </Tabs>
       </Box>
 
@@ -181,18 +181,13 @@ export default function DashboardCharts({
       {activeTab === 0 && (
         <Box>
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2, flexWrap: "wrap", gap: 1 }}>
-            <Box>
-              <Typography variant="subtitle1" sx={{ fontWeight: 700, color: tokens.textPrimary }}>
-                Fine Particle Dust (PM2.5) across Debrecen Zones
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Dashed line indicates World Health Organization (WHO) 24-hour safe guideline limit (15 µg/m³)
-              </Typography>
-            </Box>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: tokens.textPrimary }}>
+              PM2.5 by Zone
+            </Typography>
             <Box sx={{ display: "flex", gap: 1 }}>
-              <Chip size="small" label="🟢 <15 Clean" sx={{ bgcolor: "#ecfdf5", color: "#065f46", fontWeight: 700 }} />
-              <Chip size="small" label="🟡 15-20 Moderate" sx={{ bgcolor: "#fffbeb", color: "#b45309", fontWeight: 700 }} />
-              <Chip size="small" label="🟠 >20 Watch" sx={{ bgcolor: "#fff7ed", color: "#c2410c", fontWeight: 700 }} />
+              <Chip size="small" label="<15 Clean" sx={{ bgcolor: "#ecfdf5", color: "#065f46", fontWeight: 600, height: 24 }} />
+              <Chip size="small" label="15-20 Moderate" sx={{ bgcolor: "#fffbeb", color: "#b45309", fontWeight: 600, height: 24 }} />
+              <Chip size="small" label=">20 Watch" sx={{ bgcolor: "#fff7ed", color: "#c2410c", fontWeight: 600, height: 24 }} />
             </Box>
           </Box>
 
@@ -212,7 +207,7 @@ export default function DashboardCharts({
                   domain={[0, 30]}
                 />
                 <Tooltip
-                  formatter={(val: unknown) => [`${String(val)} µg/m³`, "Fine Dust Level"]}
+                  formatter={(val: unknown) => [`${String(val)} µg/m³`, "Fine Dust"]}
                   labelFormatter={(label) => `📍 ${label}`}
                   contentStyle={{
                     borderRadius: 12,
@@ -227,7 +222,7 @@ export default function DashboardCharts({
                   stroke="#ef4444"
                   strokeDasharray="4 4"
                   label={{
-                    value: "WHO Safe Threshold (15 µg/m³)",
+                    value: "WHO Limit (15 µg/m³)",
                     fill: "#ef4444",
                     fontSize: 12,
                     fontWeight: 700,
@@ -242,25 +237,6 @@ export default function DashboardCharts({
               </BarChart>
             </ResponsiveContainer>
           </Box>
-
-          <Box
-            sx={{
-              mt: 2,
-              p: 2,
-              borderRadius: 2.5,
-              backgroundColor: "rgba(0, 220, 130, 0.06)",
-              border: "1px solid rgba(0, 220, 130, 0.15)",
-              display: "flex",
-              alignItems: "center",
-              gap: 1.5,
-            }}
-          >
-            <Typography variant="body2" sx={{ color: tokens.textPrimary }}>
-              💡 <strong>Key Takeaway for Citizens:</strong> Debrecen's recreational areas (Nagyerdő and University Campus)
-              enjoy exceptionally clean air. Industrial zones experience slightly higher dust from transport logistics,
-              which is why GreenMind AI recommends placing additional monitoring stations in the southern sector.
-            </Typography>
-          </Box>
         </Box>
       )}
 
@@ -268,17 +244,12 @@ export default function DashboardCharts({
       {activeTab === 1 && (
         <Box>
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2, flexWrap: "wrap", gap: 1 }}>
-            <Box>
-              <Typography variant="subtitle1" sx={{ fontWeight: 700, color: tokens.textPrimary }}>
-                How Sound Levels Change Between Day and Night
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Comparing daytime traffic pulse with nighttime residential quietness in Debrecen
-              </Typography>
-            </Box>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: tokens.textPrimary }}>
+              Day vs Night Noise
+            </Typography>
             <Box sx={{ display: "flex", gap: 1 }}>
-              <Chip size="small" label={`☀️ Daytime Avg: ${daytimeNoise.toFixed(1)} dB`} sx={{ bgcolor: "#eff6ff", color: "#1e40af", fontWeight: 700 }} />
-              <Chip size="small" label={`🌙 Nighttime Avg: ${nighttimeNoise.toFixed(1)} dB`} sx={{ bgcolor: "#f5f3ff", color: "#5b21b6", fontWeight: 700 }} />
+              <Chip size="small" label={`☀️ Day: ${daytimeNoise.toFixed(1)} dB`} sx={{ bgcolor: "#eff6ff", color: "#1e40af", fontWeight: 600, height: 24 }} />
+              <Chip size="small" label={`🌙 Night: ${nighttimeNoise.toFixed(1)} dB`} sx={{ bgcolor: "#f5f3ff", color: "#5b21b6", fontWeight: 600, height: 24 }} />
             </Box>
           </Box>
 
@@ -294,7 +265,7 @@ export default function DashboardCharts({
                 />
                 <YAxis unit=" dB" domain={[20, 80]} tick={{ fill: tokens.textSecondary, fontSize: 12 }} />
                 <Tooltip
-                  formatter={(val: unknown) => [`${String(val)} dB`, "Sound Level"]}
+                  formatter={(val: unknown) => [`${String(val)} dB`, "Noise Level"]}
                   contentStyle={{
                     borderRadius: 12,
                     border: `1px solid ${tokens.cardBorder}`,
@@ -308,28 +279,12 @@ export default function DashboardCharts({
                   y={50}
                   stroke="#10b981"
                   strokeDasharray="3 3"
-                  label={{ value: "Quiet Sleep Standard (50 dB)", fill: "#10b981", fontSize: 11, position: "top" }}
+                  label={{ value: "Sleep Standard (50 dB)", fill: "#10b981", fontSize: 11, position: "top" }}
                 />
-                <Bar dataKey="day" name="Daytime Noise (dB)" fill="#3b82f6" radius={[6, 6, 0, 0]} />
-                <Bar dataKey="night" name="Nighttime Noise (dB)" fill="#8b5cf6" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="day" name="Day (dB)" fill="#3b82f6" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="night" name="Night (dB)" fill="#8b5cf6" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-          </Box>
-
-          <Box
-            sx={{
-              mt: 2,
-              p: 2,
-              borderRadius: 2.5,
-              backgroundColor: "rgba(139, 92, 246, 0.08)",
-              border: "1px solid rgba(139, 92, 246, 0.2)",
-            }}
-          >
-            <Typography variant="body2" sx={{ color: tokens.textPrimary }}>
-              💤 <strong>Sleep Quality Insight:</strong> On average across Debrecen, noise drops by <strong>{(daytimeNoise - nighttimeNoise).toFixed(1)} dB</strong> at night.
-              This drop ensures peaceful sleep in residential neighborhoods, while tram and ring-road corridors maintain
-              moderate sound from maintenance and logistics.
-            </Typography>
           </Box>
         </Box>
       )}
@@ -338,39 +293,74 @@ export default function DashboardCharts({
       {activeTab === 2 && (
         <Box>
           <Grid container spacing={3} sx={{ alignItems: "center" }}>
-            <Grid size={{ xs: 12, md: 6 }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 700, color: tokens.textPrimary, mb: 1 }}>
-                Monitoring Coverage vs. City Blind Spots
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.6 }}>
-                GreenMind AI calculates that approximately <strong>68%</strong> of Debrecen's inhabited territory
-                is within optimal range of official Green Sentinel stations. The remaining <strong>32%</strong> represents
-                monitoring gaps where air and noise are currently estimated.
+            <Grid size={{ xs: 12, md: 5 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700, color: tokens.textPrimary, mb: 2 }}>
+                Network Coverage
               </Typography>
 
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-                <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: "rgba(0, 220, 130, 0.08)", border: "1px solid rgba(0, 220, 130, 0.2)" }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#065f46" }}>
-                    ✅ Currently Monitored: {stationCount} Air Stations + 15 Wells + 5 Acoustic Poles
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Continuously streaming high-precision physical telemetry.
+                <Box
+                  sx={{
+                    p: 1.5,
+                    borderRadius: 2,
+                    bgcolor: "rgba(0, 220, 130, 0.08)",
+                    border: "1px solid rgba(0, 220, 130, 0.25)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
+                    <Box
+                      sx={{
+                        width: 10,
+                        height: 10,
+                        borderRadius: "50%",
+                        bgcolor: "#00dc82",
+                      }}
+                    />
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600, color: tokens.textPrimary }}>
+                      Monitored Area
+                    </Typography>
+                  </Box>
+                  <Typography variant="h5" sx={{ fontWeight: 800, color: "#059669" }}>
+                    {monitored}%
                   </Typography>
                 </Box>
 
-                <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: "rgba(245, 158, 11, 0.08)", border: "1px solid rgba(245, 158, 11, 0.2)" }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#b45309" }}>
-                    🎯 Priority Blind Spots: 5 Recommended Installations
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Identified by GreenMind AI to maximize coverage with minimal municipal budget.
+                <Box
+                  sx={{
+                    p: 1.5,
+                    borderRadius: 2,
+                    bgcolor: "rgba(245, 158, 11, 0.08)",
+                    border: "1px solid rgba(245, 158, 11, 0.25)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
+                    <Box
+                      sx={{
+                        width: 10,
+                        height: 10,
+                        borderRadius: "50%",
+                        bgcolor: "#f59e0b",
+                      }}
+                    />
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600, color: tokens.textPrimary }}>
+                      Blind Spots
+                    </Typography>
+                  </Box>
+                  <Typography variant="h5" sx={{ fontWeight: 800, color: "#d97706" }}>
+                    {blindSpots}%
                   </Typography>
                 </Box>
               </Box>
             </Grid>
 
-            <Grid size={{ xs: 12, md: 6 }}>
-              <Box sx={{ width: "100%", height: 280 }}>
+            <Grid size={{ xs: 12, md: 7 }}>
+              <Box sx={{ width: "100%", height: 260 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -378,7 +368,7 @@ export default function DashboardCharts({
                       cx="50%"
                       cy="50%"
                       innerRadius={65}
-                      outerRadius={105}
+                      outerRadius={100}
                       paddingAngle={4}
                       dataKey="value"
                       label={({ value }) => `${value}%`}
@@ -388,7 +378,7 @@ export default function DashboardCharts({
                       ))}
                     </Pie>
                     <Tooltip
-                      formatter={(val: unknown) => [`${String(val)}%`, "Coverage Ratio"]}
+                      formatter={(val: unknown) => [`${String(val)}%`, "Coverage"]}
                       contentStyle={{
                         borderRadius: 12,
                         border: `1px solid ${tokens.cardBorder}`,
@@ -396,7 +386,6 @@ export default function DashboardCharts({
                         fontWeight: 600,
                       }}
                     />
-                    <Legend verticalAlign="bottom" />
                   </PieChart>
                 </ResponsiveContainer>
               </Box>

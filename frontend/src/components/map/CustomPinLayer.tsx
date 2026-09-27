@@ -19,24 +19,24 @@ interface CustomPinLayerProps {
   stations: Station[];
 }
 
-const createCustomTierPinIcon = (tier: SensorTier = "iot") => {
-  let bgGradient = "linear-gradient(135deg, #0f766e 0%, #047857 100%)";
-  let borderColor = "#14b8a6";
-  let glowColor = "rgba(20, 184, 166, 0.4)";
-  let symbol = "📶";
-  let size = 26;
+const createCustomTierPinIcon = (tier: SensorTier = "air") => {
+  let bgGradient = "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)";
+  let borderColor = "#38bdf8";
+  let glowColor = "rgba(56, 189, 248, 0.4)";
+  let symbol = "🌬️";
+  let size = 28;
 
-  if (tier === "reference") {
-    bgGradient = "linear-gradient(135deg, #b45309 0%, #d97706 100%)";
-    borderColor = "#f59e0b";
-    glowColor = "rgba(245, 158, 11, 0.5)";
-    symbol = "🏛️";
-    size = 32;
-  } else if (tier === "micro") {
-    bgGradient = "linear-gradient(135deg, #6b21a8 0%, #9333ea 100%)";
+  if (tier === "water") {
+    bgGradient = "linear-gradient(135deg, #0d9488 0%, #0f766e 100%)";
+    borderColor = "#14b8a6";
+    glowColor = "rgba(20, 184, 166, 0.45)";
+    symbol = "💧";
+    size = 28;
+  } else if (tier === "noise") {
+    bgGradient = "linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)";
     borderColor = "#a855f7";
     glowColor = "rgba(168, 85, 247, 0.45)";
-    symbol = "📡";
+    symbol = "🔊";
     size = 28;
   }
 
@@ -75,7 +75,7 @@ const createCustomTierPinIcon = (tier: SensorTier = "iot") => {
           align-items: center;
           justify-content: center;
           color: #ffffff;
-          font-size: ${tier === "reference" ? 14 : 12}px;
+          font-size: 13px;
         ">
           ${symbol}
         </div>
@@ -102,9 +102,9 @@ const CustomPinLayer = React.memo(function CustomPinLayer({ stations }: CustomPi
 
   const icons = useMemo(
     () => ({
-      reference: createCustomTierPinIcon("reference"),
-      micro: createCustomTierPinIcon("micro"),
-      iot: createCustomTierPinIcon("iot"),
+      air: createCustomTierPinIcon("air"),
+      water: createCustomTierPinIcon("water"),
+      noise: createCustomTierPinIcon("noise"),
     }),
     [],
   );
@@ -117,13 +117,13 @@ const CustomPinLayer = React.memo(function CustomPinLayer({ stations }: CustomPi
     <>
       {customPins.map((station) => {
         const rec = station.recommendation;
-        const tier = (station.sensorTier as SensorTier) || "iot";
-        const tierConfig = TIER_CONFIGS[tier] || TIER_CONFIGS.iot;
+        const tier = (station.sensorTier as SensorTier) || "air";
+        const tierConfig = TIER_CONFIGS[tier] || TIER_CONFIGS.air;
 
         const markerColor = tierConfig.color;
         const fillColor = tierConfig.borderColor;
         const radiusMeters = tierConfig.radiusKm * 1000;
-        const icon = icons[tier] || icons.iot;
+        const icon = icons[tier] || icons.air;
 
         return (
           <Box key={`custom-pin-${station.id}`} component="span">
@@ -134,10 +134,10 @@ const CustomPinLayer = React.memo(function CustomPinLayer({ stations }: CustomPi
               pathOptions={{
                 color: markerColor,
                 fillColor: fillColor,
-                fillOpacity: tier === "reference" ? 0.08 : 0.05,
+                fillOpacity: 0.08,
                 opacity: 0.6,
-                weight: tier === "reference" ? 2.5 : 1.5,
-                dashArray: tier === "reference" ? "6 6" : "8 8",
+                weight: 2,
+                dashArray: "6 6",
               }}
             />
 
@@ -198,7 +198,7 @@ const CustomPinLayer = React.memo(function CustomPinLayer({ stations }: CustomPi
                       <Typography
                         variant="subtitle2"
                         sx={{
-                          fontWeight: 800,
+                          fontWeight: 600,
                           lineHeight: 1.25,
                           color: "#0f172a",
                           fontSize: "0.88rem",
@@ -232,7 +232,7 @@ const CustomPinLayer = React.memo(function CustomPinLayer({ stations }: CustomPi
                         sx={{
                           height: 22,
                           fontSize: "0.68rem",
-                          fontWeight: 800,
+                          fontWeight: 600,
                           backgroundColor: tierConfig?.bgColor || "#ecfdf5",
                           color: markerColor,
                           border: `1px solid ${tierConfig?.borderColor || "#a7f3d0"}`,
@@ -249,14 +249,14 @@ const CustomPinLayer = React.memo(function CustomPinLayer({ stations }: CustomPi
                           },
                         }}
                       >
-                        <MenuItem value="reference" sx={{ fontSize: "0.75rem", fontWeight: 700 }}>
-                          🏛️ Reference
+                        <MenuItem value="air" sx={{ fontSize: "0.75rem", fontWeight: 600 }}>
+                          🌬️ Air Quality
                         </MenuItem>
-                        <MenuItem value="micro" sx={{ fontSize: "0.75rem", fontWeight: 700 }}>
-                          📡 Micro
+                        <MenuItem value="water" sx={{ fontSize: "0.75rem", fontWeight: 600 }}>
+                          💧 Water Quality
                         </MenuItem>
-                        <MenuItem value="iot" sx={{ fontSize: "0.75rem", fontWeight: 700 }}>
-                          📶 IoT Mesh
+                        <MenuItem value="noise" sx={{ fontSize: "0.75rem", fontWeight: 600 }}>
+                          🔊 Noise Sensor
                         </MenuItem>
                       </Select>
                     </FormControl>
@@ -287,7 +287,7 @@ const CustomPinLayer = React.memo(function CustomPinLayer({ stations }: CustomPi
                           <Typography
                             variant="caption"
                             sx={{
-                              fontWeight: 800,
+                              fontWeight: 600,
                               color: isGood ? "#15803d" : "#b45309",
                               textTransform: "uppercase",
                               letterSpacing: 0.5,
@@ -310,7 +310,7 @@ const CustomPinLayer = React.memo(function CustomPinLayer({ stations }: CustomPi
                             <Typography
                               sx={{
                                 fontSize: "0.62rem",
-                                fontWeight: 800,
+                                fontWeight: 600,
                                 color: isGood ? "#166534" : "#92400e",
                               }}
                             >
@@ -324,7 +324,7 @@ const CustomPinLayer = React.memo(function CustomPinLayer({ stations }: CustomPi
                             <Typography
                               sx={{
                                 fontSize: "1.45rem",
-                                fontWeight: 900,
+                                fontWeight: 700,
                                 lineHeight: 1.1,
                                 color: isGood ? "#14532d" : "#78350f",
                               }}
@@ -334,7 +334,7 @@ const CustomPinLayer = React.memo(function CustomPinLayer({ stations }: CustomPi
                             <Typography
                               variant="caption"
                               sx={{
-                                fontWeight: 700,
+                                fontWeight: 600,
                                 color: isGood ? "#166534" : "#92400e",
                                 fontSize: "0.75rem",
                               }}
@@ -380,7 +380,7 @@ const CustomPinLayer = React.memo(function CustomPinLayer({ stations }: CustomPi
                         sx={{
                           display: "block",
                           color: "#7e22ce",
-                          fontWeight: 700,
+                          fontWeight: 600,
                           fontSize: "0.65rem",
                           lineHeight: 1.2,
                         }}
@@ -388,7 +388,7 @@ const CustomPinLayer = React.memo(function CustomPinLayer({ stations }: CustomPi
                         Acoustic Noise
                       </Typography>
                       <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.35, mt: 0.2 }}>
-                        <Typography sx={{ fontWeight: 800, fontSize: "0.88rem", color: "#581c87", lineHeight: 1.1 }}>
+                        <Typography sx={{ fontWeight: 600, fontSize: "0.88rem", color: "#581c87", lineHeight: 1.1 }}>
                           {rec?.estimatedDaytimeNoise != null ? Number(rec.estimatedDaytimeNoise).toFixed(1) : "52.4"}
                         </Typography>
                         <Typography sx={{ fontSize: "0.65rem", fontWeight: 600, color: "#9333ea" }}>
@@ -411,7 +411,7 @@ const CustomPinLayer = React.memo(function CustomPinLayer({ stations }: CustomPi
                         sx={{
                           display: "block",
                           color: "#1d4ed8",
-                          fontWeight: 700,
+                          fontWeight: 600,
                           fontSize: "0.65rem",
                           lineHeight: 1.2,
                         }}
@@ -419,7 +419,7 @@ const CustomPinLayer = React.memo(function CustomPinLayer({ stations }: CustomPi
                         Groundwater Cond.
                       </Typography>
                       <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.35, mt: 0.2 }}>
-                        <Typography sx={{ fontWeight: 800, fontSize: "0.88rem", color: "#1e3a8a", lineHeight: 1.1 }}>
+                        <Typography sx={{ fontWeight: 600, fontSize: "0.88rem", color: "#1e3a8a", lineHeight: 1.1 }}>
                           {rec?.estimatedConductivity != null ? Number(rec.estimatedConductivity).toFixed(2) : "1.05"}
                         </Typography>
                         <Typography sx={{ fontSize: "0.65rem", fontWeight: 600, color: "#2563eb" }}>
@@ -442,7 +442,7 @@ const CustomPinLayer = React.memo(function CustomPinLayer({ stations }: CustomPi
                         sx={{
                           display: "block",
                           color: "#475569",
-                          fontWeight: 700,
+                          fontWeight: 600,
                           fontSize: "0.65rem",
                           lineHeight: 1.2,
                         }}
@@ -450,7 +450,7 @@ const CustomPinLayer = React.memo(function CustomPinLayer({ stations }: CustomPi
                         Priority Score
                       </Typography>
                       <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.35, mt: 0.2 }}>
-                        <Typography sx={{ fontWeight: 800, fontSize: "0.88rem", color: markerColor, lineHeight: 1.1 }}>
+                        <Typography sx={{ fontWeight: 600, fontSize: "0.88rem", color: markerColor, lineHeight: 1.1 }}>
                           {rec?.priorityScore ?? 70}
                         </Typography>
                         <Typography sx={{ fontSize: "0.65rem", fontWeight: 600, color: "#64748b" }}>
@@ -473,7 +473,7 @@ const CustomPinLayer = React.memo(function CustomPinLayer({ stations }: CustomPi
                         sx={{
                           display: "block",
                           color: "#475569",
-                          fontWeight: 700,
+                          fontWeight: 600,
                           fontSize: "0.65rem",
                           lineHeight: 1.2,
                         }}
@@ -482,7 +482,7 @@ const CustomPinLayer = React.memo(function CustomPinLayer({ stations }: CustomPi
                       </Typography>
                       <Typography
                         sx={{
-                          fontWeight: 700,
+                          fontWeight: 600,
                           fontSize: "0.72rem",
                           color: "#1e293b",
                           lineHeight: 1.2,
@@ -516,7 +516,7 @@ const CustomPinLayer = React.memo(function CustomPinLayer({ stations }: CustomPi
                       <Typography variant="caption" sx={{ fontSize: "0.6rem", color: "#64748b", display: "block" }}>
                         CapEx
                       </Typography>
-                      <Typography sx={{ fontSize: "0.72rem", fontWeight: 800, color: "#0f172a" }}>
+                      <Typography sx={{ fontSize: "0.72rem", fontWeight: 600, color: "#0f172a" }}>
                         €{((tierConfig?.unitCost ?? 1200) / 1000).toFixed(1)}k
                       </Typography>
                     </Box>
@@ -524,7 +524,7 @@ const CustomPinLayer = React.memo(function CustomPinLayer({ stations }: CustomPi
                       <Typography variant="caption" sx={{ fontSize: "0.6rem", color: "#64748b", display: "block" }}>
                         Coverage Radius
                       </Typography>
-                      <Typography sx={{ fontSize: "0.72rem", fontWeight: 800, color: markerColor }}>
+                      <Typography sx={{ fontSize: "0.72rem", fontWeight: 600, color: markerColor }}>
                         {tierConfig?.radiusKm ?? 0.8} km
                       </Typography>
                     </Box>
@@ -532,7 +532,7 @@ const CustomPinLayer = React.memo(function CustomPinLayer({ stations }: CustomPi
                       <Typography variant="caption" sx={{ fontSize: "0.6rem", color: "#64748b", display: "block" }}>
                         Annual O&M
                       </Typography>
-                      <Typography sx={{ fontSize: "0.72rem", fontWeight: 800, color: "#0f172a" }}>
+                      <Typography sx={{ fontSize: "0.72rem", fontWeight: 600, color: "#0f172a" }}>
                         €{tierConfig?.annualOm ?? 150}/yr
                       </Typography>
                     </Box>
@@ -575,7 +575,7 @@ const CustomPinLayer = React.memo(function CustomPinLayer({ stations }: CustomPi
                         borderRadius: 1,
                         backgroundColor: "#f1f5f9",
                         border: "1px solid #e2e8f0",
-                        fontFamily: "monospace",
+                        fontFamily: "inherit",
                         fontSize: "0.64rem",
                         color: "#475569",
                         fontWeight: 600,
@@ -596,7 +596,7 @@ const CustomPinLayer = React.memo(function CustomPinLayer({ stations }: CustomPi
                     onClick={() => removeSimulatedStation(station.id)}
                     sx={{
                       textTransform: "none",
-                      fontWeight: 700,
+                      fontWeight: 600,
                       fontSize: "0.72rem",
                       py: 0.35,
                       borderRadius: 1.5,

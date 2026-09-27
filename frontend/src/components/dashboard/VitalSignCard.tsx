@@ -12,7 +12,7 @@ import { InfoOutlined as InfoIcon } from "@mui/icons-material";
 import { useAppTheme } from "../../context/ThemeContext";
 
 export interface VitalSignCardProps {
-  title: string;
+  title?: string;
   category: string;
   icon: ReactNode;
   statusBadge: {
@@ -22,9 +22,9 @@ export interface VitalSignCardProps {
   };
   humanValue: string;
   technicalValue: string;
-  viewMode: "citizen" | "analyst";
-  humanAnalogy: string;
-  technicalDetails: string;
+  viewMode?: "citizen" | "analyst";
+  humanAnalogy?: string;
+  technicalDetails?: string;
   progressPercent: number;
   progressColor: string;
   scaleLabels: [string, string, string];
@@ -32,15 +32,12 @@ export interface VitalSignCardProps {
 }
 
 export default function VitalSignCard({
-  title,
   category,
   icon,
   statusBadge,
   humanValue,
   technicalValue,
-  viewMode,
-  humanAnalogy,
-  technicalDetails,
+  viewMode = "citizen",
   progressPercent,
   progressColor,
   scaleLabels,
@@ -52,7 +49,7 @@ export default function VitalSignCard({
     <Paper
       elevation={0}
       sx={{
-        p: 2.75,
+        p: 2.25,
         borderRadius: 3,
         height: "100%",
         display: "flex",
@@ -61,22 +58,21 @@ export default function VitalSignCard({
         backgroundColor: tokens.cardBg,
         border: `1px solid ${tokens.cardBorder}`,
         boxShadow: tokens.cardShadow,
-        transition: "transform 0.2s ease, box-shadow 0.2s ease",
+        transition: "border-color 0.2s ease",
         "&:hover": {
-          transform: "translateY(-3px)",
-          boxShadow: "0 10px 25px rgba(0,0,0,0.06)",
+          borderColor: statusBadge.color,
         },
       }}
     >
       <Box>
-        {/* Header: Icon, Category & Info Button */}
+        {/* Header: Icon, Category & Status Badge */}
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1.5 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
             <Box
               sx={{
-                width: 42,
-                height: 42,
-                borderRadius: 2.5,
+                width: 38,
+                height: 38,
+                borderRadius: 2,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -86,107 +82,73 @@ export default function VitalSignCard({
             >
               {icon}
             </Box>
-            <Box>
-              <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 700, letterSpacing: "0.06em" }}>
-                {category.toUpperCase()}
-              </Typography>
-              <Typography variant="h6" sx={{ fontWeight: 800, color: tokens.textPrimary, lineHeight: 1.2 }}>
-                {title}
-              </Typography>
-            </Box>
+            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: tokens.textPrimary, lineHeight: 1.2 }}>
+              {category}
+            </Typography>
           </Box>
 
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
             <Chip
               label={statusBadge.label}
               size="small"
               sx={{
-                fontWeight: 800,
-                fontSize: "0.75rem",
+                fontWeight: 700,
+                fontSize: "0.72rem",
+                height: 22,
                 backgroundColor: statusBadge.bg,
                 color: statusBadge.color,
                 border: `1px solid ${statusBadge.color}33`,
               }}
             />
             {onInfoClick && (
-              <Tooltip title="What does this mean? Click for details">
-                <IconButton size="small" onClick={onInfoClick} sx={{ color: "text.secondary" }}>
-                  <InfoIcon sx={{ fontSize: 18 }} />
+              <Tooltip title="Glossary details">
+                <IconButton size="small" onClick={onInfoClick} sx={{ color: "text.secondary", p: 0.5 }}>
+                  <InfoIcon sx={{ fontSize: 16 }} />
                 </IconButton>
               </Tooltip>
             )}
           </Box>
         </Box>
 
-        {/* Primary Indicator: Large number or Human condition */}
-        <Box sx={{ my: 1.75 }}>
+        {/* Primary Metric: Big bold number */}
+        <Box sx={{ my: 1.5 }}>
           <Typography
             variant="h4"
             sx={{
-              fontWeight: 800,
+              fontWeight: 900,
               color: tokens.textPrimary,
               letterSpacing: "-0.02em",
+              fontSize: { xs: "1.5rem", sm: "1.75rem" },
             }}
           >
             {viewMode === "citizen" ? humanValue : technicalValue}
           </Typography>
-          <Typography variant="body2" sx={{ color: tokens.textSecondary, mt: 0.5, lineHeight: 1.5, minHeight: 44 }}>
-            {viewMode === "citizen" ? humanAnalogy : technicalDetails}
-          </Typography>
         </Box>
 
-        {/* Visual Progress Bar / Scale */}
-        <Box sx={{ mt: 2, mb: 1 }}>
+        {/* Visual Progress Bar & Min/Max Scale */}
+        <Box sx={{ mt: 1.5 }}>
           <LinearProgress
             variant="determinate"
             value={progressPercent}
             sx={{
-              height: 8,
-              borderRadius: 4,
+              height: 6,
+              borderRadius: 3,
               backgroundColor: tokens.sidebarHoverBg,
               "& .MuiLinearProgress-bar": {
                 backgroundColor: progressColor,
-                borderRadius: 4,
+                borderRadius: 3,
               },
             }}
           />
           <Box sx={{ display: "flex", justifyContent: "space-between", mt: 0.75 }}>
-            <Typography variant="caption" sx={{ fontSize: "0.7rem", color: "text.secondary", fontWeight: 600 }}>
+            <Typography variant="caption" sx={{ fontSize: "0.68rem", color: "text.secondary", fontWeight: 600 }}>
               {scaleLabels[0]}
             </Typography>
-            <Typography variant="caption" sx={{ fontSize: "0.7rem", color: "text.secondary", fontWeight: 600 }}>
-              {scaleLabels[1]}
-            </Typography>
-            <Typography variant="caption" sx={{ fontSize: "0.7rem", color: "text.secondary", fontWeight: 600 }}>
+            <Typography variant="caption" sx={{ fontSize: "0.68rem", color: "text.secondary", fontWeight: 600 }}>
               {scaleLabels[2]}
             </Typography>
           </Box>
         </Box>
-      </Box>
-
-      {/* Sub-label for Citizen vs Analyst */}
-      <Box
-        sx={{
-          mt: 2,
-          pt: 1.5,
-          borderTop: `1px solid ${tokens.cardBorder}`,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 600 }}>
-          {viewMode === "citizen" ? "WHO Safe Guideline Aligned" : "Calibrated Sentinel Sensor Feeds"}
-        </Typography>
-        <Typography
-          variant="caption"
-          sx={{
-            fontWeight: 700,
-            color: statusBadge.color,
-          }}
-        >
-          ● Active Monitoring
-        </Typography>
       </Box>
     </Paper>
   );

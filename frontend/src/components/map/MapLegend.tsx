@@ -22,7 +22,7 @@ export default function MapLegend() {
         minWidth: 190,
       }}
     >
-      <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 700 }}>
+      <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
         Map legend
       </Typography>
 

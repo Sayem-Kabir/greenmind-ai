@@ -83,7 +83,7 @@ export default function Sidebar() {
           variant="overline"
           sx={{
             color: tokens.textMuted,
-            fontWeight: 800,
+            fontWeight: 600,
             letterSpacing: "0.12em",
           }}
         >
@@ -108,7 +108,7 @@ export default function Sidebar() {
               selected={selected}
               sx={{
                 position: "relative",
-                minHeight: 52,
+                minHeight: 46,
                 mb: 0.75,
                 px: 1.5,
                 borderRadius: 2.5,
@@ -117,13 +117,13 @@ export default function Sidebar() {
                   "background-color 160ms ease, color 160ms ease, transform 160ms ease",
                 "&:hover": {
                   backgroundColor: tokens.sidebarHoverBg,
-                  color: isMidnight ? "#00dc82" : tokens.primary,
-                  transform: "translateX(2px)",
+                  color: tokens.primary,
+                  transform: "none",
                 },
                 "&.Mui-selected": {
                   backgroundColor: tokens.sidebarActiveBg,
                   color: selected ? (isMidnight ? "#0b1329" : tokens.sidebarActiveColor) : tokens.sidebarTextColor,
-                  fontWeight: 700,
+                  fontWeight: 600,
                   "&:hover": {
                     backgroundColor: tokens.sidebarActiveBg,
                   },
@@ -137,7 +137,7 @@ export default function Sidebar() {
                   width: 4,
                   borderRadius: "0 6px 6px 0",
                   backgroundColor: tokens.sidebarActiveIndicator,
-                  boxShadow: isMidnight ? "0 0 10px rgba(0, 220, 130, 0.6)" : "none",
+                  boxShadow: "none",
                 },
               }}
             >
@@ -145,7 +145,7 @@ export default function Sidebar() {
                 sx={{
                   minWidth: 42,
                   color: selected
-                    ? (isMidnight ? "#00dc82" : tokens.primary)
+                    ? tokens.accent
                     : "inherit",
                 }}
               >
@@ -157,8 +157,8 @@ export default function Sidebar() {
                 slotProps={{
                   primary: {
                     sx: {
-                      fontWeight: selected ? 800 : 600,
-                      fontSize: "0.95rem",
+                      fontWeight: selected ? 600 : 500,
+                      fontSize: "0.875rem",
                     },
                   },
                 }}
@@ -185,7 +185,7 @@ export default function Sidebar() {
             borderRadius: 3,
             border: `1px solid ${tokens.sidebarFooterBorder}`,
             backgroundColor: tokens.sidebarFooterBg,
-            boxShadow: isMidnight ? "0 8px 24px rgba(11, 19, 41, 0.12)" : "none",
+            boxShadow: "none",
             transition: "all 0.3s ease",
           }}
         >
@@ -194,12 +194,12 @@ export default function Sidebar() {
             label="DEIK.AI Challenge 2026"
             sx={{
               mb: 1.25,
-              color: isMidnight ? "#00dc82" : "#0f766e",
+              color: isMidnight ? "#79b998" : "#0f766e",
               backgroundColor: isMidnight
                 ? "rgba(0, 220, 130, 0.15)"
                 : "#d8f1ea",
               border: isMidnight ? "1px solid rgba(0, 220, 130, 0.3)" : "none",
-              fontWeight: 700,
+              fontWeight: 600,
             }}
           />
 
@@ -207,7 +207,7 @@ export default function Sidebar() {
             <Typography
               component="span"
               sx={{
-                fontWeight: 900,
+                fontWeight: 700,
                 fontSize: "1.05rem",
                 color: isMidnight ? "#ffffff" : "#183d35",
               }}
@@ -217,7 +217,7 @@ export default function Sidebar() {
             <Typography
               component="span"
               sx={{
-                fontWeight: 900,
+                fontWeight: 700,
                 fontSize: "1.05rem",
                 color: tokens.brandNameWord2,
               }}
