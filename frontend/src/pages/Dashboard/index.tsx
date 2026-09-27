@@ -22,8 +22,10 @@ import {
 } from "../../services/aiAnalyticsService";
 import { calculateCoverageMetrics } from "../../utils/calculateCoverageMetrics";
 import type { Station } from "../../types/station";
+import { useAppTheme } from "../../context/ThemeContext";
 
 export default function Dashboard() {
+  const { isMidnight } = useAppTheme();
   const [stations, setStations] = useState<Station[]>([]);
   const [aiAnalytics, setAiAnalytics] = useState<AiCityAnalyticsResponse | null>(null);
   const [error, setError] = useState("");
@@ -136,17 +138,17 @@ export default function Dashboard() {
         <Grid size={{ xs: 12, md: 4 }}>
           <VitalSignCard
             category="Air Quality"
-            icon={<AirIcon sx={{ fontSize: 22 }} />}
+            icon={<AirIcon sx={{ fontSize: 20 }} />}
             statusBadge={{
-              label: aiAnalytics?.vitalSigns?.airQuality?.statusLabel || (averagePm25 <= 15 ? "Clean & Fresh" : "Moderate"),
+              label: averagePm25 <= 15 ? "Optimal" : "Moderate",
               color: "#059669",
-              bg: "#ecfdf5",
+              bg: isMidnight ? "rgba(5, 150, 105, 0.12)" : "#ecfdf5",
             }}
             humanValue={`${averagePm25.toFixed(1)} µg/m³`}
             technicalValue={`${averagePm25.toFixed(2)} µg/m³ PM2.5`}
             progressPercent={airQualityProgress}
             progressColor="#10b981"
-            scaleLabels={["0 Fresh", "15 WHO Target", "35 Alert"]}
+            scaleLabels={["0 µg/m³", "15 WHO Target", "35 µg/m³ limit"]}
             onInfoClick={() => setGlossaryOpen(true)}
           />
         </Grid>
@@ -155,17 +157,17 @@ export default function Dashboard() {
         <Grid size={{ xs: 12, md: 4 }}>
           <VitalSignCard
             category="Urban Acoustics"
-            icon={<VolumeIcon sx={{ fontSize: 22 }} />}
+            icon={<VolumeIcon sx={{ fontSize: 20 }} />}
             statusBadge={{
-              label: aiAnalytics?.vitalSigns?.urbanAcoustics?.statusLabel || (daytimeNoiseDb <= 60 ? "Comfortable" : "Elevated"),
+              label: daytimeNoiseDb <= 60 ? "Normal" : "Elevated",
               color: "#7c3aed",
-              bg: "#f5f3ff",
+              bg: isMidnight ? "rgba(124, 58, 237, 0.12)" : "#f5f3ff",
             }}
             humanValue={`${daytimeNoiseDb.toFixed(1)} dB`}
             technicalValue={`${daytimeNoiseDb.toFixed(1)} dB Day / ${nighttimeNoiseDb.toFixed(1)} dB Night`}
             progressPercent={noiseProgress}
             progressColor="#8b5cf6"
-            scaleLabels={["30 Whisper", "56 Debrecen Avg", "85 Heavy Traffic"]}
+            scaleLabels={["30 dB", "55 EU Target", "85 dB max"]}
             onInfoClick={() => setGlossaryOpen(true)}
           />
         </Grid>
@@ -174,17 +176,17 @@ export default function Dashboard() {
         <Grid size={{ xs: 12, md: 4 }}>
           <VitalSignCard
             category="Groundwater"
-            icon={<WaterIcon sx={{ fontSize: 22 }} />}
+            icon={<WaterIcon sx={{ fontSize: 20 }} />}
             statusBadge={{
-              label: aiAnalytics?.vitalSigns?.groundwater?.statusLabel || "Healthy & Stable",
+              label: "Stable",
               color: "#2563eb",
-              bg: "#eff6ff",
+              bg: isMidnight ? "rgba(37, 99, 235, 0.12)" : "#eff6ff",
             }}
             humanValue={`${waterTemperatureC.toFixed(1)}°C`}
             technicalValue={`${waterTemperatureC.toFixed(1)}°C (${groundwaterStationCount} wells)`}
             progressPercent={waterProgress}
             progressColor="#3b82f6"
-            scaleLabels={["5°C Cold", "13.5°C Optimal", "25°C Warm"]}
+            scaleLabels={["5°C", "13.5°C Normal", "25°C max"]}
             onInfoClick={() => setGlossaryOpen(true)}
           />
         </Grid>

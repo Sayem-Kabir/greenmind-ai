@@ -1,7 +1,6 @@
 import {
   Box,
   Typography,
-  Chip,
   Paper,
 } from "@mui/material";
 import { useAppTheme } from "../../context/ThemeContext";
@@ -21,20 +20,24 @@ interface CitizenHealthHeroProps {
 
 export default function CitizenHealthHero({
   healthScore = 89,
-  vitalityLabel = "Optimal Condition",
-  vitalityColor = "#059669",
-  vitalityBg = "rgba(0, 220, 130, 0.12)",
+  vitalityLabel = "Optimal",
 }: CitizenHealthHeroProps) {
-  const { tokens } = useAppTheme();
+  const { tokens, isMidnight } = useAppTheme();
+
+  // Sanitize any verbose text to keep it crisp and human-designed
+  const cleanLabel = vitalityLabel
+    ?.replace(/\s*&\s*(Fresh|Healthy|Safe)/gi, "")
+    ?.replace(/Condition/gi, "")
+    ?.trim() || "Optimal";
 
   return (
     <Paper
       elevation={0}
       sx={{
-        p: { xs: 2, sm: 2.5 },
+        p: { xs: 2, sm: 2.25 },
         mb: 3,
         borderRadius: 3,
-        background: tokens.cardBg,
+        backgroundColor: tokens.cardBg,
         border: `1px solid ${tokens.cardBorder}`,
         boxShadow: "none",
         display: "flex",
@@ -44,106 +47,118 @@ export default function CitizenHealthHero({
         gap: 2,
       }}
     >
-      {/* Title & Status Badge */}
+      {/* Title & Live Status Indicator */}
       <Box>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.25, flexWrap: "wrap" }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
           <Typography
-            variant="h5"
-            sx={{
-              fontWeight: 700,
-              color: tokens.textPrimary,
-              letterSpacing: "-0.02em",
-              fontSize: { xs: "1.25rem", sm: "1.45rem" },
-            }}
-          >
-            Debrecen Environmental Health
-          </Typography>
-
-          <Chip
-            size="small"
-            label={vitalityLabel}
             sx={{
               fontWeight: 600,
-              fontSize: "0.72rem",
-              height: 22,
-              backgroundColor: vitalityBg,
-              color: vitalityColor,
-              border: `1px solid ${vitalityColor}35`,
+              color: tokens.textPrimary,
+              fontSize: { xs: "1.15rem", sm: "1.3rem" },
+              letterSpacing: "-0.01em",
             }}
-          />
+          >
+            Debrecen Environmental Status
+          </Typography>
+
+          <Box
+            sx={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 0.75,
+              px: 1.2,
+              py: 0.35,
+              borderRadius: 2,
+              backgroundColor: isMidnight ? "rgba(5, 150, 105, 0.12)" : "#ecfdf5",
+              border: `1px solid ${isMidnight ? "rgba(5, 150, 105, 0.25)" : "#d1fae5"}`,
+            }}
+          >
+            <Box
+              sx={{
+                width: 7,
+                height: 7,
+                borderRadius: "50%",
+                backgroundColor: "#10b981",
+              }}
+            />
+            <Typography
+              sx={{
+                fontSize: "0.74rem",
+                fontWeight: 500,
+                color: isMidnight ? "#34d399" : "#059669",
+              }}
+            >
+              {cleanLabel}
+            </Typography>
+          </Box>
         </Box>
+
+        <Typography
+          sx={{
+            color: tokens.textMuted,
+            fontSize: "0.8rem",
+            mt: 0.35,
+          }}
+        >
+          Continuous environmental telemetry across active municipal monitoring stations
+        </Typography>
       </Box>
 
-      {/* Compact Health Score Badge */}
+      {/* Clean, authentic City Health Index Metric */}
       <Box
         sx={{
           display: "flex",
           alignItems: "center",
           gap: 1.5,
-          px: 2,
-          py: 1,
+          px: 1.75,
+          py: 0.85,
           borderRadius: 2.5,
-          backgroundColor: tokens.cardBg,
-          border: `1px solid ${tokens.cardBorder}`,
-          boxShadow: "none",
+          backgroundColor: isMidnight ? "rgba(255, 255, 255, 0.02)" : "#f8fafc",
+          border: `1px solid ${isMidnight ? "rgba(255, 255, 255, 0.06)" : "#e2e8f0"}`,
           flexShrink: 0,
         }}
       >
-        <Box
-          sx={{
-            width: 44,
-            height: 44,
-            borderRadius: "50%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: "conic-gradient(#00dc82 0% 89%, #e2e8f0 89% 100%)",
-            p: "3px",
-          }}
-        >
-          <Box
+        <Box sx={{ textAlign: "right" }}>
+          <Typography
             sx={{
-              width: "100%",
-              height: "100%",
-              borderRadius: "50%",
-              backgroundColor: tokens.cardBg,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              fontSize: "0.68rem",
+              fontWeight: 500,
+              color: tokens.textMuted,
+              letterSpacing: "0.04em",
+              textTransform: "uppercase",
+              lineHeight: 1.2,
             }}
           >
-            <Typography variant="body2" sx={{ fontWeight: 700, color: "#059669", lineHeight: 1 }}>
-              {healthScore}
-            </Typography>
-          </Box>
+            City Health Index
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: "0.8rem",
+              fontWeight: 600,
+              color: healthScore >= 80 ? (isMidnight ? "#34d399" : "#059669") : tokens.textPrimary,
+              lineHeight: 1.2,
+              mt: 0.2,
+            }}
+          >
+            {healthScore >= 80 ? "Optimal & Stable" : "Moderate"}
+          </Typography>
         </Box>
 
-        <Box>
-          <Typography
-            variant="caption"
-            sx={{
-              color: "text.secondary",
-              fontWeight: 600,
-              letterSpacing: "0.04em",
-              fontSize: "0.62rem",
-              display: "block",
-              lineHeight: 1,
-              mb: 0.3,
-            }}
-          >
-            CITY HEALTH SCORE
-          </Typography>
-          <Typography
-            variant="subtitle2"
-            sx={{
-              fontWeight: 600,
-              color: tokens.textPrimary,
-              lineHeight: 1.1,
-              fontSize: "0.85rem",
-            }}
-          >
-            Healthy & Safe
-          </Typography>
+        <Box
+          sx={{
+            px: 1.25,
+            py: 0.45,
+            minWidth: 42,
+            textAlign: "center",
+            borderRadius: 2,
+            backgroundColor: isMidnight ? "rgba(16, 185, 129, 0.15)" : "#d1fae5",
+            color: isMidnight ? "#34d399" : "#065f46",
+            fontSize: "1.15rem",
+            fontWeight: 700,
+            lineHeight: 1,
+          }}
+        >
+          {healthScore}
         </Box>
       </Box>
     </Paper>
