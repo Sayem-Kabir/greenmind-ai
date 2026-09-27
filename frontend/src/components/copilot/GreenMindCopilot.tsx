@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import {
   Box,
   Paper,
@@ -18,6 +18,8 @@ import SendIcon from "@mui/icons-material/Send";
 import DeleteIcon from "@mui/icons-material/Delete";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
+import RemoveIcon from "@mui/icons-material/Remove";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CheckIcon from "@mui/icons-material/Check";
@@ -33,39 +35,30 @@ import {
 import { useSimulation } from "../../context/SimulationContext";
 import { useAppTheme } from "../../context/ThemeContext";
 
-
 const DEFAULT_SUGGESTIONS = [
   {
-    icon: <SchoolIcon sx={{ fontSize: 15 }} />,
-    text: "How to allocate €50k for school protection?",
+    icon: <SchoolIcon sx={{ fontSize: 13 }} />,
+    text: "School €50k allocation",
   },
   {
-    icon: <BalanceIcon sx={{ fontSize: 15 }} />,
-    text: "Explain Reference vs IoT Mesh hardware trade-offs",
+    icon: <BalanceIcon sx={{ fontSize: 13 }} />,
+    text: "Reference vs IoT trade-offs",
   },
   {
-    icon: <PrecisionManufacturingIcon sx={{ fontSize: 15 }} />,
-    text: "Assess Southern Industrial Zone pollution risks",
+    icon: <PrecisionManufacturingIcon sx={{ fontSize: 13 }} />,
+    text: "Industrial zone risks",
   },
   {
-    icon: <DescriptionIcon sx={{ fontSize: 15 }} />,
-    text: "Draft a 1-page Debrecen City Council briefing",
+    icon: <DescriptionIcon sx={{ fontSize: 13 }} />,
+    text: "Council briefing",
   },
 ];
 
 const INITIAL_GREETING: CopilotMessage = {
   role: "assistant",
-  content: `👋 **Welcome to GreenMind Copilot!**
-
-I am your **Debrecen Urban Environmental & Municipal Decision-Support AI**, connected directly to your live sensor grid and budget optimizer.
-
-**I can assist you with:**
-* **Real-time Air Quality Insights**: Analyzing PM2.5, PM10, NO2, O3 trends across Debrecen districts.
-* **Hardware & Budget Decisions**: Comparing EN Reference (€28k), Mid-Tier Micro (€6.5k), and IoT Mesh (€1.2k) nodes.
-* **What-If Coverage Simulations**: Evaluating new sensor positions and coverage halos.
-* **Municipal Briefings & Policy**: Drafting reports, regulatory compliance assessments, and procurement dossiers.
-
-*Ask me anything below or pick a quick topic to start!*`,
+  content: `👋 **Hi, I'm GreenMind Copilot.**
+Connected to Debrecen's sensor grid & budget optimizer.
+Ask me about air quality, sensor placement, or budget decisions!`,
   timestamp: Date.now(),
 };
 
@@ -74,11 +67,11 @@ function FormattedMessage({ content }: { content: string }) {
   const lines = content.split("\n");
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
       {lines.map((line, idx) => {
         const trimmed = line.trim();
         if (!trimmed) {
-          return <Box key={idx} sx={{ height: 4 }} />;
+          return <Box key={idx} sx={{ height: 3 }} />;
         }
 
         // Headers
@@ -86,8 +79,8 @@ function FormattedMessage({ content }: { content: string }) {
           return (
             <Typography
               key={idx}
-              variant="subtitle2"
-              sx={{ fontWeight: 800, color: "#0f766e", mt: 0.5 }}
+              variant="caption"
+              sx={{ fontWeight: 600, color: "#0f766e", mt: 0.5, display: "block" }}
             >
               {renderBoldText(trimmed.replace(/^###\s*/, ""))}
             </Typography>
@@ -97,8 +90,8 @@ function FormattedMessage({ content }: { content: string }) {
           return (
             <Typography
               key={idx}
-              variant="subtitle1"
-              sx={{ fontWeight: 800, color: "#064e3b", mt: 0.5 }}
+              variant="subtitle2"
+              sx={{ fontWeight: 600, color: "#064e3b", mt: 0.5 }}
             >
               {renderBoldText(trimmed.replace(/^##\s*/, ""))}
             </Typography>
@@ -110,17 +103,17 @@ function FormattedMessage({ content }: { content: string }) {
           return (
             <Box
               key={idx}
-              sx={{ display: "flex", alignItems: "flex-start", gap: 1, pl: 0.5 }}
+              sx={{ display: "flex", alignItems: "flex-start", gap: 0.75, pl: 0.25 }}
             >
               <Typography
                 component="span"
-                sx={{ color: "#0f766e", fontWeight: 900, lineHeight: 1.4 }}
+                sx={{ color: "#0f766e", fontWeight: 700, lineHeight: 1.3, fontSize: "0.8rem" }}
               >
                 •
               </Typography>
               <Typography
                 variant="body2"
-                sx={{ color: "#334155", fontSize: "0.85rem", lineHeight: 1.45 }}
+                sx={{ fontSize: "0.82rem", lineHeight: 1.4, color: "#334155" }}
               >
                 {renderBoldText(trimmed.replace(/^[\*\-]\s*/, ""))}
               </Typography>
@@ -128,14 +121,13 @@ function FormattedMessage({ content }: { content: string }) {
           );
         }
 
-        // Regular text
         return (
           <Typography
             key={idx}
             variant="body2"
-            sx={{ color: "#334155", fontSize: "0.85rem", lineHeight: 1.45 }}
+            sx={{ fontSize: "0.82rem", lineHeight: 1.4, color: "#334155" }}
           >
-            {renderBoldText(line)}
+            {renderBoldText(trimmed)}
           </Typography>
         );
       })}
@@ -143,13 +135,13 @@ function FormattedMessage({ content }: { content: string }) {
   );
 }
 
-// Helper to format **bold** and `code` inline
 function renderBoldText(text: string) {
   const parts = text.split(/(\*\*.*?\*\*|`.*?`)/g);
-  return parts.map((part, i) => {
+
+  return parts.map((part, idx) => {
     if (part.startsWith("**") && part.endsWith("**")) {
       return (
-        <strong key={i} style={{ fontWeight: 800, color: "#0f172a" }}>
+        <strong key={idx} style={{ color: "#0f766e", fontWeight: 700 }}>
           {part.slice(2, -2)}
         </strong>
       );
@@ -157,14 +149,14 @@ function renderBoldText(text: string) {
     if (part.startsWith("`") && part.endsWith("`")) {
       return (
         <code
-          key={i}
+          key={idx}
           style={{
             backgroundColor: "#f1f5f9",
             padding: "1px 4px",
-            borderRadius: "4px",
-            fontFamily: "monospace",
-            fontSize: "0.8rem",
+            borderRadius: 3,
+            fontSize: "0.78rem",
             color: "#0f766e",
+            fontFamily: "monospace",
           }}
         >
           {part.slice(1, -1)}
@@ -184,16 +176,93 @@ export default function GreenMindCopilot() {
   const [suggestions, setSuggestions] = useState(DEFAULT_SUGGESTIONS);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
+  // Dragging states
+  const [btnPos, setBtnPos] = useState<{ x: number; y: number } | null>(null);
+  const [winPos, setWinPos] = useState<{ x: number; y: number } | null>(null);
+
+  const btnDraggingRef = useRef(false);
+  const btnStartRef = useRef({ mouseX: 0, mouseY: 0, startX: 0, startY: 0 });
+  const btnMovedRef = useRef(false);
+
+  const winDraggingRef = useRef(false);
+  const winStartRef = useRef({ mouseX: 0, mouseY: 0, startX: 0, startY: 0 });
+
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const { simulatedStations } = useSimulation();
   const { tokens, isMidnight } = useAppTheme();
 
-  useEffect(() => {
+  const currentWinWidth = isExpanded ? 520 : 350;
+  const currentWinHeight = isExpanded ? 560 : 440;
 
+  useEffect(() => {
     if (isOpen) {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, isOpen, isLoading]);
+
+  // Floating trigger pointer handlers
+  const handleBtnPointerDown = useCallback((e: React.PointerEvent) => {
+    btnDraggingRef.current = true;
+    btnMovedRef.current = false;
+    const currentX = btnPos?.x ?? (window.innerWidth - 68);
+    const currentY = btnPos?.y ?? (window.innerHeight - 72);
+    btnStartRef.current = {
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+      startX: currentX,
+      startY: currentY,
+    };
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  }, [btnPos]);
+
+  const handleBtnPointerMove = useCallback((e: React.PointerEvent) => {
+    if (!btnDraggingRef.current) return;
+    const dx = e.clientX - btnStartRef.current.mouseX;
+    const dy = e.clientY - btnStartRef.current.mouseY;
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+      btnMovedRef.current = true;
+    }
+    const newX = Math.min(Math.max(10, btnStartRef.current.startX + dx), window.innerWidth - 60);
+    const newY = Math.min(Math.max(10, btnStartRef.current.startY + dy), window.innerHeight - 60);
+    setBtnPos({ x: newX, y: newY });
+  }, []);
+
+  const handleBtnPointerUp = useCallback(() => {
+    btnDraggingRef.current = false;
+    if (!btnMovedRef.current) {
+      setIsOpen(true);
+    }
+  }, []);
+
+  // Chat window header drag handlers
+  const handleWinPointerDown = useCallback((e: React.PointerEvent) => {
+    if ((e.target as HTMLElement).closest("button")) return;
+    winDraggingRef.current = true;
+    const currentX = winPos?.x ?? (window.innerWidth - currentWinWidth - 20);
+    const currentY = winPos?.y ?? (window.innerHeight - currentWinHeight - 20);
+    winStartRef.current = {
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+      startX: currentX,
+      startY: currentY,
+    };
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  }, [winPos, currentWinWidth, currentWinHeight]);
+
+  const handleWinPointerMove = useCallback((e: React.PointerEvent) => {
+    if (!winDraggingRef.current) return;
+    const dx = e.clientX - winStartRef.current.mouseX;
+    const dy = e.clientY - winStartRef.current.mouseY;
+    const maxX = window.innerWidth - currentWinWidth - 10;
+    const maxY = window.innerHeight - currentWinHeight - 10;
+    const newX = Math.min(Math.max(10, winStartRef.current.startX + dx), maxX);
+    const newY = Math.min(Math.max(10, winStartRef.current.startY + dy), maxY);
+    setWinPos({ x: newX, y: newY });
+  }, [currentWinWidth, currentWinHeight]);
+
+  const handleWinPointerUp = useCallback(() => {
+    winDraggingRef.current = false;
+  }, []);
 
   async function handleSendMessage(textToSend?: string) {
     const query = (textToSend || inputQuery).trim();
@@ -238,7 +307,7 @@ export default function GreenMindCopilot() {
       if (result.suggestions && result.suggestions.length > 0) {
         setSuggestions(
           result.suggestions.map((s) => ({
-            icon: <AutoAwesomeIcon sx={{ fontSize: 14 }} />,
+            icon: <AutoAwesomeIcon sx={{ fontSize: 13 }} />,
             text: s,
           })),
         );
@@ -246,7 +315,7 @@ export default function GreenMindCopilot() {
     } catch (err) {
       const errorMessage: CopilotMessage = {
         role: "assistant",
-        content: `⚠️ **Copilot Connection Error**: ${err instanceof Error ? err.message : "Failed to reach AI service."}\n\nPlease check that your OpenAI key is configured properly in \`backend/.env\`.`,
+        content: `⚠️ **Copilot Connection Error**: ${err instanceof Error ? err.message : "Failed to reach AI service."}`,
         timestamp: Date.now(),
       };
       setMessages((prev) => [...prev, errorMessage]);
@@ -268,15 +337,23 @@ export default function GreenMindCopilot() {
 
   return (
     <>
-      {/* Floating Action Button */}
+      {/* Floating Action Button (Compact, Circular, Draggable) */}
       {!isOpen && (
         <Fade in={!isOpen}>
           <Box
+            onPointerDown={handleBtnPointerDown}
+            onPointerMove={handleBtnPointerMove}
+            onPointerUp={handleBtnPointerUp}
             sx={{
               position: "fixed",
-              bottom: 24,
-              right: 24,
+              left: btnPos ? btnPos.x : undefined,
+              top: btnPos ? btnPos.y : undefined,
+              right: btnPos ? undefined : 20,
+              bottom: btnPos ? undefined : 20,
               zIndex: 1300,
+              touchAction: "none",
+              cursor: "grab",
+              "&:active": { cursor: "grabbing" },
             }}
           >
             <Badge
@@ -287,96 +364,80 @@ export default function GreenMindCopilot() {
               sx={{
                 "& .MuiBadge-badge": {
                   boxShadow: "0 0 0 2px white",
-                  width: 12,
-                  height: 12,
+                  width: 10,
+                  height: 10,
                   borderRadius: "50%",
                 },
               }}
             >
-              <Paper
-                elevation={6}
-                onClick={() => setIsOpen(true)}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1.25,
-                  px: 2.25,
-                  py: 1.25,
-                  borderRadius: 8,
-                  backgroundColor: tokens.copilotTriggerBg,
-                  color: tokens.copilotTriggerColor,
-                  cursor: "pointer",
-                  boxShadow: tokens.copilotTriggerShadow,
-                  border: isMidnight ? "1px solid rgba(0, 220, 130, 0.3)" : "none",
-                  transition: "all 0.25s ease",
-                  "&:hover": {
-                    backgroundColor: isMidnight ? "#1e293b" : "#0d655e",
-                    transform: "translateY(-3px)",
-                    boxShadow: isMidnight
-                      ? "0 12px 36px rgba(0, 220, 130, 0.35)"
-                      : "0 12px 30px rgba(15, 118, 110, 0.5)",
-                  },
-                }}
-              >
-                <SmartToyIcon sx={{ fontSize: 24, color: isMidnight ? "#00dc82" : "inherit" }} />
-                <Box>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ fontWeight: 900, lineHeight: 1.2, letterSpacing: 0.3 }}
-                  >
-                    GreenMind Copilot
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      fontSize: "0.68rem",
-                      color: isMidnight ? "#94a3b8" : "#ccfbf1",
-                      display: "block",
-                      fontWeight: 600,
-                    }}
-                  >
-                    Debrecen Urban AI
-                  </Typography>
-                </Box>
-              </Paper>
+              <Tooltip title="GreenMind Copilot • Click to open or drag to move" arrow placement="left">
+                <Paper
+                  elevation={4}
+                  sx={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: tokens.copilotTriggerBg,
+                    color: tokens.copilotTriggerColor,
+                    boxShadow: "0 6px 20px rgba(15, 118, 110, 0.35)",
+                    border: isMidnight ? "1px solid rgba(0, 220, 130, 0.4)" : "1px solid rgba(255, 255, 255, 0.4)",
+                    transition: "transform 0.15s ease, box-shadow 0.15s ease",
+                    "&:hover": {
+                      transform: "scale(1.08)",
+                      boxShadow: "0 8px 24px rgba(15, 118, 110, 0.45)",
+                    },
+                  }}
+                >
+                  <SmartToyIcon sx={{ fontSize: 24, color: isMidnight ? "#79b998" : "#ffffff" }} />
+                </Paper>
+              </Tooltip>
             </Badge>
           </Box>
         </Fade>
       )}
 
-      {/* Floating Chat Drawer Window */}
+      {/* Floating Chat Window (Compact, Movable, Non-intrusive) */}
       {isOpen && (
         <Fade in={isOpen}>
           <Paper
-            elevation={12}
+            elevation={10}
             sx={{
               position: "fixed",
-              bottom: { xs: 0, sm: 24 },
-              right: { xs: 0, sm: 24 },
+              left: winPos ? winPos.x : undefined,
+              top: winPos ? winPos.y : undefined,
+              right: winPos ? undefined : { xs: 12, sm: 20 },
+              bottom: winPos ? undefined : { xs: 12, sm: 20 },
               width: {
-                xs: "100vw",
-                sm: isExpanded ? 720 : 420,
+                xs: "calc(100vw - 24px)",
+                sm: currentWinWidth,
               },
               height: {
-                xs: "100vh",
-                sm: isExpanded ? "85vh" : 620,
+                xs: "65vh",
+                sm: currentWinHeight,
               },
-              maxHeight: "90vh",
-              borderRadius: { xs: 0, sm: 3.5 },
+              maxHeight: "80vh",
+              borderRadius: 3,
               overflow: "hidden",
               zIndex: 1400,
               display: "flex",
               flexDirection: "column",
               backgroundColor: "#ffffff",
               border: `1px solid ${tokens.cardBorder}`,
-              boxShadow: "0 20px 45px rgba(11, 19, 41, 0.25)",
-              transition: "width 0.25s ease, height 0.25s ease",
+              boxShadow: "0 16px 38px rgba(15, 23, 42, 0.18)",
+              transition: winDraggingRef.current ? "none" : "width 0.2s ease, height 0.2s ease",
             }}
           >
-            {/* Drawer Header */}
+            {/* Draggable Header */}
             <Box
+              onPointerDown={handleWinPointerDown}
+              onPointerMove={handleWinPointerMove}
+              onPointerUp={handleWinPointerUp}
               sx={{
-                p: 2,
+                px: 1.5,
+                py: 1,
                 background: isMidnight
                   ? "linear-gradient(135deg, #0b1329 0%, #1e293b 100%)"
                   : "linear-gradient(135deg, #0f766e 0%, #064e3b 100%)",
@@ -384,137 +445,106 @@ export default function GreenMindCopilot() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                boxShadow: "0 2px 10px rgba(0,0,0,0.15)",
+                cursor: "grab",
+                touchAction: "none",
+                userSelect: "none",
+                "&:active": { cursor: "grabbing" },
                 borderBottom: isMidnight ? "1px solid rgba(0, 220, 130, 0.2)" : "none",
               }}
             >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
-                <Box
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <DragIndicatorIcon sx={{ fontSize: 18, color: "rgba(255, 255, 255, 0.6)" }} />
+                <SmartToyIcon sx={{ color: isMidnight ? "#79b998" : "#5eead4", fontSize: 20 }} />
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, lineHeight: 1.2, fontSize: "0.85rem" }}>
+                  GreenMind Copilot
+                </Typography>
+                <Chip
+                  size="small"
+                  label="GPT-4o"
                   sx={{
-                    width: 38,
-                    height: 38,
-                    borderRadius: 2,
-                    backgroundColor: isMidnight
-                      ? "rgba(0, 220, 130, 0.15)"
-                      : "rgba(255, 255, 255, 0.15)",
-                    border: isMidnight ? "1px solid rgba(0, 220, 130, 0.3)" : "none",
-                    backdropFilter: "blur(4px)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    height: 16,
+                    fontSize: "0.58rem",
+                    fontWeight: 600,
+                    backgroundColor: isMidnight ? "#79b998" : "#14b8a6",
+                    color: isMidnight ? "#0b1329" : "#ffffff",
+                    px: 0.2,
                   }}
-                >
-                  <SmartToyIcon sx={{ color: isMidnight ? "#00dc82" : "#5eead4", fontSize: 24 }} />
-                </Box>
-
-                <Box>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 900, lineHeight: 1.2 }}>
-                      GreenMind Copilot
-                    </Typography>
-                    <Chip
-                      size="small"
-                      label="GPT-4o"
-                      sx={{
-                        height: 18,
-                        fontSize: "0.62rem",
-                        fontWeight: 800,
-                        backgroundColor: isMidnight ? "#00dc82" : "#14b8a6",
-                        color: isMidnight ? "#0b1329" : "#ffffff",
-                      }}
-                    />
-                  </Box>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: isMidnight ? "#94a3b8" : "#99f6e4",
-                      fontSize: "0.7rem",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 0.5,
-                    }}
-                  >
-                    <span style={{ color: "#00dc82" }}>●</span> Connected to Debrecen Sensor Grid
-                  </Typography>
-                </Box>
+                />
               </Box>
 
-              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                <Tooltip title="Clear chat history" arrow>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.25 }}>
+                <Tooltip title="Clear chat" arrow>
                   <IconButton
                     size="small"
                     onClick={handleClearChat}
-                    sx={{ color: "rgba(255, 255, 255, 0.8)", "&:hover": { color: "#ffffff" } }}
+                    sx={{ color: "rgba(255, 255, 255, 0.75)", p: 0.5, "&:hover": { color: "#ffffff" } }}
                   >
-                    <DeleteIcon fontSize="small" />
+                    <DeleteIcon sx={{ fontSize: 16 }} />
                   </IconButton>
                 </Tooltip>
 
-                <Tooltip title={isExpanded ? "Restore size" : "Expand window"} arrow>
+                <Tooltip title="Minimize" arrow>
+                  <IconButton
+                    size="small"
+                    onClick={() => setIsOpen(false)}
+                    sx={{ color: "rgba(255, 255, 255, 0.75)", p: 0.5, "&:hover": { color: "#ffffff" } }}
+                  >
+                    <RemoveIcon sx={{ fontSize: 16 }} />
+                  </IconButton>
+                </Tooltip>
+
+                <Tooltip title={isExpanded ? "Standard size" : "Expand size"} arrow>
                   <IconButton
                     size="small"
                     onClick={() => setIsExpanded((prev) => !prev)}
                     sx={{
-                      color: "rgba(255, 255, 255, 0.8)",
+                      color: "rgba(255, 255, 255, 0.75)",
+                      p: 0.5,
                       "&:hover": { color: "#ffffff" },
                       display: { xs: "none", sm: "inline-flex" },
                     }}
                   >
                     {isExpanded ? (
-                      <CloseFullscreenIcon fontSize="small" />
+                      <CloseFullscreenIcon sx={{ fontSize: 16 }} />
                     ) : (
-                      <OpenInFullIcon fontSize="small" />
+                      <OpenInFullIcon sx={{ fontSize: 16 }} />
                     )}
                   </IconButton>
                 </Tooltip>
 
-                <Tooltip title="Close Copilot" arrow>
+                <Tooltip title="Close" arrow>
                   <IconButton
                     size="small"
                     onClick={() => setIsOpen(false)}
-                    sx={{ color: "rgba(255, 255, 255, 0.8)", "&:hover": { color: "#ffffff" } }}
+                    sx={{ color: "rgba(255, 255, 255, 0.75)", p: 0.5, "&:hover": { color: "#ffffff" } }}
                   >
-                    <CloseIcon fontSize="small" />
+                    <CloseIcon sx={{ fontSize: 16 }} />
                   </IconButton>
                 </Tooltip>
               </Box>
             </Box>
 
-            {/* Live Context Banner */}
+            {/* Compact Context Banner */}
             <Box
               sx={{
-                px: 2,
-                py: 0.85,
+                px: 1.5,
+                py: 0.5,
                 backgroundColor: "#f0fdfa",
                 borderBottom: "1px solid #ccfbf1",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                gap: 1,
               }}
             >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, minWidth: 0 }}>
-                <Chip
-                  size="small"
-                  label={`📍 ${window.location.pathname === "/" ? "Dashboard" : window.location.pathname.replace("/", "")}`}
-                  sx={{
-                    height: 20,
-                    fontSize: "0.68rem",
-                    fontWeight: 800,
-                    backgroundColor: "#ccfbf1",
-                    color: "#0f766e",
-                  }}
-                />
-                <Typography
-                  variant="caption"
-                  noWrap
-                  sx={{ color: "#0d9488", fontWeight: 700, fontSize: "0.72rem" }}
-                >
-                  {simulatedStations.length > 0
-                    ? `📡 ${simulatedStations.length} simulated stations (€${simulatedStations.reduce((acc, s) => acc + (s.unitCost || 1200), 0).toLocaleString()})`
-                    : "🔒 Strictly grounded to GreenMind AI & Debrecen"}
-                </Typography>
-              </Box>
+              <Typography
+                variant="caption"
+                noWrap
+                sx={{ color: "#0f766e", fontWeight: 600, fontSize: "0.7rem" }}
+              >
+                {simulatedStations.length > 0
+                  ? `📡 ${simulatedStations.length} simulated stations (€${simulatedStations.reduce((acc, s) => acc + (s.unitCost || 1200), 0).toLocaleString()})`
+                  : "🔒 Connected to Debrecen Sensor Grid"}
+              </Typography>
             </Box>
 
             {/* Chat Messages Stream */}
@@ -522,11 +552,11 @@ export default function GreenMindCopilot() {
               sx={{
                 flex: 1,
                 overflowY: "auto",
-                p: 2,
+                p: 1.5,
                 backgroundColor: "#f8fafc",
                 display: "flex",
                 flexDirection: "column",
-                gap: 1.5,
+                gap: 1.25,
               }}
             >
               {messages.map((msg, index) => {
@@ -543,17 +573,17 @@ export default function GreenMindCopilot() {
                     <Paper
                       elevation={0}
                       sx={{
-                        maxWidth: "88%",
-                        p: 1.75,
-                        borderRadius: 3,
-                        borderTopRightRadius: isUser ? 0 : 3,
-                        borderTopLeftRadius: isUser ? 3 : 0,
+                        maxWidth: "90%",
+                        p: 1.25,
+                        borderRadius: 2.5,
+                        borderTopRightRadius: isUser ? 0 : 2.5,
+                        borderTopLeftRadius: isUser ? 2.5 : 0,
                         backgroundColor: isUser ? "#0f766e" : "#ffffff",
                         color: isUser ? "#ffffff" : "#1e293b",
                         border: isUser ? "none" : "1px solid #e2e8f0",
                         boxShadow: isUser
-                          ? "0 4px 12px rgba(15, 118, 110, 0.25)"
-                          : "0 2px 8px rgba(0, 0, 0, 0.04)",
+                          ? "0 2px 8px rgba(15, 118, 110, 0.2)"
+                          : "0 1px 4px rgba(0, 0, 0, 0.04)",
                         position: "relative",
                         "&:hover .copy-btn": { opacity: 1 },
                       }}
@@ -567,26 +597,26 @@ export default function GreenMindCopilot() {
                             onClick={() => handleCopyMessage(msg.content, index)}
                             sx={{
                               position: "absolute",
-                              top: 6,
-                              right: 6,
+                              top: 4,
+                              right: 4,
                               opacity: 0,
                               transition: "opacity 0.2s",
                               color: "#64748b",
-                              p: 0.5,
+                              p: 0.3,
                             }}
                             title="Copy response"
                           >
                             {copiedIndex === index ? (
-                              <CheckIcon sx={{ fontSize: 15, color: "#059669" }} />
+                              <CheckIcon sx={{ fontSize: 13, color: "#059669" }} />
                             ) : (
-                              <ContentCopyIcon sx={{ fontSize: 15 }} />
+                              <ContentCopyIcon sx={{ fontSize: 13 }} />
                             )}
                           </IconButton>
                         </>
                       ) : (
                         <Typography
                           variant="body2"
-                          sx={{ fontSize: "0.88rem", lineHeight: 1.45, fontWeight: 500 }}
+                          sx={{ fontSize: "0.82rem", lineHeight: 1.35, fontWeight: 500 }}
                         >
                           {msg.content}
                         </Typography>
@@ -597,40 +627,28 @@ export default function GreenMindCopilot() {
               })}
 
               {isLoading && (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, p: 1 }}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      backgroundColor: "#ffffff",
-                      px: 2,
-                      py: 1,
-                      borderRadius: 3,
-                      border: "1px solid #e2e8f0",
-                    }}
-                  >
-                    <CircularProgress size={16} sx={{ color: "#0f766e" }} />
-                    <Typography variant="caption" sx={{ color: "#64748b", fontWeight: 700 }}>
-                      GreenMind Copilot is analyzing Debrecen data...
-                    </Typography>
-                  </Box>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1, p: 0.5 }}>
+                  <CircularProgress size={14} sx={{ color: "#0f766e" }} />
+                  <Typography variant="caption" sx={{ color: "#64748b", fontWeight: 600, fontSize: "0.75rem" }}>
+                    Analyzing sensor data...
+                  </Typography>
                 </Box>
               )}
 
               <div ref={messagesEndRef} />
             </Box>
 
-            {/* Quick Suggestions Chips */}
+            {/* Quick Suggestions Chips (Compact scroll) */}
             <Box
               sx={{
-                p: 1.25,
+                px: 1,
+                py: 0.75,
                 backgroundColor: "#ffffff",
-                borderTop: "1px solid #e2e8f0",
+                borderTop: "1px solid #f1f5f9",
                 display: "flex",
                 flexWrap: "nowrap",
                 overflowX: "auto",
-                gap: 0.75,
+                gap: 0.5,
                 "&::-webkit-scrollbar": { display: "none" },
               }}
             >
@@ -645,8 +663,9 @@ export default function GreenMindCopilot() {
                   disabled={isLoading}
                   sx={{
                     flexShrink: 0,
-                    fontSize: "0.72rem",
-                    fontWeight: 700,
+                    fontSize: "0.68rem",
+                    height: 24,
+                    fontWeight: 600,
                     backgroundColor: "#f0fdfa",
                     color: "#0f766e",
                     border: "1px solid #99f6e4",
@@ -664,19 +683,17 @@ export default function GreenMindCopilot() {
             {/* Input Bar */}
             <Box
               sx={{
-                p: 1.5,
+                p: 1,
                 backgroundColor: "#ffffff",
                 display: "flex",
                 alignItems: "center",
-                gap: 1,
+                gap: 0.75,
               }}
             >
               <TextField
                 fullWidth
                 size="small"
-                multiline
-                maxRows={3}
-                placeholder="Ask about air quality, budget allocation, or council reports..."
+                placeholder="Ask about air, budget, or sensors..."
                 value={inputQuery}
                 onChange={(e) => setInputQuery(e.target.value)}
                 onKeyDown={(e) => {
@@ -688,8 +705,9 @@ export default function GreenMindCopilot() {
                 disabled={isLoading}
                 sx={{
                   "& .MuiOutlinedInput-root": {
-                    borderRadius: 2.5,
-                    fontSize: "0.85rem",
+                    borderRadius: 2,
+                    fontSize: "0.8rem",
+                    py: 0.25,
                     backgroundColor: "#f8fafc",
                     "&.Mui-focused": {
                       backgroundColor: "#ffffff",
@@ -704,8 +722,8 @@ export default function GreenMindCopilot() {
                 onClick={() => handleSendMessage()}
                 disabled={!inputQuery.trim() || isLoading}
                 sx={{
-                  width: 40,
-                  height: 40,
+                  width: 34,
+                  height: 34,
                   backgroundColor: inputQuery.trim() ? "#0f766e" : "#e2e8f0",
                   color: "#ffffff",
                   "&:hover": {
@@ -717,7 +735,7 @@ export default function GreenMindCopilot() {
                   },
                 }}
               >
-                <SendIcon fontSize="small" />
+                <SendIcon sx={{ fontSize: 16 }} />
               </IconButton>
             </Box>
           </Paper>

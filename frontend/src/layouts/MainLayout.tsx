@@ -75,15 +75,13 @@ export default function MainLayout() {
                 width: 44,
                 height: 44,
                 background: tokens.brandAvatarBg,
-                boxShadow: isMidnight
-                  ? "0 4px 16px rgba(0, 220, 130, 0.25)"
-                  : "0 10px 24px rgba(15, 118, 110, 0.25)",
+                boxShadow: "none",
                 border: isMidnight
                   ? "1px solid rgba(0, 220, 130, 0.3)"
                   : "none",
               }}
             >
-              <ParkIcon sx={{ color: isMidnight ? "#00dc82" : "#ffffff" }} />
+              <ParkIcon sx={{ color: isMidnight ? "#79b998" : "#ffffff" }} />
             </Avatar>
 
             <BrandLogo variant="header" showTagline={true} />
@@ -122,7 +120,7 @@ export default function MainLayout() {
                     backgroundColor: isMidnight
                       ? "rgba(255, 255, 255, 0.12)"
                       : "rgba(15, 118, 110, 0.14)",
-                    color: isMidnight ? "#00dc82" : "#0f766e",
+                    color: isMidnight ? "#79b998" : "#0f766e",
                   },
                 }}
               >
@@ -148,7 +146,7 @@ export default function MainLayout() {
                 border: isMidnight
                   ? "1px solid rgba(192, 132, 252, 0.25)"
                   : "1px solid #e9d5ff",
-                fontWeight: 700,
+                fontWeight: 600,
                 "& .MuiChip-icon": {
                   color: isMidnight ? "#c084fc" : "#7c3aed",
                 },
@@ -161,14 +159,14 @@ export default function MainLayout() {
               sx={{
                 height: 34,
                 px: 0.75,
-                color: isMidnight ? "#00dc82" : "#0f766e",
+                color: isMidnight ? "#79b998" : "#0f766e",
                 backgroundColor: isMidnight
                   ? "rgba(0, 220, 130, 0.1)"
                   : "#e8f7f3",
                 border: isMidnight
                   ? "1px solid rgba(0, 220, 130, 0.3)"
                   : "1px solid #cdece4",
-                fontWeight: 700,
+                fontWeight: 600,
               }}
             />
           </Box>

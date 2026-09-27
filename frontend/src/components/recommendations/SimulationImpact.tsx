@@ -106,7 +106,7 @@ export default function SimulationImpact() {
       <Typography
         variant="h5"
         sx={{
-          fontWeight: 700,
+          fontWeight: 600,
           mb: 2,
         }}
       >
@@ -149,7 +149,7 @@ export default function SimulationImpact() {
 
                   <Typography
                     variant="h5"
-                    sx={{ fontWeight: 700 }}
+                    sx={{ fontWeight: 600 }}
                   >
                     {metric.after}
                   </Typography>

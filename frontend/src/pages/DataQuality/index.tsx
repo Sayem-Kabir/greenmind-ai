@@ -66,9 +66,9 @@ function QualityMetricCard({
         transition:
           "transform 160ms ease, box-shadow 160ms ease",
         "&:hover": {
-          transform: "translateY(-3px)",
+          transform: "none",
           boxShadow:
-            "0 12px 28px rgba(31, 60, 52, 0.09)",
+            "none",
         },
       }}
     >
@@ -94,7 +94,7 @@ function QualityMetricCard({
             variant="body2"
             sx={{
               color: card.accent,
-              fontWeight: 700,
+              fontWeight: 600,
             }}
           >
             {card.title}
@@ -104,7 +104,7 @@ function QualityMetricCard({
         <Typography
           variant="h4"
           sx={{
-            fontWeight: 800,
+            fontWeight: 600,
             color: "#1f2f2b",
             letterSpacing: "-0.03em",
           }}
@@ -171,7 +171,7 @@ export default function DataQuality() {
         <Typography
           variant="h4"
           sx={{
-            fontWeight: 800,
+            fontWeight: 600,
             color: "#173c35",
             letterSpacing: "-0.03em",
           }}
@@ -211,7 +211,7 @@ export default function DataQuality() {
         <Typography
           variant="h4"
           sx={{
-            fontWeight: 800,
+            fontWeight: 600,
             color: "#173c35",
             mb: 3,
           }}
@@ -376,7 +376,7 @@ export default function DataQuality() {
           <Typography
             variant="h4"
             sx={{
-              fontWeight: 800,
+              fontWeight: 600,
               color: "#173c35",
               letterSpacing: "-0.03em",
             }}
@@ -413,7 +413,7 @@ export default function DataQuality() {
               color: "#0f766e",
               backgroundColor: "#ecfdf5",
               border: "1px solid #a7f3d0",
-              fontWeight: 700,
+              fontWeight: 600,
             }}
           />
 
@@ -424,7 +424,7 @@ export default function DataQuality() {
               color: "#7c3aed",
               backgroundColor: "#f5f3ff",
               border: "1px solid #ddd6fe",
-              fontWeight: 700,
+              fontWeight: 600,
             }}
           />
 
@@ -435,7 +435,7 @@ export default function DataQuality() {
               color: "#2563eb",
               backgroundColor: "#eff6ff",
               border: "1px solid #bfdbfe",
-              fontWeight: 700,
+              fontWeight: 600,
             }}
           />
         </Box>
@@ -457,7 +457,7 @@ export default function DataQuality() {
         <Typography
           variant="h5"
           sx={{
-            fontWeight: 800,
+            fontWeight: 600,
             color: "#213a34",
           }}
         >
@@ -498,7 +498,7 @@ export default function DataQuality() {
         sx={{
           mt: 3,
           mb: 2,
-          fontWeight: 800,
+          fontWeight: 600,
           color: "#213a34",
         }}
       >
@@ -527,7 +527,7 @@ export default function DataQuality() {
           borderColor:
             "rgba(15, 118, 110, 0.12)",
           background:
-            "linear-gradient(135deg, #ffffff 0%, #f4faf8 100%)",
+            "#ffffff",
         }}
       >
         <CardContent
@@ -541,7 +541,7 @@ export default function DataQuality() {
           <Typography
             variant="h6"
             sx={{
-              fontWeight: 800,
+              fontWeight: 600,
               color: "#213a34",
             }}
           >
@@ -600,7 +600,7 @@ export default function DataQuality() {
                     variant="h5"
                     sx={{
                       mt: 0.75,
-                      fontWeight: 800,
+                      fontWeight: 600,
                       color: "#173c35",
                     }}
                   >

@@ -16,12 +16,12 @@
 <br/>
 
 <p align="center">
-  <img src="docs/screenshots/01_overview_dashboard.png" alt="GreenMind AI Control Tower" width="95%" style="border-radius: 12px; box-shadow: 0 12px 36px rgba(0,0,0,0.25);" />
+  <img src="docs/screenshots/01_overview_dashboard.png" alt="GreenMind AI Control Tower" width="96%" style="border-radius: 12px; box-shadow: 0 12px 36px rgba(0,0,0,0.25);" />
 </p>
 
 <p align="center">
-  <b>GreenMind AI</b> bridges the gap between raw environmental sensor feeds and municipal policy action.<br/>
-  It optimizes sensor network expansion using <b>Adjacent Frontier AI placement</b>, forecasts hardware degradation with <b>predictive maintenance</b>, manages the complete sensor lifecycle (including <b>sensor decommissioning</b>), and plans multi-year <b>municipal budgets</b>.
+  <b>GreenMind AI</b> bridges the gap between raw environmental sensor feeds and actionable municipal policy.<br/>
+  It powers autonomous network expansion via <b>Gaussian Process Kriging & Frontier AI Placement</b>, solves multi-tier <b>MILP Budget Optimization</b>, forecasts hardware degradation with <b>Weibull AFT Predictive Maintenance</b>, and assists city leaders through the <b>GreenMind Copilot</b>.
 </p>
 
 </div>
@@ -30,90 +30,136 @@
 
 ## 📑 Table of Contents
 
-- [Key Capabilities](#-key-capabilities)
-- [Visual Walkthrough & Screenshots](#-visual-walkthrough--screenshots)
-- [System Architecture](#-system-architecture)
-- [Algorithmic & Mathematical Foundation](#-algorithmic--mathematical-foundation)
-  - [Adjacent Frontier Sensor Placement](#1-adjacent-frontier-sensor-placement-algorithm)
-  - [Spatial IDW Interpolation](#2-spatial-inverse-distance-weighting-idw)
-  - [Multi-Objective Suitability Scoring](#3-multi-objective-environmental-scoring)
-  - [Hardware Degradation & RUL Modeling](#4-predictive-maintenance-health-prognostics)
-- [Sensor Health & Decommissioning Lifecycle](#-sensor-health--decommissioning-lifecycle)
-- [API Reference](#-api-reference)
-- [Project Directory Structure](#-project-directory-structure)
-- [Quickstart & Installation](#-quickstart--installation)
-- [Testing & Quality Verification](#-testing--quality-verification)
-- [Author & Credits](#-author--credits)
+- [🌟 Key Capabilities](#-key-capabilities)
+- [📸 Visual Walkthrough & System Screenshots](#-visual-walkthrough--system-screenshots)
+  - [1. Central Municipal Operations Control Tower](#1-central-municipal-operations-control-tower)
+  - [2. Debrecen Spatial Digital Twin & Real-Time Kriging Heatmap](#2-debrecen-spatial-digital-twin--real-time-kriging-heatmap)
+  - [3. Mathematical Global Optimum Budget Optimizer (MILP Solver)](#3-mathematical-global-optimum-budget-optimizer-milp-solver)
+  - [4. Sensor Fleet Health Diagnostics & Degradation Tracking](#4-sensor-fleet-health-diagnostics--degradation-tracking)
+  - [5. Predictive Maintenance & Field Technician Dispatch Queue](#5-predictive-maintenance--field-technician-dispatch-queue)
+  - [6. GreenMind Copilot (Autonomous Municipal Assistant)](#6-greenmind-copilot-autonomous-municipal-assistant)
+  - [7. Interactive AI Recommendations & Geospatial Optimization](#7-interactive-ai-recommendations--geospatial-optimization)
+  - [8. Spatial Coverage Blanketing & Multi-Tier Station Metrics](#8-spatial-coverage-blanketing--multi-tier-station-metrics)
+- [🏛️ System Architecture](#-system-architecture)
+- [🔬 Algorithmic & Mathematical Foundation](#-algorithmic--mathematical-foundation)
+  - [1. Spatial Kriging (Gaussian Process Regression) & IDW](#1-spatial-kriging-gaussian-process-regression--idw)
+  - [2. Spatial Random Forest Surrogate & Active Learning](#2-spatial-random-forest-surrogate--active-learning)
+  - [3. Adjacent Frontier Placement Optimization](#3-adjacent-frontier-placement-optimization)
+  - [4. Mixed-Integer Linear Programming (MILP) Budget Optimizer](#4-mixed-integer-linear-programming-milp-budget-optimizer)
+  - [5. Weibull Accelerated Failure Time (AFT) Prognostics](#5-weibull-accelerated-failure-time-aft-prognostics)
+- [🛠️ Sensor Fleet Lifecycle & Decommissioning](#-sensor-fleet-lifecycle--decommissioning)
+- [📡 API Reference](#-api-reference)
+- [📂 Project Directory Structure](#-project-directory-structure)
+- [🚀 Quickstart & Installation](#-quickstart--installation)
+- [🧪 Testing & Quality Verification](#-testing--quality-verification)
+- [👨‍💻 Author & Credits](#-author--credits)
 
 ---
 
 ## 🌟 Key Capabilities
 
 1. **Frontier-Adjacent AI Placement Optimizer**
-   - Eliminates blind spots by analyzing PM2.5, PM10, NO₂, O₃, acoustic noise, groundwater tables, and DKV public transit mobility.
-   - Enforces **contiguity and non-overlapping radius constraints** ($r = 2.0\text{ km}$, separation $\ge 2.4\text{ km}$), first covering immediate adjacent zones of existing stations before expanding outward.
+   - Eliminates city-wide blind spots by analyzing $\text{PM}_{2.5}$, $\text{PM}_{10}$, $\text{NO}_2$, $\text{O}_3$, acoustic noise, groundwater tables, and DKV transit flows.
+   - Enforces **contiguity and non-overlapping radius constraints** ($r = 2.0\text{ km}$, separation $\ge 2.4\text{ km}$), expanding methodically outward from current monitoring anchors.
 
-2. **Full GIS Digital Twin & Real-Time Simulation**
-   - Interactive Leaflet geospatial map of Debrecen with official stations, AI recommendations, and custom drag-and-drop simulated pins.
-   - Live coverage blanketing calculations, sector balancing (North, South, East, West, Airport, Industrial belts), and boundary containment.
+2. **Full GIS Digital Twin & Real-Time Simulation Map**
+   - Interactive Leaflet geospatial map of Debrecen with official sentinel stations, AI recommendations, and custom drag-and-drop simulated pins.
+   - Real-time Gaussian Process Kriging contour interpolation, multi-tier coverage halos (Gold: $3.5\text{ km}$, Purple: $1.8\text{ km}$, Teal: $0.8\text{ km}$), and municipal boundary containment.
 
-3. **Sensor Fleet Health, Diagnostics & Lifecycle Management**
-   - Real-time tracking of sensor degradation, signal jitter, baseline drift, packet completeness, and calibration offsets.
-   - **Sensor Decommissioning System**: Remove faulty or retired sensors from active monitoring, auto-recalculating fleet diagnostics.
-   - Custom sensor registration with automatic prognostic baseline assignment.
+3. **CapEx & 5-Year TCO Municipal Budget Optimizer**
+   - **MILP Mathematical Global Optimum Solver** (`scipy.optimize.milp`) for multi-choice 0-1 knapsack budget allocation.
+   - Balances certified **EN Reference Stations (€28,000)**, **Mid-Tier Micro-Stations (€6,500)**, and **Low-Cost IoT Mesh Nodes (€1,200)** to maximize population coverage per Euro.
+   - Calculates 5-year operating lifecycle costs (OpEx/O&M), citizen ROI (€/resident protected), and EU Clean Air Directive compliance readiness.
 
-4. **Predictive Maintenance (PdM) & Work Orders**
-   - Remaining Useful Life (RUL) modeling and automatic triage into `CRITICAL`, `WARNING`, and `OPTIMAL` health tiers.
-   - Automated dispatch order creation for field technician crews with localized routing and tool checklists.
+4. **Sensor Fleet Health, Diagnostics & Lifecycle Management**
+   - Continuously analyzes telemetry stability: signal jitter variance, baseline zero-drift, packet loss, and calibration offsets.
+   - **Full Decommissioning System**: Retire or decommission faulty sensors with single-click safety modals, automatically flushing caches and recalculating fleet statistics.
+   - Custom station onboarding with instant prognostic baseline initialization.
 
-5. **CapEx & OpEx Municipal Budget Optimizer**
-   - Interactive budget allocation simulator for phased 1-to-5-year municipal planning.
-   - Real-time ROI analysis: cost per monitored citizen, cost per km² coverage, and dynamic tier selection (Reference vs. Micro vs. Virtual nodes).
+5. **Predictive Maintenance (PdM) & Work Order Dispatch**
+   - **Weibull AFT Machine Learning** models Remaining Useful Life (RUL) and triages fleet components into `CRITICAL (P1)`, `WARNING (P2)`, and `OPTIMAL (P3)`.
+   - Automated work order generation with failure mode diagnosis, estimated service duration, and assigned field engineering crews.
 
-6. **GreenMind AI Copilot**
-   - Context-aware autonomous environmental intelligence assistant capable of answering complex municipal queries, explaining anomalies, and guiding planning decisions.
+6. **GreenMind Copilot (Context-Aware Municipal Assistant)**
+   - GPT-4o powered environmental intelligence co-pilot integrated directly with Debrecen's live sensor grid and simulation state.
+   - Explains pollutant anomalies, evaluates what-if coverage scenarios, answers municipal budget questions, and drafts council briefings.
 
 7. **Dual-Theme Operations Control Tower**
-   - **Midnight Operations Mode**: High-contrast OLED dark mode engineered for municipal control rooms.
-   - **Clean Light Mode**: High-readability light aesthetic designed for public briefings and reports.
+   - **Midnight Operations Mode**: High-contrast OLED dark mode engineered for 24/7 municipal control rooms.
+   - **Clean Light Mode**: Crisp, high-readability presentation theme for public briefings and stakeholder reports.
 
 ---
 
-## 📸 Visual Walkthrough & Screenshots
+## 📸 Visual Walkthrough & System Screenshots
 
-### 1. Interactive AI Recommendations & Geospatial Optimization
+### 1. Central Municipal Operations Control Tower
+> Unified operations center consolidating Debrecen's live environmental vital signs, pollutant distributions, fleet health indices, and cross-sector telemetry feeds.
+
+<p align="center">
+  <img src="docs/screenshots/01_overview_dashboard.png" alt="Municipal Operations Dashboard" width="95%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.18);" />
+</p>
+
+---
+
+### 2. Debrecen Spatial Digital Twin & Real-Time Kriging Heatmap
+> Interactive Leaflet GIS digital twin featuring real-time Gaussian Process Kriging interpolation, municipal boundary constraints, layer toggles, and multi-tier sensor deployment halos.
+
+<p align="center">
+  <img src="docs/screenshots/02_debrecen_spatial_digital_twin.png" alt="Debrecen Spatial Digital Twin" width="95%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.18);" />
+</p>
+
+---
+
+### 3. Mathematical Global Optimum Budget Optimizer (MILP Solver)
+> Automated municipal procurement engine utilizing Mixed-Integer Linear Programming (`scipy.optimize.milp`) to allocate CapEx and 5-Year TCO across Reference, Micro, and IoT tiers with live city map synchronization.
+
+<p align="center">
+  <img src="docs/screenshots/07_budget_optimizer_milp.png" alt="MILP Budget Optimizer" width="95%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.18);" />
+</p>
+
+---
+
+### 4. Sensor Fleet Health Diagnostics & Degradation Tracking
+> Weibull AFT predictive diagnostics continuously tracking signal jitter, zero-point baseline drift, and packet completeness across all active Debrecen monitoring nodes.
+
+<p align="center">
+  <img src="docs/screenshots/08_sensor_health_fleet.png" alt="Sensor Fleet Health Overview" width="95%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.18);" />
+</p>
+
+---
+
+### 5. Predictive Maintenance & Field Technician Dispatch Queue
+> Automated technician dispatch board converting sensor failure indicators into prioritized service tickets with technician assignment, estimated field hours, and targeted action checklists.
+
+<p align="center">
+  <img src="docs/screenshots/09_work_orders_dispatch.png" alt="Work Orders Dispatch Queue" width="95%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.18);" />
+</p>
+
+---
+
+### 6. GreenMind Copilot (Autonomous Municipal Assistant)
+> Context-aware urban intelligence assistant powered by GPT-4o, providing instant query resolution, what-if simulation explanations, and policy briefing generation.
+
+<p align="center">
+  <img src="docs/screenshots/10_greenmind_copilot_assistant.png" alt="GreenMind Copilot Assistant" width="55%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.18);" />
+</p>
+
+---
+
+### 7. Interactive AI Recommendations & Geospatial Optimization
 > High-priority monitoring candidates placed contiguously without overlapping sensor radii across Debrecen's urban, academic, and industrial sectors.
 
 <p align="center">
-  <img src="docs/screenshots/02_ai_recommendations_map.png" alt="AI Sensor Placement Recommendations" width="90%" style="border-radius: 8px;" />
+  <img src="docs/screenshots/02_ai_recommendations_map.png" alt="AI Sensor Placement Recommendations" width="95%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.18);" />
 </p>
 
 ---
 
-### 2. High-Fidelity Environmental Telemetry & Digital Twin
-> Proportional telemetry cards displaying estimated PM2.5, WHO target alignment, Class-1 acoustic noise, groundwater conductivity, CapEx/OpEx, and exact GPS coordinates.
+### 8. Spatial Coverage Blanketing & Multi-Tier Station Metrics
+> Dynamic telemetry analytics comparing active population coverage, unmonitored blind spot percentage, and sector-balanced recommendation rankings.
 
 <p align="center">
-  <img src="docs/screenshots/04_simulated_sensor_telemetry.png" alt="Simulated Sensor Telemetry" width="48%" style="border-radius: 8px; display: inline-block; vertical-align: top; margin-right: 2%;" />
-  <img src="docs/screenshots/03_implemented_sensor_card.png" alt="Implemented Sensor Telemetry" width="48%" style="border-radius: 8px; display: inline-block; vertical-align: top;" />
-</p>
-
----
-
-### 3. Spatial Coverage Blanketing & Multi-Tier Station Management
-> Real-time coverage expansion metrics showing active population coverage, unmonitored blind spot percentage, and sector-balanced recommendation rankings.
-
-<p align="center">
-  <img src="docs/screenshots/05_coverage_and_rankings.png" alt="Coverage and Rankings" width="90%" style="border-radius: 8px;" />
-</p>
-
----
-
-### 4. Municipal Operations Control Center & Executive Reporting
-> Cohesive command dashboard integrating live environmental indices, pollutant distributions, fleet status, and cross-sector telemetry feeds.
-
-<p align="center">
-  <img src="docs/screenshots/06_system_control_center.png" alt="System Control Center" width="90%" style="border-radius: 8px;" />
+  <img src="docs/screenshots/05_coverage_and_rankings.png" alt="Coverage and Rankings" width="95%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.18);" />
 </p>
 
 ---
@@ -130,11 +176,12 @@ flowchart TB
     end
 
     subgraph Backend Layer ["FastAPI Intelligence Core (Python 3.12)"]
+        P1 --> ML["ML Placement Engine<br/>(GP Kriging + Random Forest Surrogate)"]
         P1 --> RE["Recommendation Engine<br/>(Frontier Expansion & Adjacency)"]
-        P1 --> SH["Sensor Health Service<br/>(Degradation & RUL Prognostics)"]
+        P1 --> SH["Sensor Health Service<br/>(Weibull AFT & Degradation)"]
         P1 --> MS["Maintenance Dispatcher<br/>(Work Order Scheduler)"]
-        P1 --> BO["Budget Optimizer<br/>(CapEx / OpEx Multi-Year Simulator)"]
-        P1 --> CP["GreenMind AI Copilot<br/>(Contextual Municipal Chatbot)"]
+        P1 --> BO["Budget Optimizer<br/>(MILP Solver & 5-Year TCO)"]
+        P1 --> CP["GreenMind Copilot<br/>(Contextual Municipal Chatbot)"]
 
         RE --> API1["/api/recommendations"]
         SH --> API2["/api/sensor-health"]
@@ -149,7 +196,7 @@ flowchart TB
         SC --> MC["Maintenance Context"]
         SC --> SI["Simulation Context"]
 
-        TC & MC & SI --> UI1["Geospatial GIS Map<br/>(Leaflet + Voronoi Blanketing)"]
+        TC & MC & SI --> UI1["Geospatial GIS Map<br/>(Leaflet + Kriging Contours)"]
         TC & MC & SI --> UI2["Sensor Health & Decommissioning Modal"]
         TC & MC & SI --> UI3["Work Order Dispatch Control"]
         TC & MC & SI --> UI4["CapEx / OpEx Planning Studio"]
@@ -161,53 +208,59 @@ flowchart TB
 
 ## 🔬 Algorithmic & Mathematical Foundation
 
-### 1. Adjacent Frontier Sensor Placement Algorithm
-Instead of placing stations arbitrarily or scattering them to rural outer boundaries, GreenMind AI implements **Adjacent Frontier Expansion**:
+### 1. Spatial Kriging (Gaussian Process Regression) & IDW
+GreenMind AI uses a dual spatial interpolation strategy:
 
-1. **Immediate Proximity Incentive**:
-   For any candidate point $c = (\text{lat}, \text{lng})$, its distance to the nearest existing station is $d_{\min} = \min_{s \in S_{\text{active}}} \|c - s\|_2$.
-   - When $2.4\text{ km} \le d_{\min} \le 3.8\text{ km}$, adjacency bonus is maximum ($W_{\text{adj}} = 1.0$).
-   - When $d_{\min} > 3.8\text{ km}$, an exponential distance penalty is applied:
-     $$P_{\text{dist}} = \exp\bigl(-0.65 \times (d_{\min} - 3.8)\bigr)$$
-2. **Contiguous Non-Overlapping Guarantee**:
-   Each monitoring station carries an effective radius $R_{\text{cov}} = 2.0\text{ km}$.
-   A hard threshold $D_{\text{sep}} \ge 2.4\text{ km}$ combined with an overlap penalty ensures that coverage circles seamlessly touch at their boundaries without wasteful redundancy:
+1. **Gaussian Process Regression (Kriging)**:
+   Models spatial atmospheric diffusion of $\text{PM}_{2.5}$ and $\text{NO}_2$ as a continuous Gaussian process using a Matérn $\nu = 1.5$ kernel:
+   $$k(x, x') = \sigma_f^2 \left(1 + \frac{\sqrt{3}d}{l}\right) \exp\left(-\frac{\sqrt{3}d}{l}\right) + \sigma_n^2$$
+   Provides both the predictive mean $\mu(x)$ and **epistemic uncertainty $\sigma(x)$**, allowing the system to quantify unmonitored blind spots.
+
+2. **Inverse Distance Weighting (IDW)**:
+   Employed for rapid urban acoustic sound field estimation (Day/Night noise dB) and baseline groundwater telemetry with power parameter $p = 2.0$:
+   $$\hat{Z}(c) = \frac{\sum_{i=1}^{N} \frac{1}{d(c, s_i)^p} Z(s_i)}{\sum_{i=1}^{N} \frac{1}{d(c, s_i)^p}}$$
+
+### 2. Spatial Random Forest Surrogate & Active Learning
+A spatial `RandomForestRegressor` surrogate (60 estimators, max depth 6) models non-linear interactions across spatial coordinates, distance to city center, DKV passenger traffic density, industrial proximity, and vulnerable population receptors:
+$$\text{Information Gain}(c) = w_{\sigma} \cdot \sigma_{\text{GP}}(c) + w_{\text{risk}} \cdot \text{Risk}_{\text{RF}}(c)$$
+
+### 3. Adjacent Frontier Placement Optimization
+Prevents arbitrary placement and avoids scattering stations to rural boundaries:
+1. **Adjacency Bonus**: For distance $d_{\min} = \min_{s \in S_{\text{active}}} \|c - s\|_2$:
+   - Maximum bonus when $2.4\text{ km} \le d_{\min} \le 3.8\text{ km}$ ($W_{\text{adj}} = 1.0$).
+   - Exponential distance penalty for remote candidates:
+     $$P_{\text{dist}} = \exp\bigl(-0.65 \times (d_{\min} - 3.8)\bigr) \quad \text{for } d_{\min} > 3.8\text{ km}$$
+2. **Contiguity & Overlap Penalty**: Separation threshold $D_{\text{sep}} \ge 2.4\text{ km}$ with an overlap barrier:
    $$\text{Penalty}_{\text{overlap}} = 1.5 \times \sum_{s \in S_{\text{active}}} \mathbb{I}(\|c - s\|_2 < 2.0\text{ km})$$
-3. **Municipal Boundary Containment**:
-   Enforces a $1.5\text{ km}$ buffer from Debrecen's outer polygon boundary, preventing sensors from landing outside city limits.
+3. **Boundary Buffer**: Enforces a $1.5\text{ km}$ inward buffer from Debrecen's official municipal boundary polygon.
 
-### 2. Spatial Inverse Distance Weighting (IDW)
-Environmental attributes (PM2.5, PM10, NO₂, Noise, Groundwater) at unmonitored locations are estimated via power-parameterized spatial interpolation:
+### 4. Mixed-Integer Linear Programming (MILP) Budget Optimizer
+Solves a multi-choice 0-1 knapsack problem via `scipy.optimize.milp` to find the mathematically guaranteed optimal hardware allocation across candidate sites $i$ and tiers $j \in \{\text{Reference}, \text{Micro}, \text{IoT}\}$:
+$$\max \sum_{i} \sum_{j} U_{i,j} \cdot x_{i,j}$$
+$$\text{subject to} \quad \sum_{i} \sum_{j} C_j^{\text{CapEx}} \cdot x_{i,j} \le B_{\text{total}}, \quad \sum_{j} x_{i,j} \le 1 \quad \forall i, \quad x_{i,j} \in \{0, 1\}$$
+$$\text{5-Year TCO} = \sum_{i} \sum_{j} \left( C_j^{\text{CapEx}} + 5 \times C_j^{\text{O\&M}} \right) x_{i,j}$$
 
-$$\hat{Z}(c) = \frac{\sum_{i=1}^{N} \frac{1}{d(c, s_i)^p} Z(s_i)}{\sum_{i=1}^{N} \frac{1}{d(c, s_i)^p}}, \quad p = 2.0$$
-
-### 3. Multi-Objective Environmental Scoring
-Candidate sites are evaluated across four normalized environmental dimensions:
-
-$$\text{Priority Score}(c) = 100 \times \left( 0.40 \cdot S_{\text{air}}(c) + 0.25 \cdot S_{\text{noise}}(c) + 0.20 \cdot S_{\text{water}}(c) + 0.15 \cdot S_{\text{transit}}(c) \right) \cdot W_{\text{adj}}(c)$$
-
-### 4. Predictive Maintenance & Health Prognostics
-Sensor Remaining Useful Life (RUL) and degradation indices are derived from telemetry stability metrics:
-
+### 5. Weibull Accelerated Failure Time (AFT) Prognostics
+Sensor Remaining Useful Life (RUL) and degradation index are estimated from hardware telemetry stability:
 $$\text{Degradation Index} = \alpha \cdot \text{PacketLossRate} + \beta \cdot \frac{\sigma_{\text{jitter}}}{\sigma_{\text{nominal}}} + \gamma \cdot |\text{BaselineDrift}|$$
 $$\text{RUL (Days)} = \text{RUL}_{\text{base}} \times \left(1 - \frac{\text{Degradation Index}}{100}\right)$$
 
 ---
 
-## 🛠️ Sensor Health & Decommissioning Lifecycle
+## 🛠️ Sensor Fleet Lifecycle & Decommissioning
 
-GreenMind AI provides end-to-end lifecycle management for municipal sensor networks:
+GreenMind AI provides full lifecycle operations for municipal sensor networks:
 
 1. **Decommission API Endpoint**:
    `DELETE /api/sensor-health/stations/{station_code}`
-   - Automatically removes custom stations from active state memory.
-   - Registers station codes in `DECOMMISSIONED_STATION_CODES`.
-   - Flushes LRU response caches (`get_sensor_health_report.cache_clear()`).
-2. **User Interface Controls**:
-   - **Quick-Action Card Button**: Dedicated delete button with tooltip on every sensor card.
-   - **Diagnostics Modal Action**: Outlined "Decommission Sensor" button inside deep-dive diagnostics.
-   - **Confirmation Safety Modal**: Requires user confirmation, displaying clear warnings about data stream archival before executing.
-   - **Zero-Reload State Synchronization**: Fleet metrics and lists update instantaneously, accompanied by persistent feedback toasts.
+   - Automatically removes sensors from active state memory.
+   - Enters retired station codes into persistent decommission logs.
+   - Clears LRU telemetry response caches (`get_sensor_health_report.cache_clear()`).
+2. **Interactive UI Safety Controls**:
+   - **Quick-Action Decommission**: Dedicated delete button with tooltip on every sensor card.
+   - **Deep Diagnostics Modal**: Detailed telemetry diagnosis with explicit decommission triggers.
+   - **Confirmation Safety Modal**: Safeguard preventing accidental removal by showing data impact warnings before execution.
+   - **Instant State Synchronization**: Fleet counters, health percentages, and map markers update dynamically without page reloads.
 
 ---
 
@@ -217,13 +270,13 @@ GreenMind AI provides end-to-end lifecycle management for municipal sensor netwo
 | :--- | :--- | :--- |
 | `GET` | `/api/recommendations/` | Returns ranked AI sensor placement candidates with multi-objective scores |
 | `POST` | `/api/recommendations/simulate` | Evaluates simulated coverage and blind spot reduction for custom sensor sets |
-| `GET` | `/api/sensor-health/` | Fetches fleet health status, RUL forecasts, and maintenance triage categories |
-| `POST` | `/api/sensor-health/stations` | Registers a new physical or virtual sensor into the active fleet |
-| `DELETE`| `/api/sensor-health/stations/{code}` | Decommissions a sensor, removing it from active monitoring and health reports |
+| `GET` | `/api/sensor-health/` | Fetches fleet health status, Weibull RUL forecasts, and maintenance triage categories |
+| `POST` | `/api/sensor-health/stations` | Registers a new physical or virtual sensor into active fleet monitoring |
+| `DELETE`| `/api/sensor-health/stations/{code}` | Decommissions a sensor, removing it from active monitoring and recalculating metrics |
 | `GET` | `/api/maintenance/schedule` | Retrieves scheduled work orders, field crew assignments, and service routes |
-| `POST` | `/api/maintenance/dispatch` | Creates and dispatches a new field service work order |
-| `POST` | `/api/budget/optimize` | Calculates multi-year CapEx/OpEx allocation, ROI, and citizen coverage |
-| `POST` | `/api/copilot/query` | Submits natural language queries to the context-aware environmental assistant |
+| `POST` | `/api/maintenance/dispatch` | Creates and dispatches a new field technician work order |
+| `POST` | `/api/budget/optimize` | Calculates MILP multi-year CapEx/OpEx allocation, ROI, and citizen coverage |
+| `POST` | `/api/copilot/query` | Queries the context-aware environmental assistant (GPT-4o) with live grid state |
 | `GET` | `/api/data-quality/` | Returns dataset completeness, outlier statistics, and sensor drift analysis |
 
 ---
@@ -243,9 +296,10 @@ GreenMind AI/
 │   │   │   ├── official_stations.py    # Official Debrecen monitoring stations
 │   │   │   └── data_quality.py         # Data validation & quality metrics
 │   │   └── services/
+│   │       ├── ml_placement_service.py # GP Kriging, RF surrogate & Active Learning
 │   │       ├── recommendation_engine.py# Adjacent Frontier Placement Algorithm
-│   │       ├── sensor_health_service.py# Fleet prognostics & lifecycle engine
-│   │       ├── budget_optimizer.py     # CapEx/OpEx multi-year allocation
+│   │       ├── sensor_health_service.py# Weibull AFT prognostics & lifecycle engine
+│   │       ├── budget_optimizer.py     # MILP multi-choice 0-1 knapsack solver
 │   │       ├── copilot_service.py      # Environmental NLP knowledge engine
 │   │       └── processed_dataset_service.py # IDW spatial interpolation & telemetry
 │   ├── tests/

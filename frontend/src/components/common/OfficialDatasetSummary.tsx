@@ -95,7 +95,7 @@ export default function OfficialDatasetSummary() {
       <Typography
         variant="h5"
         sx={{
-          fontWeight: 700,
+          fontWeight: 600,
           mb: 2,
         }}
       >
@@ -121,7 +121,7 @@ export default function OfficialDatasetSummary() {
                   variant="h5"
                   sx={{
                     mt: 1,
-                    fontWeight: 700,
+                    fontWeight: 600,
                   }}
                 >
                   {card.value}

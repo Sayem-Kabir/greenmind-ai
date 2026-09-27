@@ -1,6 +1,6 @@
 import type { SensorRecommendation } from "./recommendation";
 
-export type SensorTier = "reference" | "micro" | "iot";
+export type SensorTier = "air" | "water" | "noise";
 
 export type OptimizationStrategy =
   | "balanced"
@@ -23,47 +23,47 @@ export interface TierConfig {
 }
 
 export const TIER_CONFIGS: Record<SensorTier, TierConfig> = {
-  reference: {
-    tier: "reference",
-    name: "Reference Grade Station",
-    badge: "Tier 1: Reference",
-    unitCost: 28000,
-    annualOm: 3200,
-    radiusKm: 3.5,
-    confidence: 95,
+  air: {
+    tier: "air",
+    name: "Air Quality Sensor",
+    badge: "Air Quality",
+    unitCost: 4500,
+    annualOm: 600,
+    radiusKm: 2.0,
+    confidence: 90,
     description:
-      "EN certified regulatory multipollutant station with weather mast and beta-attenuation PM analyzers.",
-    color: "#b45309",
-    borderColor: "#f59e0b",
-    bgColor: "#fffbeb",
+      "Multipollutant optical particulate (PM2.5/PM10) and electrochemical gas (NO2, SO2, O3) telemetry station.",
+    color: "#0284c7",
+    borderColor: "#38bdf8",
+    bgColor: "#f0f9ff",
   },
-  micro: {
-    tier: "micro",
-    name: "Mid-Tier Micro-Station",
-    badge: "Tier 2: Micro",
-    unitCost: 6500,
-    annualOm: 850,
-    radiusKm: 1.8,
-    confidence: 82,
+  water: {
+    tier: "water",
+    name: "Water Quality Sensor",
+    badge: "Water Quality",
+    unitCost: 6200,
+    annualOm: 800,
+    radiusKm: 1.5,
+    confidence: 92,
     description:
-      "Heated optical particle counter + electrochemical gas sensors + acoustic noise microphone.",
-    color: "#6b21a8",
-    borderColor: "#a855f7",
-    bgColor: "#faf5ff",
-  },
-  iot: {
-    tier: "iot",
-    name: "Low-Cost IoT Mesh Node",
-    badge: "Tier 3: IoT Mesh",
-    unitCost: 1200,
-    annualOm: 180,
-    radiusKm: 0.8,
-    confidence: 68,
-    description:
-      "Laser scattering PM2.5/PM10, temperature/humidity telemetry, solar powered for dense hyper-local grid.",
-    color: "#0f766e",
+      "Submersible aquatic probe tracking pH, dissolved oxygen, electrical conductivity, turbidity, and chemical runoff.",
+    color: "#0d9488",
     borderColor: "#14b8a6",
     bgColor: "#f0fdfa",
+  },
+  noise: {
+    tier: "noise",
+    name: "Noise Pollution Sensor",
+    badge: "Noise Sensor",
+    unitCost: 2800,
+    annualOm: 350,
+    radiusKm: 1.0,
+    confidence: 85,
+    description:
+      "Precision acoustic Class 1/2 sound level sensor tracking continuous dBA noise levels and peak disturbance patterns.",
+    color: "#7c3aed",
+    borderColor: "#a855f7",
+    bgColor: "#faf5ff",
   },
 };
 
@@ -90,9 +90,9 @@ export interface PortfolioTradeoffComparison {
   budgetUtilizationPercent: number;
   totalStations: number;
   tierCounts: {
-    reference: number;
-    micro: number;
-    iot: number;
+    air: number;
+    water: number;
+    noise: number;
   };
   estimatedAnnualOm: number;
   fiveYearTco: number;
@@ -129,9 +129,9 @@ export interface BudgetPlanningPackage {
   rationale: string;
   targetFocus: string;
   recommendedTiers: {
-    reference: number;
-    micro: number;
-    iot: number;
+    air: number;
+    water: number;
+    noise: number;
   };
   customSpecs?: CustomTierSpecs;
 }
@@ -147,9 +147,9 @@ export const PLANNING_PACKAGES: BudgetPlanningPackage[] = [
     badge: "Vulnerable Populations",
     color: "#0f766e",
     rationale:
-      "Deploys mid-tier micro sentinels equipped with acoustic & optical sensors near schools, supplemented by dense IoT nodes across residential parks.",
+      "Deploys Air quality stations near schools, supplemented by acoustic Noise sensors across residential courtyards and Water quality monitors.",
     targetFocus: "Schools, kindergartens, clinics, and residential courtyards",
-    recommendedTiers: { reference: 0, micro: 3, iot: 12 },
+    recommendedTiers: { air: 5, water: 2, noise: 4 },
   },
   {
     id: "industrial_sentinel",
@@ -161,9 +161,9 @@ export const PLANNING_PACKAGES: BudgetPlanningPackage[] = [
     badge: "Industrial Baseline",
     color: "#b45309",
     rationale:
-      "Anchor regulatory EN reference stations for statutory legal compliance and dispute defense, surrounded by micro sentinels along freight corridors.",
+      "High-density Air and Water monitoring array tracking industrial plume boundaries and stormwater runoff around the industrial park.",
     targetFocus: "Debrecen Southern Economic Zone, freight bypass, industrial boundary",
-    recommendedTiers: { reference: 2, micro: 3, iot: 8 },
+    recommendedTiers: { air: 10, water: 4, noise: 5 },
   },
   {
     id: "transit_grid",
@@ -175,13 +175,13 @@ export const PLANNING_PACKAGES: BudgetPlanningPackage[] = [
     badge: "Transit Network",
     color: "#6b21a8",
     rationale:
-      "Target high-passenger-frequency DKV tram/bus junctions with acoustic & NO2 micro-stations and transit corridor IoT buffers.",
+      "Target high-passenger-frequency DKV tram/bus junctions with Air and Noise monitoring nodes along heavy commuter corridors.",
     targetFocus: "Nagyállomás main hub, tram corridors, commuter radial avenues",
-    recommendedTiers: { reference: 1, micro: 4, iot: 15 },
+    recommendedTiers: { air: 7, water: 1, noise: 8 },
   },
   {
     id: "citywide_mesh",
-    title: "Debrecen Hyper-Local Mesh Expansion",
+    title: "Debrecen Hyper-Local Expansion Grid",
     subtitle: "Complete municipal blind-spot elimination",
     budget: 120000,
     strategy: "coverage",
@@ -189,9 +189,9 @@ export const PLANNING_PACKAGES: BudgetPlanningPackage[] = [
     badge: "Citywide Reach",
     color: "#0284c7",
     rationale:
-      "Gold standard co-location: 1 reference anchor calibrating 6 micro-stations and 35 low-cost mesh nodes across suburban rings.",
+      "Comprehensive city coverage balancing Air stations, Water monitors along canals and reservoirs, and Noise pollution sentinels.",
     targetFocus: "Suburban districts, peri-urban residential belts, parks, outer ring",
-    recommendedTiers: { reference: 1, micro: 6, iot: 35 },
+    recommendedTiers: { air: 14, water: 5, noise: 10 },
   },
   {
     id: "rapid_pilot",
@@ -203,13 +203,16 @@ export const PLANNING_PACKAGES: BudgetPlanningPackage[] = [
     badge: "Starter Pilot",
     color: "#16a34a",
     rationale:
-      "Cost-effective initial municipal rollout: 1 central micro-station and 12 IoT nodes providing fast initial coverage.",
+      "Cost-effective initial municipal rollout: balanced initial Air, Water, and Noise sensors providing immediate cross-domain environmental data.",
     targetFocus: "Inner-city ring and surrounding university campuses",
-    recommendedTiers: { reference: 0, micro: 1, iot: 12 },
+    recommendedTiers: { air: 3, water: 1, noise: 2 },
   },
 ];
 
 export interface OptimizationConstraints {
+  minAir?: number;
+  minWater?: number;
+  minNoise?: number;
   minReference?: number;
   minMicro?: number;
   maxAnnualOm?: number | null;
@@ -228,9 +231,9 @@ export interface BudgetOptimizationResult {
   budgetUtilizationPercent: number;
   totalStations: number;
   tierCounts: {
-    reference: number;
-    micro: number;
-    iot: number;
+    air: number;
+    water: number;
+    noise: number;
   };
   estimatedAnnualOm: number;
   fiveYearTco: number;
@@ -249,8 +252,10 @@ export interface BudgetOptimizationResult {
     { unitCost: number; annualOm: number; radiusKm: number; confidence: number }
   >;
   comparisons?: {
-    referenceOnly: PortfolioTradeoffComparison;
-    iotOnly: PortfolioTradeoffComparison;
+    airOnly?: PortfolioTradeoffComparison;
+    waterOnly?: PortfolioTradeoffComparison;
+    referenceOnly?: PortfolioTradeoffComparison;
+    iotOnly?: PortfolioTradeoffComparison;
     currentHybrid: PortfolioTradeoffComparison;
   };
 }

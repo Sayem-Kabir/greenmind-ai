@@ -26,35 +26,65 @@ def _is_spatially_separated(candidate_dict: dict[str, Any], placed: list[dict[st
     )
 
 TIER_SPECS: dict[str, dict[str, Any]] = {
+    "air": {
+        "tier": "air",
+        "name": "Air Quality Sensor",
+        "badge": "Air Quality",
+        "unit_cost": 4500.0,
+        "annual_om": 600.0,
+        "radius_km": 2.0,
+        "confidence": 90.0,
+        "description": "Multipollutant particulate (PM2.5/PM10) and toxic gas telemetry station",
+    },
+    "water": {
+        "tier": "water",
+        "name": "Water Quality Sensor",
+        "badge": "Water Quality",
+        "unit_cost": 6200.0,
+        "annual_om": 800.0,
+        "radius_km": 1.5,
+        "confidence": 92.0,
+        "description": "Submersible aquatic probe tracking pH, dissolved oxygen, conductivity, and turbidity",
+    },
+    "noise": {
+        "tier": "noise",
+        "name": "Noise Pollution Sensor",
+        "badge": "Noise Sensor",
+        "unit_cost": 2800.0,
+        "annual_om": 350.0,
+        "radius_km": 1.0,
+        "confidence": 85.0,
+        "description": "Precision acoustic Class 1/2 sound level sensor tracking ambient dBA noise levels",
+    },
     "reference": {
-        "tier": "reference",
-        "name": "Reference Grade Station",
-        "badge": "Tier 1: Reference",
-        "unit_cost": 28000.0,
-        "annual_om": 3200.0,
-        "radius_km": 3.5,
-        "confidence": 95.0,
-        "description": "Certified EN reference-grade multi-pollutant analyzer with weather mast",
+        "tier": "air",
+        "name": "Air Quality Sensor",
+        "badge": "Air Quality",
+        "unit_cost": 4500.0,
+        "annual_om": 600.0,
+        "radius_km": 2.0,
+        "confidence": 90.0,
+        "description": "Multipollutant particulate and toxic gas station",
     },
     "micro": {
-        "tier": "micro",
-        "name": "Mid-Tier Micro-Station",
-        "badge": "Tier 2: Micro",
-        "unit_cost": 6500.0,
-        "annual_om": 850.0,
-        "radius_km": 1.8,
-        "confidence": 82.0,
-        "description": "Optical particle counter + electrochemical gas sensors + acoustic sensor",
+        "tier": "water",
+        "name": "Water Quality Sensor",
+        "badge": "Water Quality",
+        "unit_cost": 6200.0,
+        "annual_om": 800.0,
+        "radius_km": 1.5,
+        "confidence": 92.0,
+        "description": "Submersible aquatic probe tracking pH and dissolved oxygen",
     },
     "iot": {
-        "tier": "iot",
-        "name": "Low-Cost IoT Node",
-        "badge": "Tier 3: IoT Mesh",
-        "unit_cost": 1200.0,
-        "annual_om": 180.0,
-        "radius_km": 0.8,
-        "confidence": 68.0,
-        "description": "Laser scattering particulate sensor + meteo telemetry, solar/battery powered",
+        "tier": "noise",
+        "name": "Noise Pollution Sensor",
+        "badge": "Noise Sensor",
+        "unit_cost": 2800.0,
+        "annual_om": 350.0,
+        "radius_km": 1.0,
+        "confidence": 85.0,
+        "description": "Precision acoustic sound level meter",
     },
 }
 
@@ -77,19 +107,23 @@ def _calculate_portfolio_summary(
     )
 
     annual_om_total = sum(
-        specs.get(s["sensorTier"], TIER_SPECS["iot"])["annual_om"]
+        specs.get(s.get("sensorTier", "air"), TIER_SPECS["air"])["annual_om"]
         for s in allocated_stations
     )
     five_year_tco = current_spent + (5.0 * annual_om_total)
 
-    tier_counts = {"reference": 0, "micro": 0, "iot": 0}
+    tier_counts = {"air": 0, "water": 0, "noise": 0}
     for s in allocated_stations:
-        tier = s.get("sensorTier", "iot")
-        if tier in tier_counts:
-            tier_counts[tier] += 1
+        raw_tier = s.get("sensorTier", "air")
+        if raw_tier in ("air", "reference"):
+            tier_counts["air"] += 1
+        elif raw_tier in ("water", "micro"):
+            tier_counts["water"] += 1
+        else:
+            tier_counts["noise"] += 1
 
     total_area_covered_km2 = sum(
-        3.14159 * (specs.get(s["sensorTier"], TIER_SPECS["iot"])["radius_km"] ** 2) * 0.65
+        3.14159 * (specs.get(s.get("sensorTier", "air"), TIER_SPECS["air"])["radius_km"] ** 2) * 0.65
         for s in allocated_stations
     )
     # Debrecen total municipal area is ~461 km²
@@ -120,21 +154,13 @@ def _calculate_portfolio_summary(
         else 0.0
     )
 
-    # Regulatory compliance readiness index (0 - 100%)
-    ref_count = tier_counts["reference"]
-    if ref_count >= 2:
-        reg_score = min(98, round(78 + estimated_coverage_gain * 0.25))
-    elif ref_count == 1:
-        reg_score = min(85, round(60 + estimated_coverage_gain * 0.25))
-    else:
-        reg_score = min(35, round(15 + estimated_coverage_gain * 0.2))
+    # Statutory compliance readiness index (0 - 100%)
+    air_count = tier_counts["air"]
+    water_count = tier_counts["water"]
+    noise_count = tier_counts["noise"]
+    reg_score = min(98, round(30 + air_count * 5 + water_count * 4 + noise_count * 3))
 
-    # Calibration anchor ratio: (micro + iot) per reference
-    if ref_count > 0:
-        low_cost_count = tier_counts["micro"] + tier_counts["iot"]
-        ratio_str = f"{round(low_cost_count / ref_count, 1)}:1"
-    else:
-        ratio_str = "No Reference Anchor"
+    ratio_str = f"{air_count}:{water_count}:{noise_count}"
 
     mean_info_gain = (
         round(

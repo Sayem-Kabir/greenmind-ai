@@ -48,7 +48,7 @@ export default function AiRecommendationsSpotlight() {
         borderRadius: 3.5,
         backgroundColor: tokens.cardBg,
         border: `1px solid ${tokens.cardBorder}`,
-        boxShadow: tokens.cardShadow,
+        boxShadow: "none",
       }}
     >
       <Box
@@ -64,7 +64,7 @@ export default function AiRecommendationsSpotlight() {
         <Box>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
             <AiIcon sx={{ color: "#00dc82" }} />
-            <Typography variant="h5" sx={{ fontWeight: 800, color: tokens.textPrimary }}>
+            <Typography variant="h5" sx={{ fontWeight: 600, color: tokens.textPrimary }}>
               Where Debrecen Needs New Sensors
             </Typography>
           </Box>
@@ -79,7 +79,7 @@ export default function AiRecommendationsSpotlight() {
           onClick={() => navigate("/recommendations")}
           sx={{
             borderRadius: 2,
-            fontWeight: 700,
+            fontWeight: 600,
             textTransform: "none",
             borderColor: tokens.cardBorder,
             color: tokens.textPrimary,
@@ -131,8 +131,8 @@ export default function AiRecommendationsSpotlight() {
                     justifyContent: "space-between",
                     transition: "transform 0.2s, box-shadow 0.2s",
                     "&:hover": {
-                      transform: "translateY(-3px)",
-                      boxShadow: "0 6px 20px rgba(0,0,0,0.06)",
+                      transform: "none",
+                      boxShadow: "none",
                     },
                   }}
                 >
@@ -142,13 +142,13 @@ export default function AiRecommendationsSpotlight() {
                         label={`#${index + 1} AI Priority`}
                         size="small"
                         sx={{
-                          fontWeight: 800,
-                          bgcolor: index === 0 ? "#00dc82" : "#0f766e",
+                          fontWeight: 600,
+                          bgcolor: index === 0 ? "#79b998" : "#0f766e",
                           color: "#ffffff",
                           fontSize: "0.75rem",
                         }}
                       />
-                      <Typography variant="caption" sx={{ fontWeight: 700, color: "#059669" }}>
+                      <Typography variant="caption" sx={{ fontWeight: 600, color: "#059669" }}>
                         {priorityPercent}% Priority Score
                       </Typography>
                     </Box>
@@ -156,7 +156,7 @@ export default function AiRecommendationsSpotlight() {
                     <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1, mb: 1 }}>
                       <PlaceIcon sx={{ color: "#ef4444", fontSize: 20, mt: 0.3 }} />
                       <Box>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 800, color: tokens.textPrimary, lineHeight: 1.3 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: tokens.textPrimary, lineHeight: 1.3 }}>
                           Near {rec.nearestStation}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
@@ -193,7 +193,7 @@ export default function AiRecommendationsSpotlight() {
                         minWidth: "auto",
                         textTransform: "none",
                         fontSize: "0.75rem",
-                        fontWeight: 700,
+                        fontWeight: 600,
                         color: tokens.accentHover,
                       }}
                     >

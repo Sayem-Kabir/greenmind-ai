@@ -107,7 +107,7 @@ export default function CitizenGlossaryDialog({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              background: "linear-gradient(135deg, #0b1329 0%, #00dc82 100%)",
+              background: "#0b1329",
               color: "#ffffff",
               fontSize: "1.25rem",
             }}
@@ -115,7 +115,7 @@ export default function CitizenGlossaryDialog({
             🌿
           </Box>
           <Box>
-            <Typography variant="h6" sx={{ fontWeight: 800, color: tokens.textPrimary }}>
+            <Typography variant="h6" sx={{ fontWeight: 600, color: tokens.textPrimary }}>
               Citizen Environmental Guide
             </Typography>
             <Typography variant="body2" color="text.secondary">
@@ -140,7 +140,7 @@ export default function CitizenGlossaryDialog({
               <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1.5, mb: 1 }}>
                 {term.icon}
                 <Box>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 700, color: tokens.textPrimary }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 600, color: tokens.textPrimary }}>
                     {term.title}
                   </Typography>
                   <Typography variant="body2" sx={{ color: tokens.textPrimary, mt: 0.5, fontWeight: 500 }}>
@@ -164,7 +164,7 @@ export default function CitizenGlossaryDialog({
           sx={{
             borderRadius: 2,
             px: 3,
-            fontWeight: 700,
+            fontWeight: 600,
             textTransform: "none",
             backgroundColor: "#0b1329",
             color: "#ffffff",

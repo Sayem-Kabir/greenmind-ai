@@ -11,7 +11,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Divider,
   Grid,
   IconButton,
   InputAdornment,
@@ -33,7 +32,6 @@ import SensorsRoundedIcon from "@mui/icons-material/SensorsRounded";
 import SpeedRoundedIcon from "@mui/icons-material/SpeedRounded";
 import EngineeringRoundedIcon from "@mui/icons-material/EngineeringRounded";
 import AssignmentTurnedInRoundedIcon from "@mui/icons-material/AssignmentTurnedInRounded";
-import FilterListRoundedIcon from "@mui/icons-material/FilterListRounded";
 import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
@@ -230,34 +228,34 @@ export default function SensorHealth() {
     switch (status) {
       case "CRITICAL":
         return {
-          main: "#dc2626",
-          bg: "#fef2f2",
-          border: "#fecaca",
-          textPrimary: "#991b1b",
-          textSecondary: "#7f1d1d",
-          label: "Critical Action Required",
-          icon: <ErrorOutlineRoundedIcon sx={{ fontSize: 18 }} />,
+          main: "#e11d48",
+          bg: isMidnight ? "rgba(225, 29, 72, 0.12)" : "#fff1f2",
+          border: isMidnight ? "rgba(225, 29, 72, 0.25)" : "#ffe4e6",
+          textPrimary: "#9f1239",
+          textSecondary: "#881337",
+          label: "Needs Action",
+          icon: <ErrorOutlineRoundedIcon sx={{ fontSize: 16 }} />,
         };
       case "WARNING":
         return {
           main: "#d97706",
-          bg: "#fffbeb",
-          border: "#fde68a",
+          bg: isMidnight ? "rgba(217, 119, 6, 0.12)" : "#fffbeb",
+          border: isMidnight ? "rgba(217, 119, 6, 0.25)" : "#fef3c7",
           textPrimary: "#92400e",
           textSecondary: "#78350f",
-          label: "Maintenance Warning",
-          icon: <WarningAmberRoundedIcon sx={{ fontSize: 18 }} />,
+          label: "Advisory",
+          icon: <WarningAmberRoundedIcon sx={{ fontSize: 16 }} />,
         };
       case "OPTIMAL":
       default:
         return {
           main: "#059669",
-          bg: "#f0fdf4",
-          border: "#bbf7d0",
+          bg: isMidnight ? "rgba(5, 150, 105, 0.12)" : "#f0fdf4",
+          border: isMidnight ? "rgba(5, 150, 105, 0.25)" : "#dcfce7",
           textPrimary: "#166534",
           textSecondary: "#14532d",
-          label: "Nominal & Healthy",
-          icon: <CheckCircleRoundedIcon sx={{ fontSize: 18 }} />,
+          label: "Optimal",
+          icon: <CheckCircleRoundedIcon sx={{ fontSize: 16 }} />,
         };
     }
   };
@@ -291,16 +289,16 @@ export default function SensorHealth() {
   };
 
   return (
-    <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: 1440, mx: "auto" }}>
+    <Box sx={{ p: 0, maxWidth: 1440, mx: "auto" }}>
       {/* Header Banner */}
       <Box
         sx={{
           mb: 3.5,
           p: { xs: 2.5, md: 3.5 },
           borderRadius: 4,
-          background: `linear-gradient(135deg, ${tokens.cardBg} 0%, rgba(0, 220, 130, 0.05) 100%)`,
+          background: tokens.cardBg,
           border: `1px solid ${isMidnight ? "rgba(0, 220, 130, 0.2)" : "#bbf7d0"}`,
-          boxShadow: tokens.cardShadow,
+          boxShadow: "none",
           position: "relative",
           overflow: "hidden",
           display: "flex",
@@ -319,7 +317,7 @@ export default function SensorHealth() {
             width: 220,
             height: 220,
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(0, 220, 130, 0.12) 0%, rgba(0,0,0,0) 70%)",
+            background: "transparent",
             pointerEvents: "none",
           }}
         />
@@ -335,7 +333,7 @@ export default function SensorHealth() {
                 alignItems: "center",
                 justifyContent: "center",
                 backgroundColor: "rgba(0, 220, 130, 0.12)",
-                color: isMidnight ? "#00dc82" : "#059669",
+                color: isMidnight ? "#79b998" : "#059669",
                 border: "1px solid rgba(0, 220, 130, 0.25)",
               }}
             >
@@ -345,7 +343,7 @@ export default function SensorHealth() {
               <Typography
                 variant="h4"
                 sx={{
-                  fontWeight: 900,
+                  fontWeight: 700,
                   fontSize: { xs: "1.45rem", md: "1.85rem" },
                   color: tokens.textPrimary,
                   letterSpacing: "-0.02em",
@@ -353,42 +351,18 @@ export default function SensorHealth() {
               >
                 Sensor Health & Predictive Maintenance
               </Typography>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.25 }}>
-                <Chip
-                  size="small"
-                  label="Weibull AFT Machine Learning"
-                  sx={{
-                    height: 22,
-                    fontSize: "0.72rem",
-                    fontWeight: 700,
-                    backgroundColor: "rgba(0, 220, 130, 0.15)",
-                    color: isMidnight ? "#00dc82" : "#065f46",
-                    border: "1px solid rgba(0, 220, 130, 0.3)",
-                  }}
-                />
-                <Typography
-                  variant="caption"
-                  sx={{ color: tokens.textSecondary, fontWeight: 600 }}
-                >
-                  Debrecen Municipal IoT Monitoring Fleet
-                </Typography>
-              </Box>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: tokens.textSecondary,
+                  mt: 0.5,
+                  fontSize: "0.85rem",
+                }}
+              >
+                Real-time telemetry, sensor diagnostics, and predictive maintenance dispatch.
+              </Typography>
             </Box>
           </Box>
-          <Typography
-            variant="body2"
-            sx={{
-              color: tokens.textSecondary,
-              maxWidth: 780,
-              lineHeight: 1.6,
-              mt: 1,
-              fontSize: "0.92rem",
-            }}
-          >
-            Machine Learning algorithms track signal jitter, zero-point baseline drift, and
-            packet transmission dropouts to estimate Remaining Useful Life (RUL) and dispatch
-            preventive field service work orders before failure occurs.
-          </Typography>
         </Box>
 
         <Box
@@ -409,19 +383,19 @@ export default function SensorHealth() {
               borderRadius: 2.5,
               px: 2.5,
               py: 1,
-              fontWeight: 800,
+              fontWeight: 600,
               fontSize: "0.85rem",
               textTransform: "none",
               backgroundColor: "#00dc82",
               color: "#0b1329",
-              boxShadow: "0 2px 10px rgba(0, 220, 130, 0.25)",
+              boxShadow: "none",
               "&:hover": {
                 backgroundColor: "#00c474",
-                boxShadow: "0 4px 14px rgba(0, 220, 130, 0.35)",
+                boxShadow: "none",
               },
             }}
           >
-            + Add New Sensor
+            Add Sensor
           </Button>
 
           <Button
@@ -433,13 +407,13 @@ export default function SensorHealth() {
               borderRadius: 2.5,
               px: 2.5,
               py: 1,
-              fontWeight: 700,
+              fontWeight: 600,
               fontSize: "0.85rem",
               textTransform: "none",
               borderColor: isMidnight ? "rgba(0, 220, 130, 0.3)" : "#cbd5e1",
               color: tokens.textPrimary,
               backgroundColor: tokens.cardBg,
-              boxShadow: "0 2px 8px rgba(0,0,0,0.03)",
+              boxShadow: "none",
               "&:hover": {
                 borderColor: tokens.accent,
                 backgroundColor: "rgba(0, 220, 130, 0.08)",
@@ -451,60 +425,60 @@ export default function SensorHealth() {
         </Box>
       </Box>
 
-      {/* KPI Metric Cards - Strictly Uniform */}
+      {/* KPI Metric Cards - Clean & Calming */}
       {data && (
-        <Grid container spacing={2.5} sx={{ mb: 3.5, alignItems: "stretch" }}>
+        <Grid container spacing={2} sx={{ mb: 3, alignItems: "stretch" }}>
           {/* Card 1: Fleet Health Score */}
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Card
               sx={{
-                p: 2.5,
+                p: 2.25,
                 height: "100%",
-                minHeight: 165,
-                borderRadius: 3.5,
+                borderRadius: 3,
                 backgroundColor: tokens.cardBg,
                 border: `1px solid ${tokens.cardBorder}`,
-                boxShadow: tokens.cardShadow,
+                boxShadow: "none",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
+                gap: 1.25,
               }}
             >
               <Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1.5 }}>
-                  <Typography variant="overline" sx={{ color: tokens.textMuted, fontWeight: 800 }}>
-                    Fleet Health Score
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                  <Typography sx={{ color: tokens.textMuted, fontSize: "0.82rem", fontWeight: 500 }}>
+                    Fleet Health
                   </Typography>
-                  <SpeedRoundedIcon sx={{ color: isMidnight ? "#00dc82" : tokens.primary, fontSize: 22 }} />
+                  <SpeedRoundedIcon sx={{ color: isMidnight ? "#79b998" : tokens.primary, fontSize: 18 }} />
                 </Box>
                 <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
-                  <Typography variant="h3" sx={{ fontWeight: 900, color: tokens.textPrimary }}>
+                  <Typography sx={{ fontSize: "1.75rem", fontWeight: 600, color: tokens.textPrimary, lineHeight: 1.1 }}>
                     {data.fleetSummary.fleetHealthScore}%
                   </Typography>
                   <Chip
                     size="small"
-                    label={data.fleetSummary.fleetHealthScore >= 80 ? "Optimal Grade" : "Good"}
+                    label={data.fleetSummary.fleetHealthScore >= 80 ? "Optimal" : "Fair"}
                     sx={{
-                      fontWeight: 700,
-                      height: 22,
-                      fontSize: "0.72rem",
-                      backgroundColor: isMidnight ? "rgba(0,220,130,0.18)" : "#d1fae5",
-                      color: isMidnight ? "#00dc82" : "#047857",
+                      fontWeight: 500,
+                      height: 20,
+                      fontSize: "0.7rem",
+                      backgroundColor: isMidnight ? "rgba(0,220,130,0.12)" : "#ecfdf5",
+                      color: isMidnight ? "#79b998" : "#059669",
                     }}
                   />
                 </Box>
               </Box>
-              <Box sx={{ mt: "auto", pt: 1.5 }}>
+              <Box sx={{ mt: "auto", pt: 1 }}>
                 <LinearProgress
                   variant="determinate"
                   value={data.fleetSummary.fleetHealthScore}
                   sx={{
-                    height: 5,
-                    borderRadius: 2.5,
-                    backgroundColor: isMidnight ? "rgba(0,0,0,0.06)" : "#e2e8f0",
+                    height: 4,
+                    borderRadius: 2,
+                    backgroundColor: isMidnight ? "rgba(255,255,255,0.06)" : "#f1f5f9",
                     "& .MuiLinearProgress-bar": {
-                      borderRadius: 2.5,
-                      backgroundColor: isMidnight ? "#00dc82" : tokens.primary,
+                      borderRadius: 2,
+                      backgroundColor: isMidnight ? "#79b998" : tokens.primary,
                     },
                   }}
                 />
@@ -516,91 +490,84 @@ export default function SensorHealth() {
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Card
               sx={{
-                p: 2.5,
+                p: 2.25,
                 height: "100%",
-                minHeight: 165,
-                borderRadius: 3.5,
+                borderRadius: 3,
                 backgroundColor: tokens.cardBg,
                 border: `1px solid ${tokens.cardBorder}`,
-                boxShadow: tokens.cardShadow,
+                boxShadow: "none",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
+                gap: 1.25,
               }}
             >
               <Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1.5 }}>
-                  <Typography variant="overline" sx={{ color: tokens.textMuted, fontWeight: 800 }}>
-                    Active Sensor Fleet
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                  <Typography sx={{ color: tokens.textMuted, fontSize: "0.82rem", fontWeight: 500 }}>
+                    Active Fleet
                   </Typography>
-                  <SensorsRoundedIcon sx={{ color: "#38bdf8", fontSize: 22 }} />
+                  <SensorsRoundedIcon sx={{ color: "#38bdf8", fontSize: 18 }} />
                 </Box>
                 <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
-                  <Typography variant="h3" sx={{ fontWeight: 900, color: tokens.textPrimary }}>
+                  <Typography sx={{ fontSize: "1.75rem", fontWeight: 600, color: tokens.textPrimary, lineHeight: 1.1 }}>
                     {data.fleetSummary.totalStations}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: tokens.textSecondary, fontWeight: 600 }}>
-                    Nodes Online
+                  <Typography sx={{ color: tokens.textSecondary, fontSize: "0.82rem" }}>
+                    stations online
                   </Typography>
                 </Box>
               </Box>
-              <Box sx={{ mt: "auto", pt: 1.5 }}>
-                <Typography variant="caption" noWrap sx={{ display: "block", color: tokens.textMuted }}>
-                  16 Air Stations · 5 Acoustic Poles
+              <Box sx={{ mt: "auto", pt: 1 }}>
+                <Typography variant="caption" sx={{ color: tokens.textMuted, fontSize: "0.74rem" }}>
+                  Active telemetry streams
                 </Typography>
               </Box>
             </Card>
           </Grid>
 
-          {/* Card 3: Work Orders Required - Strictly Uniform Size */}
+          {/* Card 3: Work Orders Required */}
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Card
               sx={{
-                p: 2.5,
+                p: 2.25,
                 height: "100%",
-                minHeight: 165,
-                borderRadius: 3.5,
+                borderRadius: 3,
                 backgroundColor: tokens.cardBg,
                 border: `1px solid ${tokens.cardBorder}`,
-                boxShadow: tokens.cardShadow,
+                boxShadow: "none",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
+                gap: 1.25,
               }}
             >
               <Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1.5 }}>
-                  <Typography variant="overline" sx={{ color: tokens.textMuted, fontWeight: 800 }}>
-                    Work Orders Required
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                  <Typography sx={{ color: tokens.textMuted, fontSize: "0.82rem", fontWeight: 500 }}>
+                    Maintenance Needs
                   </Typography>
-                  <EngineeringRoundedIcon sx={{ color: "#f59e0b", fontSize: 22 }} />
+                  <EngineeringRoundedIcon sx={{ color: "#f59e0b", fontSize: 18 }} />
                 </Box>
                 <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
                   <Typography
-                    variant="h3"
                     sx={{
-                      fontWeight: 900,
+                      fontSize: "1.75rem",
+                      fontWeight: 600,
                       color: data.fleetSummary.criticalCount > 0 ? "#ef4444" : "#f59e0b",
+                      lineHeight: 1.1,
                     }}
                   >
                     {data.fleetSummary.warningCount + data.fleetSummary.criticalCount}
                   </Typography>
-                  <Chip
-                    size="small"
-                    label={data.fleetSummary.criticalCount > 0 ? `${data.fleetSummary.criticalCount} Urgent` : "Routine Advisory"}
-                    sx={{
-                      fontWeight: 700,
-                      height: 22,
-                      fontSize: "0.72rem",
-                      backgroundColor: isMidnight ? "rgba(245,158,11,0.18)" : "#fef3c7",
-                      color: "#f59e0b",
-                    }}
-                  />
+                  <Typography sx={{ color: tokens.textSecondary, fontSize: "0.82rem" }}>
+                    {data.fleetSummary.criticalCount > 0 ? "urgent tasks" : "routine checks"}
+                  </Typography>
                 </Box>
               </Box>
-              <Box sx={{ mt: "auto", pt: 1.5 }}>
-                <Typography variant="caption" noWrap sx={{ display: "block", color: tokens.textMuted }}>
-                  Dust cleaning & zero baseline resets
+              <Box sx={{ mt: "auto", pt: 1 }}>
+                <Typography variant="caption" sx={{ color: tokens.textMuted, fontSize: "0.74rem" }}>
+                  Preventive servicing active
                 </Typography>
               </Box>
             </Card>
@@ -610,37 +577,37 @@ export default function SensorHealth() {
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Card
               sx={{
-                p: 2.5,
+                p: 2.25,
                 height: "100%",
-                minHeight: 165,
-                borderRadius: 3.5,
+                borderRadius: 3,
                 backgroundColor: tokens.cardBg,
                 border: `1px solid ${tokens.cardBorder}`,
-                boxShadow: tokens.cardShadow,
+                boxShadow: "none",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
+                gap: 1.25,
               }}
             >
               <Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1.5 }}>
-                  <Typography variant="overline" sx={{ color: tokens.textMuted, fontWeight: 800 }}>
-                    Avg Useful Life (RUL)
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                  <Typography sx={{ color: tokens.textMuted, fontSize: "0.82rem", fontWeight: 500 }}>
+                    Avg Useful Life
                   </Typography>
-                  <AssignmentTurnedInRoundedIcon sx={{ color: "#a855f7", fontSize: 22 }} />
+                  <AssignmentTurnedInRoundedIcon sx={{ color: "#a855f7", fontSize: 18 }} />
                 </Box>
                 <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
-                  <Typography variant="h3" sx={{ fontWeight: 900, color: tokens.textPrimary }}>
+                  <Typography sx={{ fontSize: "1.75rem", fontWeight: 600, color: tokens.textPrimary, lineHeight: 1.1 }}>
                     {data.fleetSummary.avgDaysToService}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: tokens.textSecondary, fontWeight: 600 }}>
-                    Days
+                  <Typography sx={{ color: tokens.textSecondary, fontSize: "0.82rem" }}>
+                    days avg RUL
                   </Typography>
                 </Box>
               </Box>
-              <Box sx={{ mt: "auto", pt: 1.5 }}>
-                <Typography variant="caption" noWrap sx={{ display: "block", color: tokens.textMuted }}>
-                  Earliest service: ~{data.fleetSummary.earliestDays} days
+              <Box sx={{ mt: "auto", pt: 1 }}>
+                <Typography variant="caption" sx={{ color: tokens.textMuted, fontSize: "0.74rem" }}>
+                  Earliest service in ~{data.fleetSummary.earliestDays} days
                 </Typography>
               </Box>
             </Card>
@@ -648,14 +615,15 @@ export default function SensorHealth() {
         </Grid>
       )}
 
-      {/* Search & Filter Toolbar */}
+      {/* Search & Filter Toolbar - Clean & Relaxed */}
       <Card
         sx={{
-          p: 2,
-          mb: 3.5,
-          borderRadius: 3.5,
+          p: 1.75,
+          mb: 3,
+          borderRadius: 3,
           backgroundColor: tokens.cardBg,
           border: `1px solid ${tokens.cardBorder}`,
+          boxShadow: "none",
         }}
       >
         <Box
@@ -664,29 +632,33 @@ export default function SensorHealth() {
             flexDirection: { xs: "column", md: "row" },
             alignItems: { xs: "stretch", md: "center" },
             justifyContent: "space-between",
-            gap: 2,
+            gap: 1.5,
           }}
         >
           {/* Search Input */}
           <TextField
             size="small"
-            placeholder="Search by station code, location name, or failure mode..."
+            placeholder="Search station or location..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             slotProps={{
               input: {
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchRoundedIcon sx={{ color: tokens.textMuted }} />
+                    <SearchRoundedIcon sx={{ color: tokens.textMuted, fontSize: 19 }} />
                   </InputAdornment>
                 ),
               },
             }}
             sx={{
-              minWidth: { xs: "100%", md: 360 },
+              minWidth: { xs: "100%", md: 320 },
               "& .MuiOutlinedInput-root": {
                 borderRadius: 2.5,
+                fontSize: "0.85rem",
                 backgroundColor: isMidnight ? "rgba(255,255,255,0.03)" : "#f8fafc",
+                "& fieldset": {
+                  borderColor: isMidnight ? "rgba(255,255,255,0.08)" : "#e2e8f0",
+                },
               },
             }}
           />
@@ -697,10 +669,9 @@ export default function SensorHealth() {
               display: "flex",
               flexWrap: "wrap",
               alignItems: "center",
-              gap: 1,
+              gap: 0.75,
             }}
           >
-            <FilterListRoundedIcon sx={{ color: tokens.textMuted, fontSize: 20 }} />
             {(["ALL", "CRITICAL", "WARNING", "OPTIMAL"] as StatusFilter[]).map((status) => {
               const isSelected = statusFilter === status;
               const label =
@@ -709,7 +680,7 @@ export default function SensorHealth() {
                   : status === "CRITICAL"
                     ? "Critical"
                     : status === "WARNING"
-                      ? "Advisory Warning"
+                      ? "Advisory"
                       : "Optimal";
 
               return (
@@ -717,19 +688,31 @@ export default function SensorHealth() {
                   key={status}
                   label={label}
                   clickable
+                  size="small"
                   onClick={() => setStatusFilter(status)}
                   sx={{
-                    fontWeight: 700,
+                    fontWeight: 500,
+                    fontSize: "0.78rem",
+                    height: 28,
                     borderRadius: 2,
                     border: isSelected
-                      ? `1.5px solid ${tokens.primary}`
-                      : `1px solid ${isMidnight ? "rgba(255,255,255,0.1)" : "#e2e8f0"}`,
+                      ? `1px solid ${isMidnight ? tokens.accent : tokens.primary}`
+                      : `1px solid ${isMidnight ? "rgba(255,255,255,0.08)" : "#e2e8f0"}`,
                     backgroundColor: isSelected
                       ? isMidnight
-                        ? "rgba(0, 220, 130, 0.15)"
-                        : "#dcfce7"
+                        ? "rgba(0, 220, 130, 0.12)"
+                        : "#ecfdf5"
                       : "transparent",
-                    color: isSelected ? (isMidnight ? "#00dc82" : tokens.primary) : tokens.textSecondary,
+                    color: isSelected ? (isMidnight ? "#79b998" : tokens.primary) : tokens.textSecondary,
+                    "&:hover": {
+                      backgroundColor: isSelected
+                        ? isMidnight
+                          ? "rgba(0, 220, 130, 0.18)"
+                          : "#d1fae5"
+                        : isMidnight
+                          ? "rgba(255,255,255,0.04)"
+                          : "#f1f5f9",
+                    },
                   }}
                 />
               );
@@ -740,16 +723,20 @@ export default function SensorHealth() {
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value as SortOption)}
               sx={{
-                borderRadius: 2.5,
-                fontSize: "0.85rem",
-                fontWeight: 600,
+                borderRadius: 2,
+                fontSize: "0.8rem",
+                fontWeight: 500,
+                height: 32,
                 ml: { xs: 0, md: 1 },
                 backgroundColor: isMidnight ? "rgba(255,255,255,0.03)" : "#f8fafc",
+                "& fieldset": {
+                  borderColor: isMidnight ? "rgba(255,255,255,0.08)" : "#e2e8f0",
+                },
               }}
             >
               <MenuItem value="DAYS_ASC">Shortest Service RUL</MenuItem>
-              <MenuItem value="HEALTH_ASC">Lowest Health Score</MenuItem>
-              <MenuItem value="CODE_ASC">Station Code (A-Z)</MenuItem>
+              <MenuItem value="HEALTH_ASC">Lowest Health</MenuItem>
+              <MenuItem value="CODE_ASC">Code (A-Z)</MenuItem>
             </Select>
           </Box>
         </Box>
@@ -773,10 +760,11 @@ export default function SensorHealth() {
 
       {/* Stations Diagnostic Grid */}
       {!loading && !error && (
-        <Grid container spacing={2.5}>
+        <Grid container spacing={2}>
           {filteredStations.map((station) => {
             const statusInfo = getStatusColor(station.status);
             const isScheduled = isStationScheduled(station.stationCode);
+            const isWarnOrCrit = station.status !== "OPTIMAL";
 
             return (
               <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={station.stationCode}>
@@ -785,83 +773,70 @@ export default function SensorHealth() {
                     height: "100%",
                     display: "flex",
                     flexDirection: "column",
-                    borderRadius: 3.5,
+                    borderRadius: 3,
                     backgroundColor: tokens.cardBg,
-                    border: `1px solid ${station.status !== "OPTIMAL" ? statusInfo.border : tokens.cardBorder}`,
-                    boxShadow: isMidnight
-                      ? "0 10px 24px rgba(0, 0, 0, 0.25)"
-                      : "0 4px 16px rgba(0, 0, 0, 0.03)",
-                    transition: "transform 180ms ease, box-shadow 180ms ease",
+                    border: `1px solid ${isWarnOrCrit ? statusInfo.border : tokens.cardBorder}`,
+                    boxShadow: "none",
+                    transition: "all 0.2s ease",
                     "&:hover": {
-                      transform: "translateY(-3px)",
-                      boxShadow: isMidnight
-                        ? "0 14px 30px rgba(0, 0, 0, 0.35)"
-                        : "0 8px 22px rgba(0, 0, 0, 0.08)",
+                      borderColor: isWarnOrCrit ? statusInfo.main : tokens.primary,
+                      boxShadow: "0 4px 16px rgba(0,0,0,0.04)",
                     },
                   }}
                 >
-                  <CardContent sx={{ p: 2.5, flexGrow: 1, display: "flex", flexDirection: "column" }}>
-                    {/* Top Row: Station Code & Status Chip */}
-                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1.5 }}>
-                      <Box>
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
-                          <Chip
-                            size="small"
-                            label={station.stationCode}
-                            sx={{
-                              fontWeight: 800,
-                              fontFamily: "monospace",
-                              fontSize: "0.75rem",
-                              backgroundColor: isMidnight ? "rgba(255,255,255,0.06)" : "#f1f5f9",
-                              color: tokens.textPrimary,
-                            }}
-                          />
-                          <Chip
-                            size="small"
-                            label={station.sensorCategory}
-                            sx={{
-                              fontWeight: 700,
-                              fontSize: "0.68rem",
-                              height: 20,
-                              backgroundColor:
-                                station.sensorCategory === "AIR"
-                                  ? isMidnight
-                                    ? "rgba(56, 189, 248, 0.15)"
-                                    : "#e0f2fe"
-                                  : isMidnight
-                                    ? "rgba(168, 85, 247, 0.15)"
-                                    : "#f3e8ff",
-                              color: station.sensorCategory === "AIR" ? "#38bdf8" : "#a855f7",
-                            }}
-                          />
-                        </Box>
+                  <CardContent sx={{ p: 2.25, "&:last-child": { pb: 2.25 }, flexGrow: 1, display: "flex", flexDirection: "column", gap: 1.5 }}>
+                    {/* Header: Code, Category, Status badge, Trash button */}
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                         <Typography
-                          variant="h6"
                           sx={{
-                            fontWeight: 800,
-                            fontSize: "1.05rem",
-                            color: tokens.textPrimary,
-                            lineHeight: 1.3,
+                            fontSize: "0.78rem",
+                            fontWeight: 600,
+                            color: tokens.textSecondary,
+                            letterSpacing: "0.02em",
                           }}
                         >
-                          {station.name}
+                          {station.stationCode}
                         </Typography>
+                        <Chip
+                          size="small"
+                          label={station.sensorCategory}
+                          sx={{
+                            fontWeight: 500,
+                            fontSize: "0.68rem",
+                            height: 20,
+                            borderRadius: 1.5,
+                            backgroundColor:
+                              station.sensorCategory === "AIR"
+                                ? isMidnight ? "rgba(56, 189, 248, 0.12)" : "#f0f9ff"
+                                : station.sensorCategory === "WATER"
+                                  ? isMidnight ? "rgba(20, 184, 166, 0.12)" : "#f0fdfa"
+                                  : isMidnight ? "rgba(168, 85, 247, 0.12)" : "#faf5ff",
+                            color:
+                              station.sensorCategory === "AIR"
+                                ? "#0284c7"
+                                : station.sensorCategory === "WATER"
+                                  ? "#0d9488"
+                                  : "#9333ea",
+                          }}
+                        />
                       </Box>
 
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                         <Chip
-                          icon={statusInfo.icon}
-                          label={statusInfo.label}
                           size="small"
+                          label={statusInfo.label}
                           sx={{
-                            fontWeight: 800,
-                            fontSize: "0.72rem",
+                            fontWeight: 500,
+                            fontSize: "0.7rem",
+                            height: 22,
+                            borderRadius: 1.5,
                             backgroundColor: statusInfo.bg,
                             color: statusInfo.main,
                             border: `1px solid ${statusInfo.border}`,
                           }}
                         />
-                        <Tooltip title={`Decommission / Remove ${station.stationCode}`}>
+                        <Tooltip title={`Remove ${station.stationCode}`}>
                           <IconButton
                             size="small"
                             onClick={(e) => {
@@ -869,132 +844,123 @@ export default function SensorHealth() {
                               setSensorToRemove(station);
                             }}
                             sx={{
-                              p: 0.5,
+                              p: 0.35,
                               color: tokens.textMuted,
                               "&:hover": {
                                 color: "#ef4444",
                                 backgroundColor: isMidnight
-                                  ? "rgba(239, 68, 68, 0.15)"
+                                  ? "rgba(239, 68, 68, 0.12)"
                                   : "#fee2e2",
                               },
                             }}
                           >
-                            <DeleteOutlineRoundedIcon sx={{ fontSize: 18 }} />
+                            <DeleteOutlineRoundedIcon sx={{ fontSize: 16 }} />
                           </IconButton>
                         </Tooltip>
                       </Box>
                     </Box>
 
-                    {/* Health & Remaining Useful Life Strip */}
-                    <Box
-                      sx={{
-                        my: 2,
-                        p: 1.75,
-                        borderRadius: 2.5,
-                        backgroundColor: isMidnight
-                          ? "rgba(255, 255, 255, 0.02)"
-                          : "#f8fafc",
-                        border: `1px solid ${tokens.cardBorder}`,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Box>
-                        <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 700, display: "block" }}>
-                          Health Index
-                        </Typography>
-                        <Typography variant="h5" sx={{ fontWeight: 900, color: statusInfo.main }}>
-                          {station.healthScore}%
-                        </Typography>
-                      </Box>
-
-                      <Divider orientation="vertical" flexItem sx={{ borderColor: tokens.cardBorder }} />
-
-                      <Box sx={{ textAlign: "right" }}>
-                        <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 700, display: "block" }}>
-                          Estimated Service In
-                        </Typography>
-                        <Typography
-                          variant="h5"
-                          sx={{
-                            fontWeight: 900,
-                            color: station.estimatedDaysToService <= 45 ? "#f59e0b" : tokens.textPrimary,
-                          }}
-                        >
-                          ~{station.estimatedDaysToService}{" "}
-                          <Typography component="span" variant="caption" sx={{ fontWeight: 700 }}>
-                            Days
-                          </Typography>
-                        </Typography>
-                      </Box>
+                    {/* Station Name: 1 clean line with calm font */}
+                    <Box>
+                      <Typography
+                        noWrap
+                        title={station.name}
+                        sx={{
+                          fontWeight: 600,
+                          fontSize: "0.92rem",
+                          color: tokens.textPrimary,
+                          lineHeight: 1.3,
+                        }}
+                      >
+                        {station.name}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        noWrap
+                        sx={{
+                          color: tokens.textMuted,
+                          fontSize: "0.74rem",
+                          display: "block",
+                          mt: 0.25,
+                        }}
+                      >
+                        {station.sensorType}
+                      </Typography>
                     </Box>
 
-                    {/* Primary Risk & Diagnostic Factor */}
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="caption" sx={{ color: tokens.textMuted, fontWeight: 800, display: "block", mb: 0.5 }}>
-                        Primary Degradation Risk
-                      </Typography>
-                      <Chip
-                        label={station.primaryRiskFactor}
-                        size="small"
+                    {/* Health & Estimated Service - Clean, soothing progress bar */}
+                    <Box
+                      sx={{
+                        p: 1.5,
+                        borderRadius: 2,
+                        backgroundColor: isMidnight ? "rgba(255, 255, 255, 0.02)" : "#f8fafc",
+                        border: `1px solid ${isMidnight ? "rgba(255,255,255,0.04)" : "#f1f5f9"}`,
+                      }}
+                    >
+                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", mb: 0.75 }}>
+                        <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.75 }}>
+                          <Typography sx={{ fontSize: "0.78rem", color: tokens.textMuted, fontWeight: 500 }}>
+                            Health:
+                          </Typography>
+                          <Typography sx={{ fontSize: "0.95rem", fontWeight: 600, color: statusInfo.main }}>
+                            {station.healthScore}%
+                          </Typography>
+                        </Box>
+                        <Typography sx={{ fontSize: "0.78rem", color: tokens.textSecondary, fontWeight: 500 }}>
+                          Est. Service: ~{station.estimatedDaysToService}d
+                        </Typography>
+                      </Box>
+                      <LinearProgress
+                        variant="determinate"
+                        value={station.healthScore}
                         sx={{
-                          fontWeight: 700,
-                          fontSize: "0.75rem",
-                          backgroundColor: isMidnight ? "rgba(255,255,255,0.06)" : "#f1f5f9",
-                          color: tokens.textPrimary,
-                          maxWidth: "100%",
+                          height: 4,
+                          borderRadius: 2,
+                          backgroundColor: isMidnight ? "rgba(255,255,255,0.06)" : "#e2e8f0",
+                          "& .MuiLinearProgress-bar": {
+                            borderRadius: 2,
+                            backgroundColor: statusInfo.main,
+                          },
                         }}
                       />
                     </Box>
 
-                    {/* Quick Metric Badges */}
-                    <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 1, mb: 2.5 }}>
-                      <Box sx={{ p: 1, borderRadius: 1.5, textAlign: "center", backgroundColor: isMidnight ? "rgba(255,255,255,0.02)" : "#f1f5f9" }}>
-                        <Typography variant="caption" sx={{ color: tokens.textMuted, display: "block", fontSize: "0.68rem" }}>
-                          Uptime
-                        </Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 800, color: tokens.textPrimary }}>
-                          {station.metrics.uptimePct}%
-                        </Typography>
-                      </Box>
-                      <Box sx={{ p: 1, borderRadius: 1.5, textAlign: "center", backgroundColor: isMidnight ? "rgba(255,255,255,0.02)" : "#f1f5f9" }}>
-                        <Typography variant="caption" sx={{ color: tokens.textMuted, display: "block", fontSize: "0.68rem" }}>
-                          Drift
-                        </Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 800, color: Math.abs(station.metrics.driftPct) > 15 ? "#f59e0b" : tokens.textPrimary }}>
-                          {station.metrics.driftPct > 0 ? `+${station.metrics.driftPct}%` : `${station.metrics.driftPct}%`}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ p: 1, borderRadius: 1.5, textAlign: "center", backgroundColor: isMidnight ? "rgba(255,255,255,0.02)" : "#f1f5f9" }}>
-                        <Typography variant="caption" sx={{ color: tokens.textMuted, display: "block", fontSize: "0.68rem" }}>
-                          Signal Jitter
-                        </Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 800, color: station.metrics.signalJitter > 1.5 ? "#ef4444" : tokens.textPrimary }}>
-                          {station.metrics.signalJitter}
-                        </Typography>
-                      </Box>
+                    {/* Primary Risk / Condition - simple calm text */}
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <Typography sx={{ color: tokens.textMuted, fontSize: "0.75rem", fontWeight: 500, flexShrink: 0 }}>
+                        Condition:
+                      </Typography>
+                      <Typography
+                        noWrap
+                        title={station.primaryRiskFactor}
+                        sx={{
+                          color: isWarnOrCrit ? statusInfo.main : tokens.textSecondary,
+                          fontSize: "0.78rem",
+                          fontWeight: 500,
+                        }}
+                      >
+                        {station.primaryRiskFactor}
+                      </Typography>
                     </Box>
 
-                    {/* Action Buttons */}
-                    <Box sx={{ mt: "auto", display: "flex", gap: 1 }}>
+                    {/* Action Buttons: Clean & Comfortable */}
+                    <Box sx={{ mt: "auto", pt: 0.5, display: "flex", gap: 1 }}>
                       <Button
                         fullWidth
                         variant="outlined"
+                        size="small"
                         onClick={() => setSelectedStation(station)}
                         sx={{
-                          borderRadius: 2.5,
-                          py: 0.9,
-                          fontSize: "0.82rem",
-                          fontWeight: 700,
+                          borderRadius: 2,
+                          py: 0.65,
+                          fontSize: "0.78rem",
+                          fontWeight: 500,
                           textTransform: "none",
-                          borderColor: isMidnight ? "rgba(255,255,255,0.15)" : "#cbd5e1",
+                          borderColor: isMidnight ? "rgba(255,255,255,0.12)" : "#cbd5e1",
                           color: tokens.textPrimary,
                           "&:hover": {
                             borderColor: tokens.primary,
-                            backgroundColor: isMidnight
-                              ? "rgba(0, 220, 130, 0.08)"
-                              : "rgba(16, 185, 129, 0.06)",
+                            backgroundColor: isMidnight ? "rgba(0, 220, 130, 0.08)" : "rgba(16, 185, 129, 0.06)",
                           },
                         }}
                       >
@@ -1007,19 +973,21 @@ export default function SensorHealth() {
                             component={Link}
                             to="/maintenance-schedule"
                             variant="contained"
+                            size="small"
                             sx={{
-                              borderRadius: 2.5,
+                              borderRadius: 2,
                               px: 1.5,
-                              py: 0.9,
+                              py: 0.65,
                               fontSize: "0.75rem",
-                              fontWeight: 800,
+                              fontWeight: 500,
                               textTransform: "none",
-                              backgroundColor: "#d1fae5",
-                              color: "#065f46",
-                              border: "1px solid #a7f3d0",
+                              backgroundColor: isMidnight ? "rgba(16,185,129,0.2)" : "#d1fae5",
+                              color: isMidnight ? "#34d399" : "#065f46",
+                              border: `1px solid ${isMidnight ? "rgba(16,185,129,0.3)" : "#a7f3d0"}`,
                               boxShadow: "none",
+                              whiteSpace: "nowrap",
                               "&:hover": {
-                                backgroundColor: "#bbf7d0",
+                                backgroundColor: isMidnight ? "rgba(16,185,129,0.28)" : "#bbf7d0",
                                 boxShadow: "none",
                               },
                             }}
@@ -1029,17 +997,19 @@ export default function SensorHealth() {
                         ) : (
                           <Button
                             variant="contained"
+                            size="small"
                             onClick={() => handleScheduleOrder(station)}
                             sx={{
-                              borderRadius: 2.5,
-                              px: 1.75,
-                              py: 0.9,
-                              fontSize: "0.78rem",
-                              fontWeight: 800,
+                              borderRadius: 2,
+                              px: 1.5,
+                              py: 0.65,
+                              fontSize: "0.75rem",
+                              fontWeight: 500,
                               textTransform: "none",
                               backgroundColor: "#f59e0b",
                               color: "#ffffff",
                               boxShadow: "none",
+                              whiteSpace: "nowrap",
                               "&:hover": {
                                 backgroundColor: "#d97706",
                                 boxShadow: "none",
@@ -1097,20 +1067,20 @@ export default function SensorHealth() {
                       size="small"
                       label={selectedStation.stationCode}
                       sx={{
-                        fontWeight: 800,
-                        fontFamily: "monospace",
+                        fontWeight: 600,
+                        fontFamily: "inherit",
                         backgroundColor: "#d1fae5",
                         color: "#065f46",
                       }}
                     />
-                    <Typography variant="caption" sx={{ color: "#64748b", fontWeight: 700 }}>
+                    <Typography variant="caption" sx={{ color: "#64748b", fontWeight: 600 }}>
                       {selectedStation.sensorType}
                     </Typography>
                   </Box>
-                  <Typography variant="h5" sx={{ fontWeight: 900, color: "#0f172a", mt: 0.5 }}>
+                  <Typography variant="h5" sx={{ fontWeight: 700, color: "#0f172a", mt: 0.5 }}>
                     {selectedStation.name}
                   </Typography>
-                  <Typography variant="caption" sx={{ color: "#64748b", fontFamily: "monospace", display: "block", mt: 0.25 }}>
+                  <Typography variant="caption" sx={{ color: "#64748b", fontFamily: "inherit", display: "block", mt: 0.25 }}>
                     GPS: {selectedStation.latitude.toFixed(4)}°N, {selectedStation.longitude.toFixed(4)}°E
                   </Typography>
                 </Box>
@@ -1149,7 +1119,7 @@ export default function SensorHealth() {
                     <EngineeringRoundedIcon sx={{ fontSize: 24 }} />
                   </Box>
                   <Box>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: statusInfo.textPrimary }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600, color: statusInfo.textPrimary }}>
                       {selectedStation.primaryRiskFactor}
                     </Typography>
                     <Typography variant="body2" sx={{ color: statusInfo.textSecondary, fontSize: "0.85rem", mt: 0.25 }}>
@@ -1159,7 +1129,7 @@ export default function SensorHealth() {
                 </Box>
 
                 {/* RUL & Health Details */}
-                <Typography variant="overline" sx={{ color: "#64748b", fontWeight: 800, display: "block", mb: 1.5, letterSpacing: "0.08em" }}>
+                <Typography variant="overline" sx={{ color: "#64748b", fontWeight: 600, display: "block", mb: 1.5, letterSpacing: "0.08em" }}>
                   Machine Learning Prognostic Indicators
                 </Typography>
 
@@ -1169,7 +1139,7 @@ export default function SensorHealth() {
                       <Typography variant="caption" sx={{ color: "#64748b", display: "block", fontWeight: 600 }}>
                         Estimated RUL
                       </Typography>
-                      <Typography variant="h5" sx={{ fontWeight: 900, color: "#0f172a", mt: 0.5 }}>
+                      <Typography variant="h5" sx={{ fontWeight: 700, color: "#0f172a", mt: 0.5 }}>
                         ~{selectedStation.estimatedDaysToService} Days
                       </Typography>
                     </Box>
@@ -1180,7 +1150,7 @@ export default function SensorHealth() {
                       <Typography variant="caption" sx={{ color: "#64748b", display: "block", fontWeight: 600 }}>
                         Signal Jitter
                       </Typography>
-                      <Typography variant="h5" sx={{ fontWeight: 900, color: "#0f172a", mt: 0.5 }}>
+                      <Typography variant="h5" sx={{ fontWeight: 700, color: "#0f172a", mt: 0.5 }}>
                         {selectedStation.metrics.signalJitter}
                       </Typography>
                     </Box>
@@ -1191,7 +1161,7 @@ export default function SensorHealth() {
                       <Typography variant="caption" sx={{ color: "#64748b", display: "block", fontWeight: 600 }}>
                         Zero Drift
                       </Typography>
-                      <Typography variant="h5" sx={{ fontWeight: 900, color: "#0f172a", mt: 0.5 }}>
+                      <Typography variant="h5" sx={{ fontWeight: 700, color: "#0f172a", mt: 0.5 }}>
                         {selectedStation.metrics.driftPct > 0 ? `+${selectedStation.metrics.driftPct}%` : `${selectedStation.metrics.driftPct}%`}
                       </Typography>
                     </Box>
@@ -1202,7 +1172,7 @@ export default function SensorHealth() {
                       <Typography variant="caption" sx={{ color: "#64748b", display: "block", fontWeight: 600 }}>
                         Telemetry Uptime
                       </Typography>
-                      <Typography variant="h5" sx={{ fontWeight: 900, color: "#0f172a", mt: 0.5 }}>
+                      <Typography variant="h5" sx={{ fontWeight: 700, color: "#0f172a", mt: 0.5 }}>
                         {selectedStation.metrics.uptimePct}%
                       </Typography>
                     </Box>
@@ -1218,7 +1188,7 @@ export default function SensorHealth() {
                     border: "1px solid #e2e8f0",
                   }}
                 >
-                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: "#0f172a", mb: 1.5 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, color: "#0f172a", mb: 1.5 }}>
                     Recommended Technician Field Checklist
                   </Typography>
 
@@ -1256,7 +1226,7 @@ export default function SensorHealth() {
                     px: 2,
                     py: 1,
                     textTransform: "none",
-                    fontWeight: 700,
+                    fontWeight: 600,
                     borderColor: "#fca5a5",
                     color: "#dc2626",
                     mr: "auto",
@@ -1276,7 +1246,7 @@ export default function SensorHealth() {
                     px: 3,
                     py: 1,
                     textTransform: "none",
-                    fontWeight: 700,
+                    fontWeight: 600,
                     borderColor: "#cbd5e1",
                     color: "#334155",
                     backgroundColor: "#ffffff",
@@ -1298,7 +1268,7 @@ export default function SensorHealth() {
                       px: 3,
                       py: 1,
                       textTransform: "none",
-                      fontWeight: 800,
+                      fontWeight: 600,
                       backgroundColor: "#d1fae5",
                       color: "#065f46",
                       border: "1px solid #a7f3d0",
@@ -1322,7 +1292,7 @@ export default function SensorHealth() {
                       px: 3,
                       py: 1,
                       textTransform: "none",
-                      fontWeight: 800,
+                      fontWeight: 600,
                       backgroundColor: "#00dc82",
                       color: "#0b1329",
                       boxShadow: "none",
@@ -1392,7 +1362,7 @@ export default function SensorHealth() {
                 <SensorsRoundedIcon sx={{ fontSize: 24 }} />
               </Box>
               <Box>
-                <Typography variant="h6" sx={{ fontWeight: 800, color: "#0f172a" }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: "#0f172a" }}>
                   Register New Fleet Sensor
                 </Typography>
                 <Typography variant="caption" sx={{ color: "#64748b", fontWeight: 600 }}>
@@ -1421,7 +1391,7 @@ export default function SensorHealth() {
             <Grid container spacing={2.5}>
               {/* Station Code */}
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Typography variant="caption" sx={{ fontWeight: 700, color: "#334155", mb: 0.75, display: "block" }}>
+                <Typography variant="caption" sx={{ fontWeight: 600, color: "#334155", mb: 0.75, display: "block" }}>
                   Station Code *
                 </Typography>
                 <TextField
@@ -1446,7 +1416,7 @@ export default function SensorHealth() {
 
               {/* Domain Category */}
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Typography variant="caption" sx={{ fontWeight: 700, color: "#334155", mb: 0.75, display: "block" }}>
+                <Typography variant="caption" sx={{ fontWeight: 600, color: "#334155", mb: 0.75, display: "block" }}>
                   Environmental Category *
                 </Typography>
                 <Select
@@ -1477,7 +1447,7 @@ export default function SensorHealth() {
 
               {/* Station Name */}
               <Grid size={{ xs: 12 }}>
-                <Typography variant="caption" sx={{ fontWeight: 700, color: "#334155", mb: 0.75, display: "block" }}>
+                <Typography variant="caption" sx={{ fontWeight: 600, color: "#334155", mb: 0.75, display: "block" }}>
                   Location / Station Name *
                 </Typography>
                 <TextField
@@ -1502,7 +1472,7 @@ export default function SensorHealth() {
 
               {/* Telemetry Hardware Model */}
               <Grid size={{ xs: 12 }}>
-                <Typography variant="caption" sx={{ fontWeight: 700, color: "#334155", mb: 0.75, display: "block" }}>
+                <Typography variant="caption" sx={{ fontWeight: 600, color: "#334155", mb: 0.75, display: "block" }}>
                   Telemetry Hardware Sensor Model
                 </Typography>
                 <TextField
@@ -1526,7 +1496,7 @@ export default function SensorHealth() {
 
               {/* GPS Coordinates */}
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Typography variant="caption" sx={{ fontWeight: 700, color: "#334155", mb: 0.75, display: "block" }}>
+                <Typography variant="caption" sx={{ fontWeight: 600, color: "#334155", mb: 0.75, display: "block" }}>
                   Latitude (°N) *
                 </Typography>
                 <TextField
@@ -1550,7 +1520,7 @@ export default function SensorHealth() {
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Typography variant="caption" sx={{ fontWeight: 700, color: "#334155", mb: 0.75, display: "block" }}>
+                <Typography variant="caption" sx={{ fontWeight: 600, color: "#334155", mb: 0.75, display: "block" }}>
                   Longitude (°E) *
                 </Typography>
                 <TextField
@@ -1575,7 +1545,7 @@ export default function SensorHealth() {
 
               {/* Initial Calibration & RUL */}
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Typography variant="caption" sx={{ fontWeight: 700, color: "#334155", mb: 0.75, display: "block" }}>
+                <Typography variant="caption" sx={{ fontWeight: 600, color: "#334155", mb: 0.75, display: "block" }}>
                   Initial Health Score (%)
                 </Typography>
                 <TextField
@@ -1599,7 +1569,7 @@ export default function SensorHealth() {
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Typography variant="caption" sx={{ fontWeight: 700, color: "#334155", mb: 0.75, display: "block" }}>
+                <Typography variant="caption" sx={{ fontWeight: 600, color: "#334155", mb: 0.75, display: "block" }}>
                   Estimated Days to Next Service
                 </Typography>
                 <TextField
@@ -1655,7 +1625,7 @@ export default function SensorHealth() {
                 px: 3,
                 py: 1,
                 textTransform: "none",
-                fontWeight: 700,
+                fontWeight: 600,
                 borderColor: "#cbd5e1",
                 color: "#334155",
                 backgroundColor: "#ffffff",
@@ -1677,13 +1647,13 @@ export default function SensorHealth() {
                 px: 3.5,
                 py: 1,
                 textTransform: "none",
-                fontWeight: 800,
+                fontWeight: 600,
                 backgroundColor: "#00dc82",
                 color: "#0b1329",
-                boxShadow: "0 2px 10px rgba(0, 220, 130, 0.25)",
+                boxShadow: "none",
                 "&:hover": {
                   backgroundColor: "#00c474",
-                  boxShadow: "0 4px 14px rgba(0, 220, 130, 0.35)",
+                  boxShadow: "none",
                 },
               }}
             >
@@ -1728,7 +1698,7 @@ export default function SensorHealth() {
             <DeleteOutlineRoundedIcon />
           </Box>
           <Box>
-            <Typography variant="h6" sx={{ fontWeight: 800, fontSize: "1.1rem" }}>
+            <Typography variant="h6" sx={{ fontWeight: 600, fontSize: "1.1rem" }}>
               Decommission Sensor
             </Typography>
             <Typography variant="caption" sx={{ color: tokens.textMuted }}>
@@ -1760,7 +1730,7 @@ export default function SensorHealth() {
               border: `1px solid ${isMidnight ? "rgba(239, 68, 68, 0.2)" : "#fee2e2"}`,
             }}
           >
-            <Typography variant="caption" sx={{ color: "#dc2626", fontWeight: 700, display: "block", mb: 0.5 }}>
+            <Typography variant="caption" sx={{ color: "#dc2626", fontWeight: 600, display: "block", mb: 0.5 }}>
               Notice:
             </Typography>
             <Typography variant="caption" sx={{ color: tokens.textSecondary, display: "block", lineHeight: 1.5 }}>
@@ -1778,7 +1748,7 @@ export default function SensorHealth() {
               borderRadius: 2.5,
               px: 2.5,
               textTransform: "none",
-              fontWeight: 700,
+              fontWeight: 600,
               borderColor: tokens.cardBorder,
               color: tokens.textSecondary,
               "&:hover": {
@@ -1799,7 +1769,7 @@ export default function SensorHealth() {
               borderRadius: 2.5,
               px: 3,
               textTransform: "none",
-              fontWeight: 800,
+              fontWeight: 600,
               backgroundColor: "#dc2626",
               "&:hover": {
                 backgroundColor: "#b91c1c",
@@ -1826,7 +1796,7 @@ export default function SensorHealth() {
             width: "100%",
             borderRadius: 2.5,
             fontWeight: 600,
-            boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
+            boxShadow: "none",
           }}
         >
           {removeNotification}

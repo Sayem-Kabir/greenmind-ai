@@ -12,11 +12,7 @@ export default function SimulationStatus() {
   const { simulatedStations, clearSimulation } = useSimulation();
 
   if (simulatedStations.length === 0) {
-    return (
-      <Alert severity="info" sx={{ mb: 3 }}>
-        Select a recommendation below to simulate adding a new sensor.
-      </Alert>
-    );
+    return null;
   }
 
   return (
@@ -44,7 +40,7 @@ export default function SimulationStatus() {
           gap: 1,
         }}
       >
-        <Typography sx={{ fontWeight: 700 }}>
+        <Typography sx={{ fontWeight: 600 }}>
           Simulation active
         </Typography>
 

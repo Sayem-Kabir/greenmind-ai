@@ -81,14 +81,25 @@ export function SimulationProvider({
   >([]);
 
   const [isPlacingCustomPin, setIsPlacingCustomPin] = useState(false);
-  const [customPinTier, setCustomPinTier] = useState<SensorTier>("iot");
+  const [customPinTier, setCustomPinTier] = useState<SensorTier>("air");
 
   function simulateRecommendation(
     recommendation: SensorRecommendation,
   ) {
+    const rawTier = (recommendation as any).recommendedHardwareTier;
+    const sensorTier: SensorTier =
+      rawTier === "air" || rawTier === "water" || rawTier === "noise"
+        ? rawTier
+        : recommendation.recommendationType === "water_sensor" || recommendation.primaryMonitoringNeed === "water"
+        ? "water"
+        : recommendation.recommendationType === "noise_sensor" || recommendation.primaryMonitoringNeed === "noise"
+        ? "noise"
+        : "air";
+    const tierConfig = TIER_CONFIGS[sensorTier] || TIER_CONFIGS.air;
+
     const station: SimulatedStation = {
       id: recommendation.id || Date.now(),
-      name: `Simulated Sensor #${recommendation.id}`,
+      name: (recommendation as any).name || `${tierConfig.badge}: ${recommendation.recommendedSensor || tierConfig.name} #${recommendation.id}`,
       lat: recommendation.lat,
       lng: recommendation.lng,
       station_type: 0,
@@ -100,7 +111,11 @@ export function SimulationProvider({
       windDirection: 0,
       recommendation,
       isCustom: false,
-      sensorTier: "iot",
+      sensorTier,
+      tierName: tierConfig.name,
+      tierBadge: tierConfig.badge,
+      unitCost: tierConfig.unitCost,
+      annualOm: tierConfig.annualOm,
     };
 
     setSimulatedStations((previous) => {
@@ -126,8 +141,8 @@ export function SimulationProvider({
   ): number {
     const pinId = Date.now();
     const recommendation = createCustomRecommendation(lat, lng, stations, pinId);
-    const selectedTier = tier || customPinTier || "iot";
-    const tierConfig = TIER_CONFIGS[selectedTier];
+    const selectedTier = tier || customPinTier || "air";
+    const tierConfig = TIER_CONFIGS[selectedTier] || TIER_CONFIGS.air;
 
     const station: SimulatedStation = {
       id: pinId,

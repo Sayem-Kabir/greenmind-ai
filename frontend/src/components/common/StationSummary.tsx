@@ -16,7 +16,7 @@ export default function StationSummary({
   return (
     <Card variant="outlined" sx={{ mt: 3 }}>
       <CardContent>
-        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
+        <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
           Monitoring Network Summary
         </Typography>
 
