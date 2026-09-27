@@ -48,6 +48,7 @@ import {
 } from "../../services/sensorHealthService";
 
 type StatusFilter = "ALL" | "CRITICAL" | "WARNING" | "OPTIMAL";
+type DomainFilter = "ALL" | "AIR" | "WATER" | "NOISE";
 type SortOption = "DAYS_ASC" | "HEALTH_ASC" | "CODE_ASC";
 
 export default function SensorHealth() {
@@ -59,6 +60,7 @@ export default function SensorHealth() {
   const [error, setError] = useState<string | null>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [domainFilter, setDomainFilter] = useState<DomainFilter>("ALL");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
   const [sortOption, setSortOption] = useState<SortOption>("DAYS_ASC");
   const [selectedStation, setSelectedStation] = useState<SensorDiagnostic | null>(null);
@@ -193,6 +195,10 @@ export default function SensorHealth() {
     loadData();
   }, []);
 
+  const airCount = useMemo(() => data?.stations.filter((s) => s.sensorCategory === "AIR").length ?? 0, [data]);
+  const waterCount = useMemo(() => data?.stations.filter((s) => s.sensorCategory === "WATER").length ?? 0, [data]);
+  const noiseCount = useMemo(() => data?.stations.filter((s) => s.sensorCategory === "NOISE").length ?? 0, [data]);
+
   const filteredStations = useMemo(() => {
     if (!data) return [];
     let list = [...data.stations];
@@ -205,6 +211,10 @@ export default function SensorHealth() {
           s.name.toLowerCase().includes(query) ||
           s.primaryRiskFactor.toLowerCase().includes(query)
       );
+    }
+
+    if (domainFilter !== "ALL") {
+      list = list.filter((s) => s.sensorCategory === domainFilter);
     }
 
     if (statusFilter !== "ALL") {
@@ -222,7 +232,7 @@ export default function SensorHealth() {
     });
 
     return list;
-  }, [data, searchQuery, statusFilter, sortOption]);
+  }, [data, searchQuery, domainFilter, statusFilter, sortOption]);
 
   const getStatusColor = (status: "OPTIMAL" | "WARNING" | "CRITICAL") => {
     switch (status) {
@@ -505,7 +515,7 @@ export default function SensorHealth() {
               <Box>
                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
                   <Typography sx={{ color: tokens.textMuted, fontSize: "0.82rem", fontWeight: 500 }}>
-                    Active Fleet
+                    Installed Sensors
                   </Typography>
                   <SensorsRoundedIcon sx={{ color: "#38bdf8", fontSize: 18 }} />
                 </Box>
@@ -514,13 +524,13 @@ export default function SensorHealth() {
                     {data.fleetSummary.totalStations}
                   </Typography>
                   <Typography sx={{ color: tokens.textSecondary, fontSize: "0.82rem" }}>
-                    stations online
+                    across 16 stations
                   </Typography>
                 </Box>
               </Box>
               <Box sx={{ mt: "auto", pt: 1 }}>
                 <Typography variant="caption" sx={{ color: tokens.textMuted, fontSize: "0.74rem" }}>
-                  Active telemetry streams
+                  {airCount} Air · {waterCount} Water · {noiseCount} Sound
                 </Typography>
               </Box>
             </Card>
@@ -629,8 +639,8 @@ export default function SensorHealth() {
         <Box
           sx={{
             display: "flex",
-            flexDirection: { xs: "column", md: "row" },
-            alignItems: { xs: "stretch", md: "center" },
+            flexDirection: { xs: "column", lg: "row" },
+            alignItems: { xs: "stretch", lg: "center" },
             justifyContent: "space-between",
             gap: 1.5,
           }}
@@ -651,7 +661,7 @@ export default function SensorHealth() {
               },
             }}
             sx={{
-              minWidth: { xs: "100%", md: 320 },
+              minWidth: { xs: "100%", md: 280 },
               "& .MuiOutlinedInput-root": {
                 borderRadius: 2.5,
                 fontSize: "0.85rem",
@@ -663,7 +673,45 @@ export default function SensorHealth() {
             }}
           />
 
-          {/* Filter Chips & Sorting */}
+          {/* Domain Filter Pills */}
+          <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 0.75 }}>
+            {(
+              [
+                { id: "ALL", label: `All Sensors (${data ? data.stations.length : 0})` },
+                { id: "AIR", label: `Air (${airCount})` },
+                { id: "WATER", label: `Water (${waterCount})` },
+                { id: "NOISE", label: `Sound (${noiseCount})` },
+              ] as { id: DomainFilter; label: string }[]
+            ).map((domain) => {
+              const isSelected = domainFilter === domain.id;
+              return (
+                <Chip
+                  key={domain.id}
+                  label={domain.label}
+                  clickable
+                  size="small"
+                  onClick={() => setDomainFilter(domain.id)}
+                  sx={{
+                    fontWeight: 500,
+                    fontSize: "0.78rem",
+                    height: 28,
+                    borderRadius: 2,
+                    border: isSelected
+                      ? `1px solid ${isMidnight ? tokens.accent : tokens.primary}`
+                      : `1px solid ${isMidnight ? "rgba(255,255,255,0.08)" : "#e2e8f0"}`,
+                    backgroundColor: isSelected
+                      ? isMidnight
+                        ? "rgba(0, 220, 130, 0.12)"
+                        : "#ecfdf5"
+                      : "transparent",
+                    color: isSelected ? (isMidnight ? "#79b998" : tokens.primary) : tokens.textSecondary,
+                  }}
+                />
+              );
+            })}
+          </Box>
+
+          {/* Status Filters & Sorting */}
           <Box
             sx={{
               display: "flex",
@@ -676,7 +724,7 @@ export default function SensorHealth() {
               const isSelected = statusFilter === status;
               const label =
                 status === "ALL"
-                  ? "All Stations"
+                  ? "All Status"
                   : status === "CRITICAL"
                     ? "Critical"
                     : status === "WARNING"
@@ -692,7 +740,7 @@ export default function SensorHealth() {
                   onClick={() => setStatusFilter(status)}
                   sx={{
                     fontWeight: 500,
-                    fontSize: "0.78rem",
+                    fontSize: "0.75rem",
                     height: 28,
                     borderRadius: 2,
                     border: isSelected
@@ -767,7 +815,7 @@ export default function SensorHealth() {
             const isWarnOrCrit = station.status !== "OPTIMAL";
 
             return (
-              <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={station.stationCode}>
+              <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={`${station.stationCode}-${station.sensorCategory}`}>
                 <Card
                   sx={{
                     height: "100%",
@@ -800,7 +848,7 @@ export default function SensorHealth() {
                         </Typography>
                         <Chip
                           size="small"
-                          label={station.sensorCategory}
+                          label={station.sensorCategory === "NOISE" ? "SOUND" : station.sensorCategory}
                           sx={{
                             fontWeight: 500,
                             fontSize: "0.68rem",

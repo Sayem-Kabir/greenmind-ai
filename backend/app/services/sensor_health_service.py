@@ -174,49 +174,201 @@ def _calculate_air_diagnostics() -> list[dict[str, Any]]:
     return diagnostics
 
 
-def _calculate_noise_and_water_diagnostics() -> list[dict[str, Any]]:
-    """Adds health diagnostics for official Debrecen acoustic monitoring and water stations."""
-    additional: list[dict[str, Any]] = []
-
-    # Noise stations (5 strategic acoustic monitoring poles)
-    noise_csv = PROCESSED_DATA_DIR / "noise_measurements_cleaned.csv"
-    if noise_csv.exists():
+def _get_station_lookup() -> tuple[dict[str, str], dict[int, dict[str, Any]]]:
+    """Helper mapping location strings in processed CSVs to official station codes and metadata."""
+    loc_to_code: dict[str, str] = {}
+    air_csv = PROCESSED_DATA_DIR / "air_measurements_cleaned.csv"
+    if air_csv.exists():
         try:
-            ndf = pd.read_csv(noise_csv)
-            for loc_name, grp in ndf.groupby("location"):
-                rec_count = len(grp)
-                # Noise stations sampled with 60 records each (clean baseline)
-                health = 91 if rec_count >= 60 else 74
-                est_days = 140 if health > 80 else 42
-                status = "OPTIMAL" if health >= 80 else "WARNING"
-                additional.append({
-                    "stationCode": f"NOISE-{abs(hash(loc_name)) % 1000:03d}",
-                    "stationId": None,
-                    "name": f"Acoustic Pole: {loc_name}",
-                    "latitude": 47.532 + (abs(hash(loc_name)) % 30) * 0.001 - 0.015,
-                    "longitude": 21.625 + (abs(hash(loc_name + "lng")) % 30) * 0.001 - 0.015,
-                    "sensorCategory": "NOISE",
-                    "sensorType": "Class 1 Sound Level Telemetry Pole",
-                    "healthScore": health,
-                    "estimatedDaysToService": est_days,
-                    "status": status,
-                    "maintenancePriority": 3 if status == "OPTIMAL" else 2,
-                    "primaryRiskFactor": "Microphone Windscreen Weathering" if status != "OPTIMAL" else "Nominal Acoustic Response",
-                    "recommendedAction": "Acoustic calibrator 94 dB check and foam windscreen replacement." if status != "OPTIMAL" else "Standard periodic calibration.",
-                    "metrics": {
-                        "uptimePct": round(min(100.0, (rec_count / 60.0) * 100), 1),
-                        "recordedHours": rec_count,
-                        "expectedHours": 60,
-                        "signalJitter": 0.35,
-                        "driftPct": 1.2,
-                        "missingDataPct": 0.0,
-                    },
-                    "lastTelemetryTimestamp": grp["timestamp"].iloc[-1] if "timestamp" in grp.columns else "2026-06-19T00:00:00",
-                })
+            df_air = pd.read_csv(air_csv, usecols=["station_code", "location"]).drop_duplicates()
+            loc_to_code = dict(zip(df_air["location"], df_air["station_code"]))
         except Exception as e:
-            logger.warning(f"Could not load noise data for diagnostics: {e}")
+            logger.warning(f"Could not build station lookup from air CSV: {e}")
 
-    return additional
+    station_metadata = load_station_metadata()
+    return loc_to_code, station_metadata
+
+
+def _parse_coords(loc_str: str) -> tuple[float, float]:
+    m = re.search(r"\(([\d.]+),\s*([\d.]+)\)", str(loc_str))
+    if m:
+        return float(m.group(1)), float(m.group(2))
+    return 47.5316, 21.6273
+
+
+def _clean_location_name(loc_str: str) -> str:
+    cleaned = re.sub(r"\s*\([\d.,\s-]+\)$", "", str(loc_str)).strip()
+    return cleaned or str(loc_str)
+
+
+def _calculate_water_diagnostics() -> list[dict[str, Any]]:
+    """Generates health and predictive diagnostics for the 15 official Debrecen water sensors."""
+    water_csv = PROCESSED_DATA_DIR / "water_measurements_cleaned.csv"
+    if not water_csv.exists():
+        return []
+
+    try:
+        wdf = pd.read_csv(water_csv)
+    except Exception as e:
+        logger.warning(f"Could not load water data for diagnostics: {e}")
+        return []
+
+    loc_to_code, station_metadata = _get_station_lookup()
+    diagnostics: list[dict[str, Any]] = []
+
+    for loc_name, grp in wdf.groupby("location"):
+        st_code = loc_to_code.get(loc_name)
+        if not st_code:
+            continue
+
+        st_id = extract_station_id(st_code)
+        meta = station_metadata.get(st_id, {}) if st_id else {}
+        name = meta.get("name") or _clean_location_name(loc_name)
+        lat, lng = _parse_coords(loc_name)
+        if meta.get("lat"):
+            lat = meta["lat"]
+        if meta.get("lng"):
+            lng = meta["lng"]
+
+        rec_count = len(grp)
+        # Expected is ~2109 records (703 timestamps x 3 channels)
+        uptime_pct = round(min(100.0, (rec_count / 2109.0) * 100), 1)
+
+        # Telemetry metrics from Conductivity, WaterLevel, WaterTemp
+        cond_series = grp[grp["measurement_type"] == "Conductivity"]["value"].dropna()
+        temp_series = grp[grp["measurement_type"] == "WaterTemp"]["value"].dropna()
+        level_series = grp[grp["measurement_type"] == "WaterLevel"]["value"].dropna()
+
+        # Conductivity baseline drift
+        if len(cond_series) > 20:
+            n_slice = max(5, int(len(cond_series) * 0.25))
+            early_cond = float(cond_series.iloc[:n_slice].mean())
+            late_cond = float(cond_series.iloc[-n_slice:].mean())
+            drift_delta = late_cond - early_cond
+            drift_pct = round((drift_delta / max(early_cond, 0.1)) * 100, 1)
+            jitter = float(np.abs(cond_series.diff().dropna()).mean())
+        else:
+            drift_pct = 0.5
+            jitter = 0.05
+
+        # Hazard and health score
+        drift_penalty = min(1.0, max(0.0, abs(drift_pct) / 25.0))
+        uptime_penalty = min(1.0, max(0.0, (100.0 - uptime_pct) / 20.0))
+        jitter_penalty = min(1.0, max(0.0, jitter / 0.3))
+
+        hazard = 0.45 * drift_penalty + 0.35 * uptime_penalty + 0.20 * jitter_penalty
+        health_score = int(np.clip(round(100.0 * (1.0 - math.pow(hazard, 0.85))), 58, 96))
+
+        if health_score >= 80:
+            status = "OPTIMAL"
+            maintenance_priority = 3
+            est_days = int(np.clip(round(175 * math.pow(health_score / 100.0, 1.4)), 90, 180))
+            primary_risk = "Nominal Subsurface Aquifer Response"
+            recommended_action = "Routine periodic inspection scheduled at standard 6-month cycle."
+        elif health_score >= 65:
+            status = "WARNING"
+            maintenance_priority = 2
+            est_days = int(np.clip(round(80 * math.pow(health_score / 100.0, 1.8)), 35, 89))
+            primary_risk = "Electrode Mineral Encrustation / Biofouling"
+            recommended_action = "Subsurface sonde purge, electrode rinse & zero-point recalibration."
+        else:
+            status = "CRITICAL"
+            maintenance_priority = 1
+            est_days = int(np.clip(round(25 * math.pow(health_score / 60.0, 2.0)), 5, 25))
+            primary_risk = "Hydrostatic Transducer Drift / Clogging"
+            recommended_action = "Immediate field replacement of permeable sonde sleeve."
+
+        diagnostics.append({
+            "stationCode": st_code,
+            "stationId": st_id,
+            "name": name,
+            "latitude": lat,
+            "longitude": lng,
+            "sensorCategory": "WATER",
+            "sensorType": "Subsurface Hydrostatic & Conductivity Sonde",
+            "healthScore": health_score,
+            "estimatedDaysToService": est_days,
+            "status": status,
+            "maintenancePriority": maintenance_priority,
+            "primaryRiskFactor": primary_risk,
+            "recommendedAction": recommended_action,
+            "metrics": {
+                "uptimePct": uptime_pct,
+                "recordedHours": rec_count,
+                "expectedHours": 2109,
+                "signalJitter": round(jitter, 3),
+                "driftPct": drift_pct,
+                "missingDataPct": round(max(0.0, 100.0 - uptime_pct), 1),
+            },
+            "lastTelemetryTimestamp": "2026-06-19T23:00:00",
+        })
+
+    return diagnostics
+
+
+def _calculate_noise_diagnostics() -> list[dict[str, Any]]:
+    """Generates health and predictive diagnostics for the 5 official Debrecen sound / noise sensors."""
+    noise_csv = PROCESSED_DATA_DIR / "noise_measurements_cleaned.csv"
+    if not noise_csv.exists():
+        return []
+
+    try:
+        ndf = pd.read_csv(noise_csv)
+    except Exception as e:
+        logger.warning(f"Could not load noise data for diagnostics: {e}")
+        return []
+
+    loc_to_code, station_metadata = _get_station_lookup()
+    diagnostics: list[dict[str, Any]] = []
+
+    for loc_name, grp in ndf.groupby("location"):
+        st_code = loc_to_code.get(loc_name)
+        if not st_code:
+            continue
+
+        st_id = extract_station_id(st_code)
+        meta = station_metadata.get(st_id, {}) if st_id else {}
+        name = meta.get("name") or _clean_location_name(loc_name)
+        lat, lng = _parse_coords(loc_name)
+        if meta.get("lat"):
+            lat = meta["lat"]
+        if meta.get("lng"):
+            lng = meta["lng"]
+
+        rec_count = len(grp)
+        # 60 records per station (30 day + 30 night)
+        uptime_pct = round(min(100.0, (rec_count / 60.0) * 100), 1)
+
+        health = 92 if uptime_pct >= 95 else 76
+        est_days = 150 if health > 80 else 48
+        status = "OPTIMAL" if health >= 80 else "WARNING"
+
+        diagnostics.append({
+            "stationCode": st_code,
+            "stationId": st_id,
+            "name": name,
+            "latitude": lat,
+            "longitude": lng,
+            "sensorCategory": "NOISE",
+            "sensorType": "Class 1 Acoustic Telemetry Pole",
+            "healthScore": health,
+            "estimatedDaysToService": est_days,
+            "status": status,
+            "maintenancePriority": 3 if status == "OPTIMAL" else 2,
+            "primaryRiskFactor": "Nominal Acoustic Response" if status == "OPTIMAL" else "Microphone Windscreen Weathering",
+            "recommendedAction": "Standard periodic 6-month acoustic calibration." if status == "OPTIMAL" else "Acoustic calibrator 94 dB check and foam windscreen replacement.",
+            "metrics": {
+                "uptimePct": uptime_pct,
+                "recordedHours": rec_count,
+                "expectedHours": 60,
+                "signalJitter": 0.28,
+                "driftPct": 1.1,
+                "missingDataPct": round(max(0.0, 100.0 - uptime_pct), 1),
+            },
+            "lastTelemetryTimestamp": "2026-06-19T23:00:00",
+        })
+
+    return diagnostics
 
 
 CUSTOM_REGISTERED_SENSORS: list[dict[str, Any]] = []
@@ -243,7 +395,9 @@ def register_custom_sensor(sensor_data: dict[str, Any]) -> dict[str, Any]:
     name = sensor_data.get("name") or f"Municipal Sensor {station_code}"
     category = sensor_data.get("sensorCategory", "AIR").upper()
     sensor_type = sensor_data.get("sensorType") or (
-        "Tier 2: Micro Optical Particle Counter" if category == "AIR" else "Acoustic Telemetry Pole"
+        "Tier 2: Micro Optical Particle Counter" if category == "AIR" else (
+            "Subsurface Hydrostatic & Conductivity Sonde" if category == "WATER" else "Acoustic Telemetry Pole"
+        )
     )
     lat = float(sensor_data.get("latitude", 47.5316))
     lng = float(sensor_data.get("longitude", 21.6273))
@@ -291,8 +445,9 @@ def register_custom_sensor(sensor_data: dict[str, Any]) -> dict[str, Any]:
 def get_sensor_health_report() -> dict[str, Any]:
     """Generates complete predictive maintenance and health diagnostics for the Debrecen sensor fleet."""
     air_stations = _calculate_air_diagnostics()
-    aux_stations = _calculate_noise_and_water_diagnostics()
-    all_stations = air_stations + aux_stations + list(CUSTOM_REGISTERED_SENSORS)
+    water_stations = _calculate_water_diagnostics()
+    noise_stations = _calculate_noise_diagnostics()
+    all_stations = air_stations + water_stations + noise_stations + list(CUSTOM_REGISTERED_SENSORS)
 
     # Filter out any decommissioned stations
     if DECOMMISSIONED_STATION_CODES:
